@@ -1,0 +1,61 @@
+import type {ReactNode} from 'react';
+import clsx from 'clsx';
+import Link from '@docusaurus/Link';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import Layout from '@theme/Layout';
+import HomepageFeatures from '@site/src/components/HomepageFeatures';
+import Heading from '@theme/Heading';
+
+import styles from './index.module.css';
+
+function HomepageHeader() {
+  const {siteConfig} = useDocusaurusContext();
+  return (
+    <header className={clsx('hero hero--primary', styles.heroBanner)}>
+      <div className="container">
+        <Heading as="h1" className="hero__title">
+          {siteConfig.title}
+        </Heading>
+        <p className="hero__subtitle">{siteConfig.tagline}</p>
+        <div className={styles.buttons}>
+          <Link
+            className="button button--secondary button--lg"
+            to="/docs/intro">
+            Start Learning
+          </Link>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export default function Home(): ReactNode {
+  const {siteConfig} = useDocusaurusContext();
+  return (
+    <Layout
+      title={`Hello from ${siteConfig.title}`}
+      description="Description will go into a meta tag in <head />">
+      <HomepageHeader />
+      <main>
+        <div className="container">
+          <div className="homepage-container">
+            <div>
+              <HomepageFeatures />
+            </div>
+            <div className="quick-links-sidebar">
+              <h3>Quick Links</h3>
+              <ul>
+                <li>
+                  <Link to="/docs/intro">Introduction</Link>
+                </li>
+                <li>
+                  <Link to="/docs/intro">Glossary</Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </main>
+    </Layout>
+  );
+}

@@ -1,55 +1,83 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+Version change: 1.4.0 -> 1.5.0
+Modified principles:
+  - Conversation Safety Rules: Added new rule about `npm build`/`npm start` commands.
+Added sections: None
+Removed sections: None
+Templates requiring updates:
+  - .specify/templates/plan-template.md: ⚠ pending
+  - .specify/templates/spec-template.md: ⚠ pending
+  - .specify/templates/tasks-template.md: ⚠ pending
+  - .specify/templates/commands/sp.constitution.md: ✅ updated
+  - .specify/templates/commands/sp.adr.md: ⚠ pending
+  - .specify/templates/commands/sp.analyze.md: ⚠ pending
+  - .specify/templates/commands/sp.checklist.md: ⚠ pending
+  - .specify/templates/commands/sp.clarify.md: ⚠ pending
+  - .specify/templates/commands/sp.git.commit_pr.md: ⚠ pending
+  - .specify/templates/commands/sp.implement.md: ✅ updated
+  - .specify/templates/commands/sp.phr.md: ⚠ pending
+  - .specify/templates/commands/sp.plan.md: ⚠ pending
+  - .specify/templates/commands/sp.specify.md: ⚠ pending
+  - .specify/templates/commands/sp.tasks.md: ⚠ pending
+Follow-up TODOs:
+  - TODO(RATIFICATION_DATE): Original adoption date unknown
+-->
+# Hackathon Project: AI/Spec-Driven Book + RAG Chatbot Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+1.  **Always ask clarifying questions** whenever:
+    *   A requirement is ambiguous
+    *   A file structure is unclear
+    *   A configuration may break
+    *   A name, folder, or chapter is not confirmed
+    *   A context reference is missing
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+2.  **Token preservation rule:**
+    Never generate long content unless explicitly approved.
+    Always ask first.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+3.  **Context7 Usage Rules:**
+    *   Use Context7 for documentation lookup
+    *   Use Context7 for verification of Docusaurus, FastAPI, Qdrant, or config details
+    *   Use Context7 to avoid hallucinations
+    *   Use Context7 before generating any file that may contain errors
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+4.  **GitHub MCP Usage Rules:**
+    *   Use MCP for all file operations
+    *   Never create filesystem paths without validating structure
+    *   Ask for confirmation before writing major directories
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+5.  **Code & Documentation Rules:**
+    *   Generate clean, production-grade code
+    *   Follow Docusaurus 3.9 conventions
+    *   Follow best practices for API + RAG pipelines
+    *   Use consistent formatting
 
-### [PRINCIPLE_6_NAME]
+6.  **Conversation Safety Rules:**
+    *   Never proceed on assumptions
+    *   Always confirm critical steps
+    *   Ask for approval before finalizing structure
+    *   Always ask for explicit permission before executing `npm build` or `npm start` commands.
 
+7.  **Single Source of Truth:**
+    The project book must always remain consistent:
+    *   Title
+    *   Chapter structure
+    *   Layout
+    *   RAG logic
+    *   Navigation
 
-[PRINCIPLE__DESCRIPTION]
-
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
-
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+8.  **Error Handling:**
+    If an output is risky:
+    *   Stop
+    *   Ask
+    *   Retry only after confirmation
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+<!-- Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+All PRs/reviews must verify compliance; Complexity must be justified; Use CLAUDE.md for runtime development guidance.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.5.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2025-12-06

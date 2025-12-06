@@ -1,0 +1,153 @@
+/**
+ * Any CSS inside this file applies to all Docusaurus components in the project.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@400;700&display=swap');
+
+:root {
+  --ifm-color-primary: #003366;
+  --ifm-color-primary-dark: #002b54;
+  --ifm-color-primary-darker: #00264b;
+  --ifm-color-primary-darkest: #001f3d;
+  --ifm-color-primary-light: #003b78;
+  --ifm-color-primary-lighter: #004080;
+  --ifm-color-primary-lightest: #004d99;
+  --ifm-background-color: #f0f0f0;
+  --ifm-link-color: #00ffff;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+/* For readability in dark mode */
+[data-theme='dark'] {
+  --ifm-color-primary: #87ceeb;
+  --ifm-color-primary-dark: #6495ed;
+  --ifm-color-primary-darker: #5c8ae0;
+  --ifm-color-primary-darkest: #4f73c0;
+  --ifm-color-primary-light: #a0dafa;
+  --ifm-color-primary-lighter: #addffb;
+  --ifm-color-primary-lightest: #c7e9fd;
+  --ifm-background-color: #121212;
+  --ifm-link-color: #00ffff;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.module-card {
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.module-card:hover {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.module-card h3 {
+  margin-top: 0;
+  color: var(--ifm-color-primary);
+}
+
+.homepage-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.quick-links-sidebar {
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background-color: var(--ifm-background-surface-color);
+}
+
+.quick-links-sidebar h3 {
+  margin-top: 0;
+  font-size: 1.25rem;
+}
+
+.quick-links-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.quick-links-sidebar li {
+  margin-bottom: 0.75rem;
+}
+
+.quick-links-sidebar a {
+  text-decoration: none;
+  color: var(--ifm-color-primary);
+  font-weight: 500;
+}
+
+.quick-links-sidebar a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 996px) {
+  .homepage-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Learning Objectives Component */
+.learning-objectives {
+  padding: 1.5rem;
+  margin: 2rem 0;
+  border-radius: 8px;
+  border-left: 4px solid var(--ifm-color-primary);
+  background-color: var(--ifm-background-surface-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.learning-objectives h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--ifm-color-primary);
+  font-size: 1.25rem;
+}
+
+.learning-objectives ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  list-style: none;
+}
+
+.learning-objectives li {
+  position: relative;
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+  line-height: 1.6;
+}
+
+.learning-objectives li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--ifm-color-success);
+  font-weight: bold;
+}
+
+/* Dark mode adjustments for learning objectives */
+[data-theme='dark'] .learning-objectives {
+  background-color: var(--ifm-background-surface-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}

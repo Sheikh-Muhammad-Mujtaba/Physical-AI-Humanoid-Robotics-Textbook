@@ -1,0 +1,30 @@
+# Node.js/JavaScript/TypeScript
+node_modules/
+dist/
+build/
+*.log
+.env*
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.claude/
+# Docusaurus
+.docusaurus/
+.cache-loader/
+
+# Backend
+rag-backend/
+
+# Gemini CLI Agent configuration
+.gemini/
+
