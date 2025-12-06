@@ -34,11 +34,9 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        working-directory: docs
         run: npm ci
 
       - name: Build
-        working-directory: docs
         run: npm run build
       # 👆 Build steps
 
@@ -49,7 +47,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # 👇 Specify build output path for Docusaurus
-          path: docs/build
+          path: build
 
       - name: Deploy to GitHub Pages
         id: deployment
