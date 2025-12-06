@@ -1,13 +1,12 @@
-name: Deploy Docusaurus Book to GitHub Pages
+name: Deploy Docusaurus to GitHub Pages
 
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - 001-github-pages-workflow
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -16,40 +15,40 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          ref: 001-github-pages-workflow
 
-      - name: Setup Node.js
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
-          cache-dependency-path: docs/package-lock.json # Update path
-      
-      - name: Install dependencies & build Docusaurus
-        working-directory: ./docs # Update working directory
-        run: |
-          npm ci
-          npm run build
 
-      - name: Add .nojekyll file
-        run: |
-          touch docs/build/.nojekyll # Update path
-        
-      - name: Deploy to GitHub Pages (custom branch)
-        id: deploy
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Install dependencies
+        working-directory: ./docs
+        run: npm install
+
+      - name: Build Docusaurus
+        working-directory: ./docs
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/build # Update publish directory
-          publish_branch: main # Deploy to the main branch
-          # Uncomment and set if you have a custom domain
-          cname: sheikh-muhammad-mujtaba.github.io
+          path: ./docs/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
