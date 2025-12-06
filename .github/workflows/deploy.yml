@@ -38,6 +38,9 @@ jobs:
         # env: # Uncomment and configure if you have Docusaurus environment variables
         #   NODE_ENV: 'production'
 
+      - name: Create .nojekyll file
+        run: touch ./docusaurus-book/build/.nojekyll # Create an empty .nojekyll file
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
