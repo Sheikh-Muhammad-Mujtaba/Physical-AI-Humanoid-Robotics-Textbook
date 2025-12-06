@@ -46,7 +46,7 @@ Dynamics deals with the relationship between motion and the forces and torques t
 
 The dynamics of a robot are typically described by a set of non-linear differential equations, often expressed in a generalized form:
 
-$M(q)\ddot{q} + C(q, \dot{q})\dot{q} + G(q) = \tau + J^T F_{ext}$
+$$M(q)\ddot{q} + C(q, \dot{q})\dot{q} + G(q) = \tau + J^T F_{ext}$$
 
 Where:
 *   $M(q)$ is the mass matrix (or inertia matrix).
