@@ -18,7 +18,7 @@ const config: Config = {
 
   // Set the production url of your site here
   url: 'https://sheikh-muhammad-mujtaba.github.io',
-  baseUrl: '/Physical-AI-Humanoid-Robotics-Textbook/',
+  baseUrl: '/',
 
 
   // GitHub pages deployment config.
@@ -41,30 +41,25 @@ const config: Config = {
     [
       'classic',
       {
-                    docs: {
-                      sidebarPath: './sidebars.ts',
-                      remarkPlugins: [remarkMath],
-                      rehypePlugins: [rehypeKatex],          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/Sheikh-Muhammad-Mujtaba/Physical-AI-Humanoid-Robotics-Textbook/tree/main/docs',
-        },
-        blog: {
-          showReadingTime: true,
-          feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
-          },
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/Sheikh-Muhammad-Mujtaba/Physical-AI-Humanoid-Robotics-Textbook/tree/main/docs',
-          // Useful options to enforce blogging best practices
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
-        }, theme: {
-          customCss: './src/css/custom.css',
+                            docs: {
+                              sidebarPath: './sidebars.ts',
+                              remarkPlugins: [remarkMath],
+                              rehypePlugins: [rehypeKatex],          // Please change this to your repo.
+                              // Remove this to remove the "edit this page" links.
+                            },
+                            blog: {
+                              showReadingTime: true,
+                              feedOptions: {
+                                type: ['rss', 'atom'],
+                                xslt: true,
+                              },
+                              // Please change this to your repo.
+                              // Remove this to remove the "edit this page" links.
+                              // Useful options to enforce blogging best practices
+                              onInlineTags: 'warn',
+                              onInlineAuthors: 'warn',
+                              onUntruncatedBlogPosts: 'warn',
+                            }, theme: {          customCss: './src/css/custom.css',
         },
       } satisfies Preset.Options,
     ],

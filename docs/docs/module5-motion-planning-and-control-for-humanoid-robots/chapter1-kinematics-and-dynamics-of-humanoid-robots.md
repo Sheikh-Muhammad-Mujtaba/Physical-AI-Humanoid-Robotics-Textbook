@@ -46,15 +46,17 @@ Dynamics deals with the relationship between motion and the forces and torques t
 
 The dynamics of a robot are typically described by a set of non-linear differential equations, often expressed in a generalized form:
 
-$$M(q)\ddot{q} + C(q, \dot{q})\dot{q} + G(q) = \tau + J^T F_{ext}$$
+$$
+M(q)\ddot{q} + C(q, \dot{q})\dot{q} + G(q) = \tau + J^T F_{ext}
+$$
 
 Where:
-*   $M(q)$ is the mass matrix (or inertia matrix).
-*   $C(q, \dot{q})\dot{q}$ represents Coriolis and centrifugal forces.
-*   $G(q)$ is the gravity vector.
-*   $\tau$ represents the joint torques (from motors).
-*   $J^T F_{ext}$ represents forces from external contacts, mapped to joint torques via the Jacobian transpose.
-*   $q$, $\dot{q}$, $\ddot{q}$ are joint position, velocity, and acceleration vectors, respectively.
+*   $$M(q)$$ is the mass matrix (or inertia matrix).
+*   $$C(q, \dot{q})\dot{q}$$ represents Coriolis and centrifugal forces.
+*   $$G(q)$$ is the gravity vector.
+*   $$\tau$$ represents the joint torques (from motors).
+*   $$J^T F_{ext}$$ represents forces from external contacts, mapped to joint torques via the Jacobian transpose.
+*   $$q$$, $$\dot{q}$$, $$\ddot{q}$$ are joint position, velocity, and acceleration vectors, respectively.
 
 ## The Interplay: From Plan to Action
 

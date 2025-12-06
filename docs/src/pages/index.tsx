@@ -48,9 +48,6 @@ export default function Home(): ReactNode {
                 <li>
                   <Link to="/docs/intro">Introduction</Link>
                 </li>
-                <li>
-                  <Link to="/docs/intro">Glossary</Link>
-                </li>
               </ul>
             </div>
           </div>

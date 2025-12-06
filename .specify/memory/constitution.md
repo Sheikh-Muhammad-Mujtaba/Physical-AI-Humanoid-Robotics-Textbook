@@ -59,25 +59,11 @@ Follow-up TODOs:
     *   Never proceed on assumptions
     *   Always confirm critical steps
     *   Ask for approval before finalizing structure
-    *   Always ask for explicit permission before executing `npm build` or `npm start` commands.
-
-7.  **Single Source of Truth:**
-    The project book must always remain consistent:
-    *   Title
-    *   Chapter structure
-    *   Layout
-    *   RAG logic
-    *   Navigation
-
-8.  **Error Handling:**
-    If an output is risky:
-    *   Stop
-    *   Ask
-    *   Retry only after confirmation
+    *   Always ask for explicit permission before executing `npm build`, `npm start`, or `npm install` commands.
 
 ## Governance
 <!-- Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
 All PRs/reviews must verify compliance; Complexity must be justified; Use CLAUDE.md for runtime development guidance.
 
-**Version**: 1.5.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2025-12-06
+**Version**: 1.6.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2025-12-07

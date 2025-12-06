@@ -13,9 +13,10 @@
   --ifm-color-primary-lighter: #004080;
   --ifm-color-primary-lightest: #004d99;
   --ifm-background-color: #f0f0f0;
-  --ifm-link-color: #00ffff;
+  --ifm-link-color: #007bff; /* Changed for better contrast */
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-color-success: #28a745; /* Ensure success color is defined */
 }
 
 /* For readability in dark mode */
@@ -27,8 +28,8 @@
   --ifm-color-primary-light: #a0dafa;
   --ifm-color-primary-lighter: #addffb;
   --ifm-color-primary-lightest: #c7e9fd;
-  --ifm-background-color: #121212;
-  --ifm-link-color: #00ffff;
+  --ifm-background-color: #1a1a1a; /* Darker background for dark mode */
+  --ifm-link-color: #4dc2ff; /* Adjusted for dark mode */
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
@@ -39,47 +40,71 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Montserrat', sans-serif;
-  margin-top: 24px;
-  margin-bottom: 16px;
+  margin-top: 28px; /* Slightly increased */
+  margin-bottom: 20px; /* Slightly increased */
   font-weight: 700;
 }
 
+/* Hero Banner Enhancements */
+.heroBanner {
+  padding: 6rem 0; /* Increased vertical padding */
+  background: linear-gradient(135deg, var(--ifm-color-primary-dark), var(--ifm-color-primary-light)); /* Gradient background */
+  color: white; /* Ensure text is readable */
+}
+[data-theme='dark'] .heroBanner {
+  background: linear-gradient(135deg, var(--ifm-color-primary-darkest), var(--ifm-color-primary-light)); /* Dark mode gradient */
+}
+
+
+.buttons a.button {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.buttons a.button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+
 .module-card {
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 10px; /* Slightly more rounded */
   border: 1px solid var(--ifm-color-emphasis-300);
   transition: all 0.3s ease;
   height: 100%;
+  background: var(--ifm-background-surface-color); /* Ensure it has a background */
 }
 
 .module-card:hover {
   border-color: var(--ifm-color-primary);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* More pronounced shadow */
+  transform: translateY(-5px); /* More pronounced lift */
 }
 
 .module-card h3 {
   margin-top: 0;
   color: var(--ifm-color-primary);
+  font-size: 1.3rem; /* Slightly larger */
 }
 
 .homepage-container {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 2rem;
-  margin: 2rem 0;
+  gap: 2.5rem; /* Increased gap */
+  margin: 2.5rem 0; /* Increased margin */
 }
 
 .quick-links-sidebar {
-  padding: 1.5rem;
-  border-radius: 8px;
+  padding: 2rem; /* Increased padding */
+  border-radius: 10px; /* More rounded */
   border: 1px solid var(--ifm-color-emphasis-300);
   background-color: var(--ifm-background-surface-color);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); /* Added shadow */
 }
 
 .quick-links-sidebar h3 {
   margin-top: 0;
-  font-size: 1.25rem;
+  font-size: 1.3rem; /* Slightly larger */
+  color: var(--ifm-color-primary-dark);
 }
 
 .quick-links-sidebar ul {
@@ -89,18 +114,33 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .quick-links-sidebar li {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.8rem; /* Adjusted spacing */
 }
 
 .quick-links-sidebar a {
   text-decoration: none;
-  color: var(--ifm-color-primary);
+  color: var(--ifm-link-color);
   font-weight: 500;
+  transition: color 0.2s ease-in-out;
 }
 
 .quick-links-sidebar a:hover {
   text-decoration: underline;
+  color: var(--ifm-color-primary-dark); /* Darker on hover */
 }
+
+/* Global Link Hover Effect */
+a {
+  transition: color 0.2s ease-in-out;
+}
+a:hover {
+  text-decoration: underline;
+  color: var(--ifm-color-primary-dark); /* Default link hover effect */
+}
+[data-theme='dark'] a:hover {
+  color: var(--ifm-color-primary-light);
+}
+
 
 @media (max-width: 996px) {
   .homepage-container {
@@ -110,44 +150,45 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Learning Objectives Component */
 .learning-objectives {
-  padding: 1.5rem;
-  margin: 2rem 0;
-  border-radius: 8px;
-  border-left: 4px solid var(--ifm-color-primary);
+  padding: 1.8rem; /* Slightly increased padding */
+  margin: 2.5rem 0; /* Adjusted margin */
+  border-radius: 10px; /* More rounded */
+  border-left: 5px solid var(--ifm-color-primary); /* Thicker border */
   background-color: var(--ifm-background-surface-color);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08); /* More subtle shadow */
 }
 
 .learning-objectives h3 {
   margin-top: 0;
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem; /* Adjusted spacing */
   color: var(--ifm-color-primary);
-  font-size: 1.25rem;
+  font-size: 1.35rem; /* Slightly larger */
 }
 
 .learning-objectives ul {
   margin: 0;
-  padding-left: 1.5rem;
+  padding-left: 1.8rem; /* Adjusted padding */
   list-style: none;
 }
 
 .learning-objectives li {
   position: relative;
-  margin-bottom: 0.75rem;
-  padding-left: 1.5rem;
-  line-height: 1.6;
+  margin-bottom: 0.8rem; /* Adjusted spacing */
+  padding-left: 1.8rem; /* Adjusted padding */
+  line-height: 1.7; /* Increased line height for readability */
 }
 
 .learning-objectives li::before {
-  content: '✓';
+  content: '✔'; /* Changed checkmark for better visual */
   position: absolute;
   left: 0;
   color: var(--ifm-color-success);
   font-weight: bold;
+  font-size: 1.1em;
 }
 
 /* Dark mode adjustments for learning objectives */
 [data-theme='dark'] .learning-objectives {
   background-color: var(--ifm-background-surface-color);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
 }
