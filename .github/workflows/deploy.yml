@@ -34,11 +34,11 @@ jobs:
           cache-dependency-path: 'docs/package-lock.json'
 
       - name: Install dependencies
-        working-directory: docs
+        # working-directory: docs
         run: npm ci
 
       - name: Build
-        working-directory: docs
+        # working-directory: docs
         run: npm run build
 
       - name: Setup Pages
@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # 👇 Now pointing to the docs/build directory
-          path: docs/build
+          path: build
 
       - name: Deploy to GitHub Pages
         id: deployment
