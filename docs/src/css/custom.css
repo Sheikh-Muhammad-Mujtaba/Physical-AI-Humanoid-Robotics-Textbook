@@ -5,32 +5,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@400;700&display=swap');
 
 :root {
-  --ifm-color-primary: #003366;
-  --ifm-color-primary-dark: #002b54;
-  --ifm-color-primary-darker: #00264b;
-  --ifm-color-primary-darkest: #001f3d;
-  --ifm-color-primary-light: #003b78;
-  --ifm-color-primary-lighter: #004080;
-  --ifm-color-primary-lightest: #004d99;
-  --ifm-background-color: #f0f0f0;
-  --ifm-link-color: #007bff; /* Changed for better contrast */
+  --ifm-color-primary: #ff0000; /* red */
+  --ifm-color-primary-dark: #cc0000;
+  --ifm-color-primary-darker: #990000;
+  --ifm-color-primary-darkest: #660000;
+  --ifm-color-primary-light: #ff3333;
+  --ifm-color-primary-lighter: #ff6666;
+  --ifm-color-primary-lightest: #ff9999;
+  --ifm-background-color: #ffffff; /* white */
+  --ifm-link-color: #ff0000; /* red */
   --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --docusaurus-highlighted-code-line-bg: rgba(255, 204, 203, 0.3); /* light pink */
   --ifm-color-success: #28a745; /* Ensure success color is defined */
 }
 
 /* For readability in dark mode */
 [data-theme='dark'] {
-  --ifm-color-primary: #87ceeb;
-  --ifm-color-primary-dark: #6495ed;
-  --ifm-color-primary-darker: #5c8ae0;
-  --ifm-color-primary-darkest: #4f73c0;
-  --ifm-color-primary-light: #a0dafa;
-  --ifm-color-primary-lighter: #addffb;
-  --ifm-color-primary-lightest: #c7e9fd;
-  --ifm-background-color: #1a1a1a; /* Darker background for dark mode */
-  --ifm-link-color: #4dc2ff; /* Adjusted for dark mode */
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #d8b4fe; /* light purple */
+  --ifm-color-primary-dark: #c084fc;
+  --ifm-color-primary-darker: #a855f7;
+  --ifm-color-primary-darkest: #9333ea;
+  --ifm-color-primary-light: #e9d5ff;
+  --ifm-color-primary-lighter: #f3e8ff;
+  --ifm-color-primary-lightest: #faf5ff;
+  --ifm-background-color: #000000; /* black */
+  --ifm-link-color: #d8b4fe; /* light purple */
+  --ifm-font-color-base: #cccccc; /* light grey */
+  --docusaurus-highlighted-code-line-bg: rgba(204, 204, 204, 0.3); /* light grey */
 }
 
 body {
