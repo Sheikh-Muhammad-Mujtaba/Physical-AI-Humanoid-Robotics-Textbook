@@ -3,8 +3,8 @@ module.exports = {
     collect: {
       startServerCommand: 'npm run serve',
       url: [
-        'http://localhost:3000',
-        'http://localhost:3000/docs/intro',
+        'https://ai-spec-driven.vercel.app',
+        'https://ai-spec-driven.vercel.app/docs/intro',
       ],
       numberOfRuns: 3,
     },

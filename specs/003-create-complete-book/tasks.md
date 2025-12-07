@@ -54,7 +54,7 @@
 
 ### Implementation for User Story 2
 
-- [X] T009 [US2] Create a script to find and replace placeholder URLs in `docusaurus-book/docs/`.
+- [X] T009 [US2] Create a script to find and replace placeholder URLs in `docusaurus-book/textbook/`.
 - [X] T010 [US2] Run the script to update all placeholder URLs.
 - [X] T011 [US2] Manually verify a sample of updated URLs to ensure correctness.
 
@@ -70,7 +70,7 @@
 
 ### Implementation for User Story 1
 
-- [X] T012 [US1] Create a script to generate the book structure with 5-6 modules and 3-4 chapters each in `docusaurus-book/docs/`.
+- [X] T012 [US1] Create a script to generate the book structure with 5-6 modules and 3-4 chapters each in `docusaurus-book/textbook/`.
 - [X] T013 [US1] Run the script to generate the book structure.
 - [X] T014 [US1] Write content for the first module using `context7 mcp` to get details.
 - [X] T015 [US1] Write content for the remaining modules.
@@ -84,7 +84,7 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [X] T017 [P] Documentation updates in `docusaurus-book/docs/intro.mdx`.
+- [X] T017 [P] Documentation updates in `docusaurus-book/textbook/intro.mdx`.
 - [X] T018 Code cleanup and refactoring of all scripts.
 - [X] T019 Performance optimization across all stories.
 - [X] T020 Run quickstart.md validation.

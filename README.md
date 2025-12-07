@@ -28,8 +28,8 @@ This project adheres to a strict constitution to ensure quality and consistency.
 1.  **Educational Clarity**: All content MUST be accessible to beginners while remaining technically accurate.
 2.  **Docusaurus-First Architecture**: Content MUST be structured for Docusaurus, with valid frontmatter in every Markdown file.
 3.  **Modular Content**: Large topics are broken down into atomic, readable sub-chapters.
-4.  **Single Source of Truth**: The `docs/` folder is the source of truth, and master files are archived after import.
-5.  **Asset Management**: All images and static assets are stored in `docs/static/img` and referenced with relative paths.
+4.  **Single Source of Truth**: The `textbook/` folder is the source of truth, and master files are archived after import.
+5.  **Asset Management**: All images and static assets are stored in `textbook/static/img` and referenced with relative paths.
 
 ### Contributing
 

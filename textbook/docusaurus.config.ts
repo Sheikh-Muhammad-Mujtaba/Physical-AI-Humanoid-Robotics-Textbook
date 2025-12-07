@@ -42,6 +42,7 @@ const config: Config = {
       'classic',
       {
                             docs: {
+                              path: 'docs',
                               sidebarPath: './sidebars.ts',
                               remarkPlugins: [remarkMath],
                               rehypePlugins: [rehypeKatex],          // Please change this to your repo.

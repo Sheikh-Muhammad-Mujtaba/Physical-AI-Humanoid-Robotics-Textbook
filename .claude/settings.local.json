@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git fetch:*)",
+      "Bash(ls:*)",
+      "Bash(npm run swizzle:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

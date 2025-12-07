@@ -39,7 +39,7 @@ backend/venv/
 
 # Temporary files from agent execution or tests
 error.txt
-# prompt.txt
+prompt.txt
 
 # Python build artifacts
 dist/

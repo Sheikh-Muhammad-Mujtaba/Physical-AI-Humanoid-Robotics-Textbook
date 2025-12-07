@@ -42,7 +42,7 @@ specs/003-create-complete-book/
 ### Source Code (repository root)
 ```text
 docusaurus-book/
-├── docs/
+├── textbook/
 │   ├── module1/
 │   │   ├── chapter1.md
 │   │   ...
