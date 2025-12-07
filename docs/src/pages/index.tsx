@@ -38,19 +38,9 @@ export default function Home(): ReactNode {
       <HomepageHeader />
       <main>
         <div className="container">
-          <div className="homepage-container">
-            <div>
-              <HomepageFeatures />
-            </div>
-            <div className="quick-links-sidebar">
-              <h3>Quick Links</h3>
-              <ul>
-                <li>
-                  <Link to="/docs/intro">Introduction</Link>
-                </li>
-              </ul>
-            </div>
-          </div>
+          <div>
+    <HomepageFeatures />
+</div>
         </div>
       </main>
     </Layout>
