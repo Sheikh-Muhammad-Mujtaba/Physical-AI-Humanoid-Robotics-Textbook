@@ -15,34 +15,43 @@ const FeatureList: FeatureItem[] = [
     title: 'Module 1: Introduction to Physical AI',
     description: (
       <>
-        Explore the fundamental concepts of Physical AI, its components, and the sense-plan-act cycle.
+        Explore the foundational concepts of Physical AI, its components, and the sense-plan-act cycle.
       </>
     ),
-    link: '/docs/module1-introduction-to-physical-ai/chapter1-what-is-physical-ai',
+    link: './docs/module1-introduction-to-physical-ai/what-is-physical-ai',
   },
   {
-    title: 'Module 2: Humanoid Robotics',
+    title: 'Module 2: Hardware Requirements',
     description: (
       <>
-        Dive into the world of humanoid robots, their anatomy, and the challenges in creating them.
+        Understand the hardware necessary to build and run your own Physical AI projects.
       </>
     ),
-    link: '/docs/module2-humanoid-robotics/chapter1-the-anatomy-of-a-humanoid-robot',
+    link: './docs/module2-hardware-requirements/workstation-requirements',
   },
   {
-    title: 'Module 3: AI-Native Systems',
+    title: 'Module 3: Cloud-Native Lab',
     description: (
       <>
-        Learn about the rise of AI-native systems and the crucial role of simulation in their development.
+        Learn how to set up a cloud-native lab for Physical AI development.
       </>
     ),
-    link: '/docs/module3-ai-native-systems/chapter1-the-rise-of-ai-native-systems',
+    link: './docs/module3-cloud-native-lab/cloud-workstations',
+  },
+  {
+    title: 'Module 4: Economy Jetson Student Kit',
+    description: (
+      <>
+        Get a detailed breakdown of an affordable and powerful hardware kit for students.
+      </>
+    ),
+    link: './docs/module4-economy-jetson-student-kit/jetson-student-kit',
   },
 ];
 
 function Feature({title, description, link}: FeatureItem) {
   return (
-    <div className={clsx('col col--4')}>
+    <div className={clsx('col col--3')}>
       <div className="module-card">
         <div className="text--center padding-horiz--md">
           <Heading as="h3">{title}</Heading>
