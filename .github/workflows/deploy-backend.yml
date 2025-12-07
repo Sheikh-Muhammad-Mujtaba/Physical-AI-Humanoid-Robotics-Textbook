@@ -1,0 +1,34 @@
+name: Deploy Backend to Hugging Face
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Hugging Face Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io # Hugging Face uses ghcr.io for container registry
+        username: ${{ secrets.HF_USERNAME }}
+        password: ${{ secrets.HF_TOKEN }} # Or use HUGGING_FACE_TOKEN if defined
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend # Path to your backend Dockerfile
+        push: true
+        tags: ghcr.io/${{ github.repository_owner }}/rag-backend:latest # Adjust repository name if needed
+        cache-from: type=gha
+        cache-to: type=gha,mode=max

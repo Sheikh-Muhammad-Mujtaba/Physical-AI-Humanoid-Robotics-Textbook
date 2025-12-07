@@ -1,0 +1,5 @@
+Execute the implementation tasks for the "Import Complete Textbook Content" feature.
+
+**Execution Context:**
+* **Feature Directory**: Ensure you are using the `tasks.md` and `plan.md` we just validated.
+* **Safety Check**: After updating the book content, explicitly verify that the Docusaurus build (`npm run build` in `docs/`) succeeds.

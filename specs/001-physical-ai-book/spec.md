@@ -3,7 +3,12 @@
 **Feature Branch**: `001-physical-ai-book`
 **Created**: 2025-12-05
 **Status**: Draft
-**Input**: User description: "You are designing and generating a complete Docusaurus 3.9 book project.\n\n## Primary Objective\nCreate a clean, modern, professional AI-native book titled:\n**“Physical AI & Humanoid Robotics – AI-Native Systems”**\n\nThis task has two phases:\n1. **Phase A — Docusaurus Project Layout Creation**\n2. **Phase B — Writing the Full Textbook Content Outline & Chapters"**
+**Input**: User description: "You are designing and generating a complete Docusaurus 3.9 book project to update its content."
+
+## Primary Objective
+Create a clean, modern, professional AI-native book titled:
+**“Physical AI & Humanoid Robotics – AI-Native Systems”**
+
 
 ## User Scenarios & Testing
 
@@ -57,7 +62,7 @@ As a potential reader, I want to see an introduction to the book and its authors
 
 - What happens when a search query yields no results?
 - How does the system handle very long chapter titles in the sidebar?
-- What is the behavior if a user tries to access a non-existent chapter URL?
+- Non-existent chapter URLs: Display a custom "404 Not Found" page with navigation back to the homepage or TOC.
 
 ## Requirements
 
@@ -72,6 +77,13 @@ As a potential reader, I want to see an introduction to the book and its authors
 - **FR-007**: The site MUST include a main entry page (`/src/pages/index.md` or `.tsx`) for the homepage.
 - **FR-008**: The site MUST include an introductory content page (`/docs/intro.md`) in the documentation section.
 - **FR-009**: The site MUST have a placeholder folder structure for all specified chapters, with empty markdown files.
+- **FR-010**: The content update and publishing workflow will involve manual markdown edits in the GitHub repository.
+- **FR-011**: The book structure and size will be determined by the content in `docs/contentguide.md`, expected to result in a medium-sized book (10-20 chapters, 10-20 pages each).
+
+### Non-Functional Requirements
+
+- **NFR-001**: The site MUST comply with WCAG 2.1 AA accessibility standards.
+- **NFR-002**: The target page load time for a typical chapter page MUST be under 2 seconds.
 
 ### Key Entities
 
@@ -87,3 +99,4 @@ As a potential reader, I want to see an introduction to the book and its authors
 - **SC-002**: The book's proposed chapter structure is reflected accurately in the web-based book project's navigation.
 - **SC-003**: The homepage and intro page content clearly convey the book's purpose and scope to new visitors.
 - **SC-004**: The generated web-based book project successfully builds without errors or warnings.
+

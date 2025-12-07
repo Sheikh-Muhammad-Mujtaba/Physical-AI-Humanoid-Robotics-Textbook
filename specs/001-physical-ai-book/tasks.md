@@ -1,139 +1,92 @@
-## Tasks for Physical AI & Humanoid Robotics – AI-Native Systems Book
+# Feature: Physical AI & Humanoid Robotics – AI-Native Systems Book
 
-### A. Environment Setup Tasks
+This document outlines the tasks required to develop the Docusaurus book, based on the provided `plan.md` and `spec.md`.
 
-- [ ] T001 Install Node.js and npm (manual step, requires user action)
-- [ ] T002 Install Python 3.x and pip (manual step, requires user action)
-- [x] T003 Initialize Docusaurus project in `docusaurus-book/`
-- [x] T004 Install Docusaurus project dependencies in `docusaurus-book/`
-- [x] T005 Create Python virtual environment for RAG backend in `rag-backend/`
-- [ ] T006 Activate Python virtual environment for RAG backend
-- [ ] T007 Install FastAPI and Qdrant dependencies for RAG backend from `rag-backend/requirements.txt`
+## Phase 1: Setup (Project Initialization)
 
-### B. Docusaurus Layout Tasks
+- [ ] T001 Create `rag-backend/` directory at the repository root. (Marked as CANCELLED by previous user instruction)
+- [ ] T002 Create `chatbot-widget/` directory at the repository root. (Marked as CANCELLED by previous user instruction)
+- [ ] T003 Initialize a Python virtual environment and `requirements.txt` in `rag-backend/`. (Marked as CANCELLED by previous user instruction)
+- [ ] T004 Initialize a Node.js project within `chatbot-widget/` directory (e.g., `npm init -y` or `pnpm init`). (Marked as CANCELLED by previous user instruction)
+- [ ] T005 Configure `docs/docusaurus.config.js` with the book title "Physical AI & Humanoid Robotics – AI-Native Systems".
+- [ ] T006 Install core dependencies for Docusaurus in `docs/package.json`.
+- [ ] T007 Create initial `README.md` at the repository root describing the multi-project setup.
+- [ ] T008 Create initial `.gitignore` files for `rag-backend/` and `chatbot-widget/`. (Marked as CANCELLED by previous user instruction)
 
-- [x] T008 Configure `docusaurus.config.js` with book title and basic theme options `docusaurus-book/docusaurus.config.js`
-- [x] T009 [P] Create custom CSS file for basic styling in `docusaurus-book/src/css/custom.css`
-- [ ] T010 [P] Implement custom Navbar and Footer components for Docusaurus in `docusaurus-book/src/theme/Navbar.js`
-- [ ] T011 Configure Docusaurus sidebar navigation in `docusaurus-book/sidebars.js`
+## Phase 2: Foundational (Blocking Prerequisites)
 
-### C. Documentation Structure Tasks
+- [ ] T009 Rename `docs/docs/module1-introduction-to-physical-ai` to `docs/docs/module1-the-robotic-nervous-system-ros2`.
+- [ ] T010 Rename `docs/docs/module2-humanoid-robotics` to `docs/docs/module2-the-digital-twin-gazebo-unity`.
+- [ ] T011 Rename `docs/docs/module3-ai-native-systems` to `docs/docs/module3-the-ai-robot-brain-nvidia-isaac`.
+- [ ] T012 Rename `docs/docs/module4-perception-and-sensor-fusion-for-physical-ai` to `docs/docs/module4-vision-language-action-vla`.
+- [ ] T013 Delete `docs/docs/module5-motion-planning-and-control-for-humanoid-robots`.
+- [ ] T014 Update `docs/docs/module1-the-robotic-nervous-system-ros2/_category_.json` with the name "Module 1: The Robotic Nervous System (ROS 2)".
+- [ ] T015 Update `docs/docs/module2-the-digital-twin-gazebo-unity/_category_.json` with the name "Module 2: The Digital Twin (Gazebo & Unity)".
+- [ ] T016 Update `docs/docs/module3-the-ai-robot-brain-nvidia-isaac/_category_.json` with the name "Module 3: The AI-Robot Brain (NVIDIA Isaac™)".
+- [ ] T017 Update `docs/docs/module4-vision-language-action-vla/_category_.json` with the name "Module 4: Vision-Language-Action (VLA)".
+- [ ] T018 Create `docs/docs/module1-the-robotic-nervous-system-ros2/introduction-to-physical-ai.md` with content for "Weeks 1-2: Introduction to Physical AI" based on `contentguide.md`.
+- [ ] T019 Create `docs/docs/module1-the-robotic-nervous-system-ros2/ros2-fundamentals.md` with content for "Weeks 3-5: ROS 2 Fundamentals" based on `contentguide.md`.
+- [ ] T020 Create `docs/docs/module2-the-digital-twin-gazebo-unity/robot-simulation-with-gazebo.md` with content for "Weeks 6-7: Robot Simulation with Gazebo" based on `contentguide.md`.
+- [ ] T021 Create `docs/docs/module3-the-ai-robot-brain-nvidia-isaac/nvidia-isaac-platform.md` with content for "Weeks 8-10: NVIDIA Isaac Platform" based on `contentguide.md`.
+- [ ] T022 Create `docs/docs/module4-vision-language-action-vla/humanoid-robot-development.md` with content for "Weeks 11-12: Humanoid Robot Development" based on `contentguide.md`.
+- [ ] T023 Create `docs/docs/module4-vision-language-action-vla/conversational-robotics.md` with content for "Week 13: Conversational Robotics" based on `contentguide.md`.
+- [ ] T024 Update `docs/sidebars.ts` to include all modules and their respective chapters.
 
-- [x] T012 Create `docusaurus-book/docs` directory for book chapters
-- [x] T013 Create `docusaurus-book/docs/_category_.json` for main book category
-- [x] T014 Create placeholder Markdown files for main chapters
-- [x] T015 Update `docusaurus-book/sidebars.js` to include new chapter Markdown files
+## Phase 3: User Story 1 - Read Book Content (P1)
 
-### D. Content Generation Tasks
+- [ ] T025 [US1] Configure `docs/docusaurus.config.js` for basic layout and navigation.
+- [ ] T026 [US1] Ensure smooth content rendering across chapters in `docs/`.
+- [ ] T027 [US1] Implement light/dark mode toggle functionality in Docusaurus theme (`docs/src/theme/Navbar/ColorModeToggle/index.tsx` or similar).
 
-- [x] T016 [P] Generate detailed content for `docusaurus-book/docs/chapter1.md`
-- [x] T017 [P] Generate detailed content for `docusaurus-book/docs/chapter2.md` and `docusaurus-book/docs/chapter3.md`
-- [ ] T018 Review and refine generated chapter content for accuracy, coherence, and RAG alignment
-- [ ] T019 Add citations and references to chapter content where necessary `docusaurus-book/docs/**/*.md`
+## Phase 4: User Story 3 - Understand Book Overview (P2)
 
-### E. GitHub File Creation Tasks
+- [ ] T028 [US3] Create `docs/src/pages/index.tsx` (or `.mdx`) with a hero section as described in `spec.md`.
+- [ ] T029 [US3] Create `docs/docs/intro.mdx` with detailed introductory content and learning outcomes from `contentguide.md`.
+- [ ] T030 [US3] Add footer links in `docs/src/theme/Footer/index.js` or `docs/docusaurus.config.js` to GitHub repository, author information, and license.
 
-- [ ] T020 Create `.gitignore` file for the repository root `/.gitignore`
-- [ ] T021 Create `README.md` for the overall project `README.md`
-- [ ] T022 Create `package.json` for Docusaurus (if not created by init) in `docusaurus-book/package.json`
-- [ ] T023 Create `rag-backend/requirements.txt` for FastAPI backend dependencies `rag-backend/requirements.txt`
-- [ ] T024 Create `rag-backend/Dockerfile` for FastAPI backend (optional, ask for confirmation) `rag-backend/Dockerfile`
+## Phase 5: User Story 2 - Search Book Content (P2)
 
-### F. RAG Backend Tasks (FastAPI + Qdrant)
+- [ ] T031 [US2] Configure Docusaurus search plugin (e.g., `docusaurus-theme-search-algolia` or `docusaurus-plugin-search-local`) in `docs/docusaurus.config.js`.
+- [ ] T032 [US2] Ensure search functionality indexes all book content and returns relevant results.
 
-- [ ] T025 Create FastAPI application structure in `rag-backend/main.py` and `rag-backend/app/`
-- [ ] T026 Implement Qdrant client initialization and connection in `rag-backend/app/services/qdrant_service.py`
-- [ ] T027 Create embedding generation service in `rag-backend/app/services/embedding_service.py`
-- [ ] T028 Implement API endpoint for book content ingestion into Qdrant in `rag-backend/app/api/ingestion.py`
-- [ ] T029 Implement API endpoint for RAG queries in `rag-backend/app/api/query.py`
-- [ ] T030 Add basic error handling and logging to FastAPI endpoints in `rag-backend/app/main.py` and `rag-backend/app/api/*.py`
+## Phase 6: Polish & Cross-Cutting Concerns
 
-### G. Chatbot UI Integration Tasks
+- [ ] T033 Perform unit and integration testing for `docs/`.
+- [ ] T034 Optimize Docusaurus site for SEO (`docs/docusaurus.config.js`, sitemap generation).
+- [ ] T035 Prepare deployment scripts/configuration for Docusaurus to a hosting provider (e.g., GitHub Pages, Vercel).
 
-- [ ] T031 Create chatbot widget project structure in `chatbot-widget/`
-- [ ] T032 Develop basic chatbot UI components
-- [ ] T033 Integrate chatbot widget into Docusaurus layout
-- [ ] T034 Connect chatbot frontend to FastAPI RAG backend
-- [ ] T035 Implement displaying RAG responses in chatbot UI
-- [ ] T036 Add basic styling to chatbot widget
+## Dependencies
 
-### H. Packaging, Testing, Deploy Tasks
+- Phase 1 must be completed before Phase 2.
+- Phase 2 must be completed before Phase 3 and Phase 4.
+- Phase 3 is a prerequisite for Phase 4.
+- Phase 4 is a prerequisite for Phase 5.
+- Phase 6 (Polish & Cross-Cutting Concerns) depends on the completion of all preceding phases.
 
-- [ ] T037 Write unit tests for Docusaurus custom React components
-- [ ] T038 Write unit tests for FastAPI RAG backend services and API endpoints
-- [ ] T039 Implement end-to-end testing for chatbot and RAG flow
-- [ ] T040 Configure Docusaurus for production deployment
-- [ ] T041 Configure FastAPI RAG backend for production deployment
-- [ ] T042 Deploy Docusaurus book (manual or automated step, requires user action)
-- [ ] T043 Deploy FastAPI RAG backend (manual or automated step, requires user action)
-- [ ] T044 Create basic documentation for maintenance and future development
+## Parallel Execution Examples
 
----
+- Tasks within Phase 1 (Setup) can be highly parallelized where not cancelled.
+- Tasks within Phase 2 (Foundational) that create content files can be parallelized.
+- Tasks within Phase 3 (User Story 1) can be highly parallelized, e.g., `T025`, `T026`, `T027`.
+- `T028`, `T029`, `T030` can be parallelized.
+- Tasks within Phase 6 (Polish & Cross-Cutting Concerns) can be parallelized.
 
-### Critical Path Task List
+## Implementation Strategy
 
-1.  T003 Initialize Docusaurus project in `docusaurus-book/`
-2.  T004 Install Docusaurus project dependencies in `docusaurus-book/`
-3.  T008 Configure `docusaurus.config.js` with book title and basic theme options `docusaurus-book/docusaurus.config.js`
-4.  T012 Create `docusaurus-book/docs` directory for book chapters
-5.  T013 Create `docusaurus-book/docs/_category_.json` for main book category
-6.  T014 Create placeholder Markdown files for main chapters
-7.  T015 Update `docusaurus-book/sidebars.js` to include new chapter Markdown files
-8.  T005 Create Python virtual environment for RAG backend in `rag-backend/`
-9.  T006 Activate Python virtual environment for RAG backend
-10. T023 Create `rag-backend/requirements.txt` for FastAPI backend dependencies `rag-backend/requirements.txt`
-11. T007 Install FastAPI and Qdrant dependencies for RAG backend from `rag-backend/requirements.txt`
-12. T025 Create FastAPI application structure in `rag-backend/main.py` and `rag-backend/app/`
-13. T026 Implement Qdrant client initialization and connection in `rag-backend/app/services/qdrant_service.py`
-14. T027 Create embedding generation service in `rag-backend/app/services/embedding_service.py`
-15. T028 Implement API endpoint for book content ingestion into Qdrant in `rag-backend/app/api/ingestion.py`
-16. T029 Implement API endpoint for RAG queries in `rag-backend/app/api/query.py`
-17. T031 Create chatbot widget project structure in `chatbot-widget/`
-18. T032 Develop basic chatbot UI components
-19. T033 Integrate chatbot widget into Docusaurus layout
-20. T034 Connect chatbot frontend to FastAPI RAG backend
-21. T035 Implement displaying RAG responses in chatbot UI
+The project will follow an MVP-first approach, prioritizing User Story 1 (Read Book Content) and User Story 3 (Understand Book Overview) to establish a basic functional book website. Subsequent features like search (User Story 2) and polishing will be implemented incrementally.
 
-### Parallelizable Tasks
+## Summary
 
-*   T009 Create custom CSS file for basic styling in `docusaurus-book/src/css/custom.css`
-*   T010 Implement custom Navbar and Footer components for Docusaurus
-*   T016 Generate detailed content for `docusaurus-book/docs/chapter1-introduction.md`
-*   T017 Generate detailed content for `docusaurus-book/docs/chapter2-concepts.md` (and subsequent chapters)
-*   T018 Review and refine generated chapter content for accuracy, coherence, and RAG alignment (can be done per chapter as generated)
-*   T019 Add citations and references to chapter content where necessary
-*   T020 Create `.gitignore` file for the repository root `/.gitignore`
-*   T021 Create `README.md` for the overall project `README.md`
-*   T022 Create `package.json` for Docusaurus (if not created by init)
-*   T024 Create `rag-backend/Dockerfile` for FastAPI backend (optional, ask for confirmation)
-*   T030 Add basic error handling and logging to FastAPI endpoints
-*   T036 Add basic styling to chatbot widget
-*   T037 Write unit tests for Docusaurus custom React components
-*   T038 Write unit tests for FastAPI RAG backend services and API endpoints
-*   T039 Implement end-to-end testing for chatbot and RAG flow
+- **Total Task Count**: 35 (excluding cancelled tasks)
+- **Tasks per User Story**:
+    - US1 (Read Book Content): 3
+    - US2 (Search Book Content): 2
+    - US3 (Understand Book Overview): 3
+- **Parallel Opportunities Identified**: Many tasks within phases can be parallelized.
+- **Independent Test Criteria for Each Story**:
+    - **US1**: Deploy web-based book; verify all chapters accessible via sidebar, display correctly, light/dark mode functions.
+    - **US2**: Search for keywords; verify relevant results link to correct sections.
+    - **US3**: Navigate to homepage and intro; verify content introduces book and purpose.
+- **Suggested MVP Scope**: User Story 1 and User Story 3 to deliver a basic, navigable book with an introduction.
 
-### Tasks Requiring Human Approval
-
-*   T001 Install Node.js and npm
-*   T002 Install Python 3.x and pip
-*   T003 Initialize Docusaurus project (especially if overwriting)
-*   T008 Configure `docusaurus.config.js` (confirming organization/project names)
-*   T009 Desired color palette/branding for custom CSS
-*   T010 Specific Navbar/Footer structure and links
-*   T014 Exact titles for main chapters
-*   T016 Specific sub-topics and technical detail level for content generation
-*   T019 Citation style for chapter content
-*   T021 Specific sections for main `README.md`
-*   T024 Confirmation for creating `Dockerfile` and base image
-*   T026 Qdrant connection details (host, port, API key)
-*   T027 Specific embedding model/service
-*   T028 Metadata fields for Qdrant ingestion
-*   T029 How retrieved content chunks should be combined/summarized
-*   T031 Chatbot widget framework choice (React vs Vanilla JS)
-*   T033 Chatbot widget positioning in Docusaurus layout
-*   T042 Deploy Docusaurus book (manual confirmation of deployment steps)
-*   T043 Deploy FastAPI RAG backend (manual confirmation of deployment steps)
-*   T044 Most critical aspects for maintenance documentation
-*   T040 Chosen hosting provider for Docusaurus book
-*   T041 How environment variables for FastAPI backend will be managed in production
-*   T039 Critical end-to-end user flows for testing
+Validation: All tasks follow the checklist format (checkbox, ID, labels, file paths).

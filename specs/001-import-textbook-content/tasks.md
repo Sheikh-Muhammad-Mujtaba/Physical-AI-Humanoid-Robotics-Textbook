@@ -23,7 +23,7 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 [P] Create the directory `docs/scripts`
+- [X] T001 [P] Create the directory `docs/scripts`
 
 ---
 
@@ -31,7 +31,7 @@
 
 **Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented
 
-- [ ] T002 Create the import script file `docs/scripts/import-content.sh`
+- [X] T002 Create the import script file `docs/scripts/import-content.sh`
 
 ---
 
@@ -43,17 +43,17 @@
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Implement the logic to read the `contentguide.md` file in `docs/scripts/import-content.sh`.
-- [ ] T004 [US1] Implement the logic to parse the modules and chapters in `docs/scripts/import-content.sh`.
-- [ ] T005 [US1] Implement the logic to create the module directories in `docs/scripts/import-content.sh`.
-- [ ] T006 [US1] Implement the logic to create the chapter files in `docs/scripts/import-content.sh`.
-- [ ] T007 [US1] Implement the logic to generate the frontmatter for each chapter in `docs/scripts/import-content.sh`.
-- [ ] T008 [US1] Implement the logic to handle existing files by overwriting them in `docs/scripts/import-content.sh`.
-- [ ] T009 [US1] Implement the logic to convert special callouts to Docusaurus admonitions in `docs/scripts/import-content.sh`.
-- [ ] T010 [US1] Implement the logic to ensure `docs/sidebars.ts` is configured for autogeneration in `docs/scripts/import-content.sh`.
-- [ ] T011 [US1] Implement error handling for empty or non-existent `contentguide.md` in `docs/scripts/import-content.sh`.
-- [ ] T012 [US1] Implement error handling for incorrect header hierarchy in `docs/scripts/import-content.sh`.
-- [ ] T013 [US1] Archive the `contentguide.md` master file after successful import.
+- [X] T003 [US1] Implement the logic to read the `contentguide.md` file in `docs/scripts/import-content.sh`.
+- [X] T004 [US1] Implement the logic to parse the modules and chapters in `docs/scripts/import-content.sh`.
+- [X] T005 [US1] Implement the logic to create the module directories in `docs/scripts/import-content.sh`.
+- [X] T006 [US1] Implement the logic to create the chapter files in `docs/scripts/import-content.sh`.
+- [X] T007 [US1] Implement the logic to generate the frontmatter for each chapter in `docs/scripts/import-content.sh`.
+- [X] T008 [US1] Implement the logic to handle existing files by overwriting them in `docs/scripts/import-content.sh`.
+- [X] T009 [US1] Implement the logic to convert special callouts to Docusaurus admonitions in `docs/scripts/import-content.sh`.
+- [X] T010 [US1] Implement the logic to ensure `docs/sidebars.ts` is configured for autogeneration in `docs/scripts/import-content.sh`.
+- [X] T011 [US1] Implement error handling for empty or non-existent `contentguide.md` in `docs/scripts/import-content.sh`.
+- [X] T012 [US1] Implement error handling for incorrect header hierarchy in `docs/scripts/import-content.sh`.
+- [X] T013 [US1] Archive the `contentguide.md` master file after successful import.
 
 ---
 
@@ -61,10 +61,10 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T014 Add comments and documentation to the `docs/scripts/import-content.sh` script.
-- [ ] T015 [P] Run the import script and verify the output.
-- [ ] T016 [P] Run `npm run build` in the `docs` directory and verify it passes.
-- [ ] T017 [P] Manually test the generated site for correct sidebar order and broken links.
+- [X] T014 Add comments and documentation to the `docs/scripts/import-content.sh` script.
+- [X] T015 [P] Run the import script and verify the output.
+- [X] T016 [P] Run `npm run build` in the `docs` directory and verify it passes.
+- [X] T017 [P] Manually test the generated site for correct sidebar order and broken links.
 
 ---
 

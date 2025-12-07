@@ -4,17 +4,10 @@ dist/
 build/
 *.log
 .env*
-.DS_Store
-Thumbs.db
-*.tmp
-*.swp
-.vscode/
-.idea/
-.vercel/
+package-lock.json
 .next/
 out/
 .nuxt/
-build/
 
 # Python
 __pycache__/
@@ -22,18 +15,38 @@ __pycache__/
 .venv/
 venv/
 *.egg-info/
-.claude/settings.json
-error.txt
-prompt.txt
+
+# Universal
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
+
 # Docusaurus
 .docusaurus/
 .cache-loader/
 
-# Backend
-rag-backend/
+# Backend (explicitly ignoring venv within backend)
+backend/venv/
 
 # Gemini CLI Agent configuration
 .gemini/
 
+# Claude configuration
+.claude/settings.json
 
-.vercel
+# Temporary files from agent execution or tests
+error.txt
+# prompt.txt
+
+# Python build artifacts
+dist/
+
+# Test coverage reports
+coverage/
+
+# Node.js package manager lock files
+yarn.lock
+pnpm-lock.yaml
