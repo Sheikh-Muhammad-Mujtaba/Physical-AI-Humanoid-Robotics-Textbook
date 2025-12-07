@@ -119,9 +119,27 @@ function Testimonials(): ReactNode {
     );
 }
 
+function QuickLinks(): ReactNode {
+    return (
+        <section className="quick-links-section">
+            <div className="container">
+                <Heading as="h2" className="text--center">Quick Links</Heading>
+                <div className="quick-links-container">
+                    <Link to="./docs/module1-introduction-to-physical-ai/what-is-physical-ai">Module 1: Intro to Physical AI</Link>
+                    <Link to="./docs/module2-hardware-requirements/workstation-requirements">Module 2: Hardware</Link>
+                    <Link to="./docs/module3-cloud-native-lab/cloud-workstations">Module 3: Cloud Lab</Link>
+                    <Link to="./docs/module4-economy-jetson-student-kit/jetson-student-kit">Module 4: Student Kit</Link>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+
 export default function HomepageFeatures(): ReactNode {
   return (
     <>
+        <QuickLinks />
         <section className={styles.features}>
           <div className="container">
             <div className="feature-list">
