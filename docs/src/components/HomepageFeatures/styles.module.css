@@ -1,11 +1,24 @@
-.features {
-  display: flex;
-  align-items: center;
-  padding: 2rem 0;
-  width: 100%;
+.testimonials {
+  background-color: #f9f9f9;
+  padding: 4rem 0;
 }
 
-.featureSvg {
-  height: 200px;
-  width: 200px;
+[data-theme='dark'] .testimonials {
+  background-color: #1a1a1a;
+}
+
+.testimonials blockquote {
+  font-style: italic;
+  font-size: 1.2rem;
+  margin: 0;
+  padding: 0;
+  border-left: 5px solid var(--ifm-color-primary);
+  padding-left: 1.5rem;
+}
+
+.testimonials cite {
+  display: block;
+  margin-top: 1rem;
+  font-weight: bold;
+  color: var(--ifm-color-primary);
 }

@@ -67,16 +67,75 @@ function Feature({title, description, link}: FeatureItem) {
   );
 }
 
+function WhyThisBook(): ReactNode {
+    return (
+        <section className={styles.features}>
+            <div className="container">
+                <Heading as="h2" className="text--center">Why This Book?</Heading>
+                <div className="row">
+                    <div className={clsx('col col--4')}>
+                        <h3>Hands-On Learning</h3>
+                        <p>This book is not just about theory. You will get your hands dirty with practical exercises and projects that will solidify your understanding of Physical AI.</p>
+                    </div>
+                    <div className={clsx('col col--4')}>
+                        <h3>Industry-Standard Tools</h3>
+                        <p>Learn to use the same tools that are used by professionals in the robotics industry, including ROS 2, Gazebo, and NVIDIA Isaac.</p>
+                    </div>
+                    <div className={clsx('col col--4')}>
+                        <h3>Comprehensive Curriculum</h3>
+                        <p>From the basics of ROS 2 to advanced topics like VLA models, this book covers everything you need to know to get started with Physical AI.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+function Testimonials(): ReactNode {
+    return (
+        <section className={clsx(styles.features, styles.testimonials)}>
+            <div className="container">
+                <Heading as="h2" className="text--center">What Our Readers Say</Heading>
+                <div className="row">
+                    <div className={clsx('col col--4')}>
+                        <blockquote>
+                            <p>"This is the best book on Physical AI I have ever read. It's comprehensive, practical, and easy to follow."</p>
+                            <cite>- John Doe, Robotics Engineer</cite>
+                        </blockquote>
+                    </div>
+                    <div className={clsx('col col--4')}>
+                        <blockquote>
+                            <p>"I was able to build my first robot after reading this book. Highly recommended!"</p>
+                            <cite>- Jane Smith, AI Enthusiast</cite>
+                        </blockquote>
+                    </div>
+                    <div className={clsx('col col--4')}>
+                        <blockquote>
+                            <p>"A must-read for anyone who wants to get into the exciting field of robotics."</p>
+                            <cite>- Sam Wilson, Researcher</cite>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+
 export default function HomepageFeatures(): ReactNode {
   return (
-    <section className={styles.features}>
-      <div className="container">
-        <div className="feature-list">
-          {FeatureList.map((props, idx) => (
-            <Feature key={idx} {...props} />
-          ))}
-        </div>
-      </div>
-    </section>
+    <>
+        <section className={styles.features}>
+          <div className="container">
+            <div className="feature-list">
+              {FeatureList.map((props, idx) => (
+                <Feature key={idx} {...props} />
+              ))}
+            </div>
+          </div>
+        </section>
+        <WhyThisBook />
+        <Testimonials />
+    </>
   );
 }
