@@ -1,11 +1,10 @@
 <!--
 Sync Impact Report:
-Version change: 2.0.0 -> 3.0.0
-Modified principles: All principles have been replaced to support the creation of a high-quality technical textbook.
+Version change: 3.0.0 -> 3.1.0
+Modified principles: Added new principles for RAG Backend API development.
 Added sections: None
-Removed sections: All previous principles have been replaced.
+Removed sections: None
 Templates requiring updates:
-  - WARNING: This is a major, backward-incompatible change. All templates and guidance documents require a full review to align with the new v3.0.0 constitution.
   - .specify/templates/plan-template.md: ⚠ pending
   - .specify/templates/spec-template.md: ⚠ pending
   - .specify/templates/tasks-template.md: ⚠ pending
@@ -25,7 +24,7 @@ Follow-up TODOs:
 -->
 # Hackathon Project: AI/Spec-Driven Book + RAG Chatbot Constitution
 
-These are hard rules and must ALWAYS be enforced to support a high-quality technical textbook.
+These are hard rules and must ALWAYS be enforced to support a high-quality technical textbook and RAG Backend API development.
 
 ## Core Principles
 
@@ -44,7 +43,22 @@ When importing content from a master file, the `docs/` folder becomes the new so
 ### 5) Asset Management
 Images and static assets MUST be stored in `docs/static/img` and referenced with relative paths.
 
+### 6) Serverless Compatibility
+The backend MUST be stateless and structure the entry point (`api/index.py`) to be compatible with Vercel Serverless Functions. Global variables for database clients must use lazy initialization.
+
+### 7) Type Safety
+All backend data exchange MUST be defined using Pydantic models (`BaseModel`). No loose dictionaries for API request/response payloads.
+
+### 8) Modular Utilities
+Shared logic (database connections, embeddings, helpers) MUST be separated into a `utils/` directory, distinct from the route handlers in `api/`.
+
+### 9) Secure Configuration
+API Keys (Gemini, Qdrant) and sensitive configuration MUST be loaded from environment variables.
+
+### 10) Frontend/Backend Separation
+The frontend (React/Docusaurus) MUST communicate with the backend solely via the `/api` endpoints, defined in a dedicated TypeScript service file.
+
 ## Governance
 <!-- Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-**Version**: 3.0.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2025-12-07
+**Version**: 3.1.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2025-12-07

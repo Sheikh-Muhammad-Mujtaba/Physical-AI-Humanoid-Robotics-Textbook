@@ -25,11 +25,16 @@ The textbook is structured into 5 distinct modules, each containing 3 chapters, 
 
 This project adheres to a strict constitution to ensure quality and consistency. The core principles are:
 
-1.  **Educational Clarity**: All content MUST be accessible to beginners while remaining technically accurate.
+1.  **Educational Clarity**: All content MUST be accessible to beginners while technically accurate.
 2.  **Docusaurus-First Architecture**: Content MUST be structured for Docusaurus, with valid frontmatter in every Markdown file.
 3.  **Modular Content**: Large topics are broken down into atomic, readable sub-chapters.
 4.  **Single Source of Truth**: The `textbook/` folder is the source of truth, and master files are archived after import.
 5.  **Asset Management**: All images and static assets are stored in `textbook/static/img` and referenced with relative paths.
+6.  **Serverless Compatibility**: The backend MUST be stateless and structure the entry point (`api/index.py`) to be compatible with Vercel Serverless Functions. Global variables for database clients must use lazy initialization.
+7.  **Type Safety**: All backend data exchange MUST be defined using Pydantic models (`BaseModel`). No loose dictionaries for API request/response payloads.
+8.  **Modular Utilities**: Shared logic (database connections, embeddings, helpers) MUST be separated into a `utils/` directory, distinct from the route handlers in `api/`.
+9.  **Secure Configuration**: API Keys (Gemini, Qdrant) and sensitive configuration MUST be loaded from environment variables.
+10. **Frontend/Backend Separation**: The frontend (React/Docusaurus) MUST communicate with the backend solely via the `/api` endpoints, defined in a dedicated TypeScript service file.
 
 ### Contributing
 
