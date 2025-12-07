@@ -41,7 +41,7 @@ Large topics MUST be broken down into atomic, readable sub-chapters (files) rath
 When importing content from a master file, the `docs/` folder becomes the new source of truth. The master file is archived after import.
 
 ### 5) Asset Management
-Images and static assets MUST be stored in `docs/static/img` and referenced with relative paths.
+Images and static assets MUST be stored in `textbook/static/img` and referenced with relative paths.
 
 ### 6) Serverless Compatibility
 The backend MUST be stateless and structure the entry point (`api/index.py`) to be compatible with Vercel Serverless Functions. Global variables for database clients must use lazy initialization.
