@@ -1,0 +1,112 @@
+openapi: 3.0.0
+info:
+  title: RAG Backend API
+  version: 1.0.0
+  description: API for Retrieval-Augmented Generation based on textbook content.
+
+servers:
+  - url: /api
+    description: Vercel Serverless Function API Base Path
+
+paths:
+  /chat:
+    post:
+      summary: Ask a question and get an LLM-generated answer using RAG
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Successful response with an LLM-generated answer.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '400':
+          description: Bad Request due to invalid input.
+        '500':
+          description: Internal Server Error due to Qdrant or LLM provider issues.
+        '429':
+          description: Too Many Requests due to rate limits.
+
+  /ask-selection:
+    post:
+      summary: Get a context-aware explanation for a selected text snippet and question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AskSelectionRequest'
+      responses:
+        '200':
+          description: Successful response with a context-aware explanation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse' # Re-using ChatResponse for consistency
+        '400':
+          description: Bad Request due to invalid input.
+        '500':
+          description: Internal Server Error due to Qdrant or LLM provider issues.
+        '429':
+          description: Too Many Requests due to rate limits.
+
+  /health:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: API is healthy.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          description: The user's question or prompt.
+          example: "What is Physical AI?"
+    ChatResponse:
+      type: object
+      required:
+        - answer
+      properties:
+        answer:
+          type: string
+          description: The LLM-generated answer.
+          example: "Physical AI refers to artificial intelligence systems that interact with and manipulate the physical world."
+        context:
+          type: array
+          items:
+            type: string
+          description: A list of text snippets used as context for the answer.
+          example: ["Text snippet 1", "Text snippet 2"]
+    AskSelectionRequest:
+      type: object
+      required:
+        - selection
+        - question
+      properties:
+        selection:
+          type: string
+          description: The user-selected text snippet from the textbook.
+          example: "Physical AI combines perception, planning, action, and learning."
+        question:
+          type: string
+          description: A specific question about the selected text.
+          example: "What are the components of Physical AI mentioned here?"
