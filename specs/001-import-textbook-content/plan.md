@@ -28,7 +28,7 @@ This plan outlines the process for importing a single markdown file (`contentgui
 - **Educational Clarity**: N/A for this feature, as it is a content import process.
 - **Docusaurus-First Architecture**: The entire feature is designed to structure content for Docusaurus, including frontmatter generation.
 - **Modular Content**: The import script will break down the monolithic `contentguide.md` into modular chapter files.
-- **Single Source of Truth**: The script will treat `contentguide.md` as the source and the `docs/` directory as the destination. The spec does not mention archiving the master file, so this is not part of the plan.
+- **Single Source of Truth**: The script will treat `contentguide.md` as the source and the `docs/` directory as the new source of truth. The `contentguide.md` master file MUST be archived after import.
 - **Asset Management**: The spec does not mention asset management.
 
 ## Project Structure

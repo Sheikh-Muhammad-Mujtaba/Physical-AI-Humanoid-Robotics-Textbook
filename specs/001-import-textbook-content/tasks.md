@@ -53,6 +53,7 @@
 - [ ] T010 [US1] Implement the logic to ensure `docs/sidebars.ts` is configured for autogeneration in `docs/scripts/import-content.sh`.
 - [ ] T011 [US1] Implement error handling for empty or non-existent `contentguide.md` in `docs/scripts/import-content.sh`.
 - [ ] T012 [US1] Implement error handling for incorrect header hierarchy in `docs/scripts/import-content.sh`.
+- [ ] T013 [US1] Archive the `contentguide.md` master file after successful import.
 
 ---
 
@@ -60,10 +61,10 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T013 Add comments and documentation to the `docs/scripts/import-content.sh` script.
-- [ ] T014 [P] Run the import script and verify the output.
-- [ ] T015 [P] Run `npm run build` in the `docs` directory and verify it passes.
-- [ ] T016 [P] Manually test the generated site for correct sidebar order and broken links.
+- [ ] T014 Add comments and documentation to the `docs/scripts/import-content.sh` script.
+- [ ] T015 [P] Run the import script and verify the output.
+- [ ] T016 [P] Run `npm run build` in the `docs` directory and verify it passes.
+- [ ] T017 [P] Manually test the generated site for correct sidebar order and broken links.
 
 ---
 
