@@ -89,9 +89,9 @@ As a developer, I want to check the health status of the RAG backend, so that I 
 -   **FR-001**: The backend MUST expose a POST endpoint at `/api/chat` that accepts a user query and returns an LLM-generated answer.
 -   **FR-002**: The backend MUST expose a POST endpoint at `/api/ask-selection` that accepts a selected text snippet and a question, returning a context-aware explanation.
 -   **FR-003**: The backend MUST expose a GET endpoint at `/api/health` that returns a status of `{"status": "ok"}`.
--   **FR-004**: The backend MUST retrieve relevant context from Qdrant based on the user's query for the `/api/chat` endpoint.
--   **FR-005**: The backend MUST retrieve relevant context from Qdrant based on the user's selected text for the `/api/ask-selection` endpoint.
--   **FR-006**: The backend MUST use Google Gemini via `google-generativeai` for LLM responses.
+-   **FR-004**: The backend SHOULD retrieve relevant context from an external, persistent Qdrant instance based on the user's query for the `/api/chat` endpoint. If Qdrant is unavailable, a generic LLM response may be returned.
+-   **FR-005**: The backend SHOULD retrieve relevant context from an external, persistent Qdrant instance based on the user's selected text for the `/api/ask-selection` endpoint. If Qdrant is unavailable, a generic LLM response may be returned.
+-   **FR-006**: The backend MUST primarily use Google Gemini via `google-generativeai` for LLM responses. If the Gemini API is unresponsive, a predefined generic message or a fallback LLM response (if configured) SHOULD be returned.
 -   **FR-007**: The backend MUST use Pydantic models for all API request and response payloads.
 -   **FR-008**: The backend MUST structure its main application entry point as `api/index.py` for Vercel Serverless compatibility.
 -   **FR-009**: The backend MUST separate shared logic into a `utils/` directory, including `config.py`, `models.py`, `tools.py`, and `helpers.py`.
@@ -99,6 +99,8 @@ As a developer, I want to check the health status of the RAG backend, so that I 
 -   **FR-011**: The frontend MUST communicate with the backend solely via `/api` endpoints, defined in `src/lib/chatApi.ts`.
 -   **FR-012**: The frontend MUST integrate the `ChatBot.tsx` component into `src/components/ChatBot.tsx`.
 -   **FR-013**: The project MUST include a `vercel.json` file to route `/api/*` requests to the Python backend.
+-   **FR-014**: The backend MUST attempt to parse and cleanse invalid input from `/api/chat` and `/api/ask-selection` requests before processing, to improve robustness against malformed client requests.
+-   **FR-015**: The backend MUST return a generic message to the user if rate limits are encountered from the LLM provider, to avoid exposing API errors directly.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -115,3 +117,13 @@ As a developer, I want to check the health status of the RAG backend, so that I 
 -   **SC-002**: Sending a question to `/api/chat` returns a valid LLM-generated answer within 5 seconds for 95% of requests, using textbook context.
 -   **SC-003**: Sending a user-selected text snippet and question to `/api/ask-selection` returns a context-aware explanation within 7 seconds for 95% of requests.
 -   **SC-004**: Frontend chat UI successfully sends queries to the backend and displays responses.
+
+## Clarifications
+
+### Session 2025-12-07
+
+- Q: What should be the system's behavior if the Qdrant database is unavailable during a `/api/chat` or `/api/ask-selection` request? → A: Return a specific error message to the user, but allow the LLM to generate a generic response (without RAG).
+- Q: What should be the system's behavior if the Google Gemini API is unresponsive or returns an error? → A: Return a specific error message to the user, but use a fallback LLM (if configured) or a predefined generic message.
+- Q: How should the system respond if an invalid query (e.g., malformed JSON, missing required fields) is sent to `/api/chat` or `/api/ask-selection`? → A: Attempt to parse/cleanse the invalid input before processing.
+- Q: How should the system handle potential rate limits imposed by the LLM provider (Google Gemini)? → A: Return a generic message to the user.
+- Q: Will Qdrant persist data across Vercel serverless function invocations, or will it need to be reinitialized/repopulated for each request? → A: Assume a persistent Qdrant instance (e.g., Qdrant Cloud Free Tier, self-hosted). Backend functions connect to this external instance.
