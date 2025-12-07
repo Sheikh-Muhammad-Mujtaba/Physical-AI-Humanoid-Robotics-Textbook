@@ -1,0 +1,8 @@
+
+  Exhaustive list of all broken links found:
+  - Broken link on source page path = /:
+     -> linking to ./docs/module1-introduction-to-physical-ai/what-is-physical-ai (resolved as: /docs/module1-introduction-to-physical-ai/what-is-physical-ai)
+     -> linking to ./docs/module2-hardware-requirements/workstation-requirements (resolved as: /docs/module2-hardware-requirements/workstation-requirements)
+     -> linking to ./docs/module3-cloud-native-lab/cloud-workstations (resolved as: /docs/module3-cloud-native-lab/cloud-workstations)
+     -> linking to ./docs/module4-economy-jetson-student-kit/jetson-student-kit (resolved as: /docs/module4-economy-jetson-student-kit/jetson-student-kit)
+  
