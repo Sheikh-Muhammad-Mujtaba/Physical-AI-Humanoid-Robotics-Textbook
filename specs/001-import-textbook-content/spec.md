@@ -36,6 +36,7 @@ As a content manager, I want to import the entire textbook from a single Markdow
 2.  **Given** the `docs/` directory is populated, **When** `npm run build` is run inside the `docs/` directory, **Then** the build should complete without errors.
 3.  **Given** the Docusaurus site is running, **When** a user views the site, **Then** all chapters should appear in the sidebar in the correct order.
 4.  **Given** the Docusaurus site is running, **When** a user navigates between chapters, **Then** there should be no broken links.
+5.  **Given** `contentguide.md` contains references to images or static assets, **When** the import script is run, **Then** these assets should be moved to `docs/static/img` and their references in the markdown files updated to relative paths.
 
 ### Edge Cases
 
@@ -52,9 +53,12 @@ As a content manager, I want to import the entire textbook from a single Markdow
 - **FR-003**: The system MUST create a new directory for each module inside the `docs/docs` directory.
 - **FR-004**: The system MUST create a new markdown file for each chapter inside the corresponding module directory.
 - **FR-005**: The system MUST generate Docusaurus frontmatter for each chapter file, including `id`, `title`, and `sidebar_position`.
-- **FR-006**: The system MUST handle existing content in the `docs/` directory by replacing it with the new content.
-- **FR-007**: The system MUST convert special callouts (e.g., "Note:", "Warning:") into Docusaurus admonitions.
+- **FR-006**: The system MUST overwrite existing chapter files in the `docs/` directory with content generated from `contentguide.md`.
+- **FR-007**: The system MUST convert special callouts (lines starting with `Note:`, `Warning:`, or `Info:`) into Docusaurus admonitions.
 - **FR-008**: The system MUST ensure `docs/sidebars.ts` is configured to automatically generate sidebars from the folder structure.
+- **FR-009**: The system MUST stop the import process with an error if `contentguide.md` is empty or does not exist.
+- **FR-010**: The system MUST log a warning and attempt to recover from incorrect header hierarchy (e.g., treat a level 3 header as a level 2 header if no level 2 header is present).
+- **FR-011**: The system MUST ensure that images and static assets within the imported content are stored in `docs/static/img` and referenced with relative paths.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -69,3 +73,12 @@ As a content manager, I want to import the entire textbook from a single Markdow
 - **SC-002**: All chapters from `contentguide.md` are present in the Docusaurus sidebar.
 - **SC-003**: The order of chapters in the sidebar matches the order in `contentguide.md`.
 - **SC-004**: All internal links between chapters are functional.
+
+## Clarifications
+
+### Session 2025-12-07
+
+- Q: What should happen if a chapter file to be generated from `contentguide.md` already exists in the `docs/` directory? → A: Overwrite existing files.
+- Q: What should happen if `contentguide.md` is empty or does not exist? → A: Stop the import with an error.
+- Q: How should the system handle incorrect header hierarchy (e.g., a `###` header without a `##` parent)? → A: Log a warning and attempt to recover (e.g., treat `###` as `##`).
+- Q: What constitutes a "special callout" for the purpose of converting to Docusaurus admonitions? → A: Define "special callouts" as lines starting with `Note:`, `Warning:`, or `Info:`.
