@@ -83,29 +83,29 @@ As an Urdu-speaking user, I want to view the Docusaurus site and chatbot interfa
 
 ### Functional Requirements
 
--   **FR-001**: The backend MUST persist chat history logs in a PostgreSQL database (via Neon).
--   **FR-002**: The backend MUST store chat history in a table named `chat_history`.
+-   **FR-001**: The backend SHOULD persist chat history logs in a PostgreSQL database (via Neon). If the database is unavailable, new conversations can proceed, but historical data will not be accessible, and a warning MUST be displayed to the user.
+-   **FR-002**: The backend SHOULD store chat history in a table named `chat_history`.
 -   **FR-003**: The backend MUST use `psycopg2-binary` for PostgreSQL database connections.
 -   **FR-004**: The backend MUST connect to PostgreSQL using the `DATABASE_URL` environment variable.
 -   **FR-005**: The backend MUST expose a `POST /api/feedback` endpoint to receive and store user ratings for answers.
 -   **FR-006**: The frontend Chat UI (`ChatBot.tsx`) MUST generate a UUID `sessionId` for each new user/session.
 -   **FR-007**: The frontend Chat UI MUST send the `sessionId` with all backend chat requests (`/api/chat`, `/api/ask-selection`).
--   **FR-008**: The Docusaurus site MUST be configured to support English (`en`) as default and Urdu (`ur`) as a second language using i18n.
+-   **FR-008**: The Docusaurus site MUST be configured to support English (`en`) as default and Urdu (`ur`) as a second language using i18n, with a language switcher presented as a dropdown in the navbar.
 -   **FR-009**: The Docusaurus site MUST automatically enable Right-to-Left (RTL) layout when Urdu is selected.
 -   **FR-010**: The Docusaurus project MUST have the necessary folder structure (`i18n/ur/`) for manual translation.
--   **FR-011**: The frontend MUST integrate the `ChatBot.tsx` component into the Docusaurus layout (global wrapper).
+-   **FR-011**: The frontend MUST integrate the `ChatBot.tsx` component as a persistent floating widget in the Docusaurus layout (e.g., in the bottom-right corner of the screen).
 
 ### Key Entities *(include if feature involves data)*
 
 -   **ChatHistory**: Represents a stored chat message.
+    -   `message_id` (UUID): Globally unique identifier for the message, serves as primary key.
     -   `session_id` (UUID): Unique identifier for the chat session.
-    -   `message_id` (UUID): Unique identifier for the message.
     -   `timestamp` (datetime): Time the message was sent/received.
     -   `sender` (enum: 'user', 'bot'): Who sent the message.
     -   `text` (string): The content of the message.
     -   `feedback` (integer, optional: -1, 0, 1): User feedback on bot answers.
 -   **FeedbackRequest**: Pydantic model for `/api/feedback` endpoint.
-    -   `message_id` (UUID): The ID of the message being rated.
+    -   `message_id` (UUID): The globally unique ID of the message being rated.
     -   `rating` (integer): The rating (e.g., -1 for thumbs down, 1 for thumbs up).
 
 ## Success Criteria *(mandatory)*
@@ -117,4 +117,14 @@ As an Urdu-speaking user, I want to view the Docusaurus site and chatbot interfa
 -   **SC-003**: Feedback submitted via `/api/feedback` is recorded in Postgres within 1 second.
 -   **SC-004**: Switching to Urdu language displays at least 80% of UI elements in Urdu and correctly applies RTL layout.
 -   **SC-005**: Chatbot conversations, including history, persist and load correctly across browser sessions for a given `sessionId`.
+
+## Clarifications
+
+### Session 2025-12-07
+
+- Q: What is the primary key for the `chat_history` table? Should `session_id` and `message_id` together form a composite primary key, or is `message_id` unique globally? → A: `message_id` is globally unique and serves as the primary key.
+- Q: When feedback is given via `POST /api/feedback`, is it meant for a specific `message_id` within a `session_id`, or is `message_id` globally unique and sufficient? → A: Feedback is for a specific `message_id` (globally unique).
+- Q: How should the `ChatBot.tsx` component be integrated into the Docusaurus layout as a "global wrapper"? → A: Persistent floating widget (e.g., in the bottom-right corner of the screen).
+- Q: How will the language switcher for English/Urdu be presented to the user? → A: Dropdown in the navbar.
+- Q: What is the expected behavior if the Postgres database is unavailable when trying to save or retrieve chat history? → A: Allow partial functionality without history (new conversations can start, old ones not loaded), display a warning to the user.
 ```
