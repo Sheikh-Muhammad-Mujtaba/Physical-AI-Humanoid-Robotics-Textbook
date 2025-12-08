@@ -1,19 +1,24 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
+AI:
+  label: AI
+  permalink: /tags/ai
+  description: Posts related to Artificial Intelligence
 
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
+Robotics:
+  label: Robotics
+  permalink: /tags/robotics
+  description: Posts related to Robotics
 
-docusaurus:
+Docusaurus:
   label: Docusaurus
-  permalink: /docusaurus
-  description: Docusaurus tag description
+  permalink: /tags/docusaurus
+  description: Posts related to Docusaurus framework
 
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
+Book:
+  label: Book
+  permalink: /tags/book
+  description: Posts related to the Physical AI & Humanoid Robotics textbook
+
+AI-Native:
+  label: AI-Native
+  permalink: /tags/ai-native
+  description: Posts related to AI-Native systems and development
