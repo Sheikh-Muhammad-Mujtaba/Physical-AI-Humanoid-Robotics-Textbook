@@ -36,6 +36,15 @@ This project adheres to a strict constitution to ensure quality and consistency.
 9.  **Secure Configuration**: API Keys (Gemini, Qdrant) and sensitive configuration MUST be loaded from environment variables.
 10. **Frontend/Backend Separation**: The frontend (React/Docusaurus) MUST communicate with the backend solely via the `/api` endpoints, defined in a dedicated TypeScript service file.
 
+### Environment Variables
+
+To run this project, you will need to add the following environment variables to your `.env` file in the `api` directory:
+
+*   `GEMINI_API_KEY`: Your Google Gemini API key.
+*   `QDRANT_URL`: The URL of your Qdrant instance.
+*   `QDRANT_API_KEY`: The API key for your Qdrant instance.
+*   `DATABASE_URL`: The connection string for your PostgreSQL database (e.g., Neon).
+
 ### Contributing
 
 Contributions are welcome! Please refer to the project's specification documents for guidelines on adding new content, improving existing sections, or contributing to the development of this textbook.

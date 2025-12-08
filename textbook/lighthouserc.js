@@ -1,10 +1,9 @@
 module.exports = {
   ci: {
     collect: {
-      startServerCommand: 'npm run serve',
       url: [
-        'https://ai-spec-driven.vercel.app',
-        'https://ai-spec-driven.vercel.app/docs/intro',
+        'http://localhost:3000',
+        'http://localhost:3000/docs/intro',
       ],
       numberOfRuns: 3,
     },

@@ -1,7 +1,6 @@
 from typing import List
 from qdrant_client.http.models import PointStruct
 from api.utils.config import config, Config
-from api.utils.helpers import GeminiHelper
 from api.utils.models import TextChunk
 import os
 
