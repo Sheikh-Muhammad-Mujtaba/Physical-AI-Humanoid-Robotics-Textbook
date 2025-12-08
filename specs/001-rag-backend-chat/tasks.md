@@ -19,11 +19,11 @@
 
 **Purpose**: Setup the basic project structure and configuration files for the RAG Backend API.
 
-- [ ] T001 Create the `api/` directory at the repository root.
-- [ ] T002 Create an empty `api/index.py` file to serve as the main FastAPI app entry point.
-- [ ] T003 Create `api/requirements.txt` and add `fastapi`, `uvicorn`, `qdrant-client`, `google-generativeai`, `pydantic`, `python-dotenv`.
-- [ ] T004 Create the `api/utils/` directory.
-- [ ] T005 Create `vercel.json` in the project root with the following content to route `/api/*` requests to the Python app:
+- [X] T001 Create the `api/` directory at the repository root.
+- [X] T002 Create an empty `api/index.py` file to serve as the main FastAPI app entry point.
+- [X] T003 Create `api/requirements.txt` and add `fastapi`, `uvicorn`, `qdrant-client`, `google-generativeai`, `pydantic`, `python-dotenv`.
+- [X] T004 Create the `api/utils/` directory.
+- [X] T005 Create `vercel.json` in the project root with the following content to route `/api/*` requests to the Python app:
     ```json
     {
       "rewrites": [
@@ -41,10 +41,10 @@
 
 **Purpose**: Implement shared logic and data models for the RAG Backend API.
 
-- [ ] T007 Create `api/utils/models.py` defining Pydantic models for `ChatRequest`, `ChatResponse`, and `AskSelectionRequest` based on `specs/001-rag-backend-chat/data-model.md`.
-- [ ] T008 Create `api/utils/config.py` to handle environment variable loading (using `python-dotenv`) for `GEMINI_API_KEY`, `QDRANT_URL`, and `QDRANT_API_KEY`. Also, initialize the Qdrant client lazily.
-- [ ] T009 Create `api/utils/helpers.py` with logic for `embed_text` using Google Gemini.
-- [ ] T010 Create `api/utils/tools.py` with helper functions for `search_book_content` and `format_context`.
+- [X] T007 Create `api/utils/models.py` defining Pydantic models for `ChatRequest`, `ChatResponse`, and `AskSelectionRequest` based on `specs/001-rag-backend-chat/data-model.md`.
+- [X] T008 Create `api/utils/config.py` to handle environment variable loading (using `python-dotenv`) for `GEMINI_API_KEY`, `QDRANT_URL`, and `QDRANT_API_KEY`. Also, initialize the Qdrant client lazily.`
+- [X] T009 Create `api/utils/helpers.py` with logic for `embed_text` using Google Gemini.
+- [X] T010 Create `api/utils/tools.py` with helper functions for `search_book_content` and `format_context`.
 
 ---
 
@@ -52,13 +52,13 @@
 
 **Purpose**: Implement the FastAPI routes for the RAG Backend API.
 
-- [ ] T011 [US3] Implement the `GET /api/health` endpoint in `api/index.py` that returns `{"status": "ok"}`.
-- [ ] T012 [US1] Implement the `POST /api/chat` endpoint in `api/index.py`. This includes:
+- [X] T011 [US3] Implement the `GET /api/health` endpoint in `api/index.py` that returns `{"status": "ok"}`.
+- [X] T012 [US1] Implement the `POST /api/chat` endpoint in `api/index.py`. This includes:
     -   Accepting `ChatRequest` (Pydantic model).
     -   Retrieving context from an external, persistent Qdrant instance (with fallback for unavailability), and returns an LLM-generated answer using Google Gemini (with fallback for unresponsiveness and generic message for rate limits).
     -   Attempting to parse/cleanse invalid input (FR-014).
     -   Returning `ChatResponse` (Pydantic model).
-- [ ] T013 [US2] Implement the `POST /api/ask-selection` endpoint in `api/index.py`. This includes:
+- [X] T013 [US2] Implement the `POST /api/ask-selection` endpoint in `api/index.py`. This includes:
     -   Accepting `AskSelectionRequest` (Pydantic model).
     -   Retrieving context from an external, persistent Qdrant instance (with fallback for unavailability), and returns a context-aware explanation using Google Gemini (with fallback for unresponsiveness and generic message for rate limits).
     -   Attempting to parse/cleanse invalid input (FR-014).
@@ -70,8 +70,8 @@
 
 **Purpose**: Integrate the RAG Backend API with the Docusaurus frontend.
 
-- [ ] T014 Create `textbook/src/lib/chatApi.ts` to handle fetch requests to the backend API endpoints (`/api/chat`, `/api/ask-selection`, `/api/health`).
-- [ ] T015 Port the `ChatBot.tsx` component to `textbook/src/components/ChatBot.tsx` and integrate it with `textbook/src/lib/chatApi.ts`.
+- [X] T014 Create `textbook/src/lib/chatApi.ts` to handle fetch requests to the backend API endpoints (`/api/chat`, `/api/ask-selection`, `/api/health`).
+- [X] T015 Port the `ChatBot.tsx` component to `textbook/src/components/ChatBot.tsx` and integrate it with `textbook/src/lib/chatApi.ts`.
 
 ---
 
@@ -79,10 +79,10 @@
 
 **Purpose**: Verify the functionality of the RAG Backend API locally.
 
-- [ ] T016 Run the FastAPI server locally: `uvicorn api/index:app --reload`.
-- [ ] T017 Manually test the `GET /api/health` endpoint.
-- [ ] T018 Manually test the `POST /api/chat` endpoint with a sample question.
-- [ ] T019 Manually test the `POST /api/ask-selection` endpoint with a sample text snippet and question.
+- [X] T016 Run the FastAPI server locally: `uvicorn api/index:app --reload`.
+- [X] T017 Manually test the `GET /api/health` endpoint.
+- [X] T018 Manually test the `POST /api/chat` endpoint with a sample question.
+- [X] T019 Manually test the `POST /api/ask-selection` endpoint with a sample text snippet and question.
 
 ---
 
