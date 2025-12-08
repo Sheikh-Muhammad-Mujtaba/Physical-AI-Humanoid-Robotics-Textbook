@@ -18,6 +18,9 @@ Auto-generated from all feature plans. Last updated: 2025-12-07
 - Vercel Serverless Functions (001-rag-backend-chat)
 - React, Docusaurus (frontend integration) (001-rag-backend-chat)
 
+- PostgreSQL (Neon) + SQLAlchemy, psycopg2-binary (002-chatbot-history-l10n)
+- Docusaurus i18n (002-chatbot-history-l10n)
+
 ## Project Structure
 
 ```text
@@ -46,6 +49,9 @@ Node.js >=20.0, TypeScript ~5.6.2: Follow standard conventions
 - 001-rag-backend-chat: Added Python 3.10+ + FastAPI, Google Gemini, Qdrant client, Pydantic, python-dotenv
 - 001-rag-backend-chat: Added Vercel Serverless Functions
 - 001-rag-backend-chat: Added React, Docusaurus (frontend integration)
+
+- 002-chatbot-history-l10n: Added PostgreSQL (Neon) + SQLAlchemy, psycopg2-binary
+- 002-chatbot-history-l10n: Added Docusaurus i18n
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

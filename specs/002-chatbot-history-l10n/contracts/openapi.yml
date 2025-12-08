@@ -1,0 +1,175 @@
+openapi: 3.0.0
+info:
+  title: RAG Backend API
+  version: 1.0.0
+  description: API for Retrieval-Augmented Generation based on textbook content with chat history and feedback.
+
+servers:
+  - url: /api
+    description: Vercel Serverless Function API Base Path
+
+paths:
+  /chat:
+    post:
+      summary: Ask a question and get an LLM-generated answer using RAG, with chat history persistence.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Successful response with an LLM-generated answer and message ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '400':
+          description: Bad Request due to invalid input.
+        '500':
+          description: Internal Server Error due to database, Qdrant, or LLM provider issues.
+        '429':
+          description: Too Many Requests due to rate limits.
+
+  /ask-selection:
+    post:
+      summary: Get a context-aware explanation for a selected text snippet and question, with chat history persistence.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AskSelectionRequest'
+      responses:
+        '200':
+          description: Successful response with a context-aware explanation and message ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '400':
+          description: Bad Request due to invalid input.
+        '500':
+          description: Internal Server Error due to database, Qdrant, or LLM provider issues.
+        '429':
+          description: Too Many Requests due to rate limits.
+
+  /health:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: API is healthy.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+        '500':
+          description: Internal Server Error if database connection fails.
+
+  /feedback:
+    post:
+      summary: Submit feedback on an LLM-generated answer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackRequest'
+      responses:
+        '200':
+          description: Feedback submitted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "Feedback received"
+        '400':
+          description: Bad Request due to invalid input (e.g., malformed message_id, invalid rating).
+        '404':
+          description: Message ID not found for feedback.
+        '500':
+          description: Internal Server Error due to database issues.
+
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required:
+        - query
+        - session_id
+      properties:
+        query:
+          type: string
+          description: The user's question or prompt.
+          example: "What is Physical AI?"
+        session_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the chat session.
+          example: "123e4567-e89b-12d3-a456-426614174000"
+    ChatResponse:
+      type: object
+      required:
+        - message_id
+        - answer
+      properties:
+        message_id:
+          type: string
+          format: uuid
+          description: Globally unique identifier for the bot's response message.
+          example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+        answer:
+          type: string
+          description: The LLM-generated answer.
+          example: "Physical AI refers to artificial intelligence systems that interact with and manipulate the physical world."
+        context:
+          type: array
+          items:
+            type: string
+          description: A list of text snippets used as context for the answer.
+          example: ["Text snippet 1", "Text snippet 2"]
+    AskSelectionRequest:
+      type: object
+      required:
+        - selection
+        - question
+        - session_id
+      properties:
+        selection:
+          type: string
+          description: The user-selected text snippet from the textbook.
+          example: "Physical AI combines perception, planning, action, and learning."
+        question:
+          type: string
+          description: A specific question about the selected text.
+          example: "What are the components of Physical AI mentioned here?"
+        session_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the chat session.
+          example: "123e4567-e89b-12d3-a456-426614174000"
+    FeedbackRequest:
+      type: object
+      required:
+        - message_id
+        - rating
+      properties:
+        message_id:
+          type: string
+          format: uuid
+          description: The globally unique ID of the message being rated.
+          example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+        rating:
+          type: integer
+          description: The rating (-1 for thumbs down, 1 for thumbs up).
+          example: 1
+          enum: [-1, 1]
