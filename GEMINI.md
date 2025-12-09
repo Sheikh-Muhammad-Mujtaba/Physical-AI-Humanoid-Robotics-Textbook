@@ -40,7 +40,6 @@ Node.js >=20.0, TypeScript ~5.6.2: Follow standard conventions
 ## Recent Changes
 - 001-ui-polish-select-to-ask: Added Python 3.10, TypeScript 5.x + FastAPI, React, Docusaurus, Tailwind CSS
 - 001-gemini-rag-backend: Added Python 3.10+ + FastAPI, Gemini SDK, Qdrant client, SQLAlchemy, asyncpg, pgvector
-- 001-gemini-rag-backend: Added Python 3.10+ + FastAPI, Gemini SDK, Qdrant client
 
 
 
