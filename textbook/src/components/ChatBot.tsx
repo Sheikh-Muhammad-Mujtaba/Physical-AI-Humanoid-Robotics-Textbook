@@ -3,6 +3,7 @@
 import React, { useState, FormEvent, ChangeEvent, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { chatWithBackend, askSelectionWithBackend, getHistory, sendFeedback } from '../lib/chatApi';
+import { useChat } from '../lib/ChatProvider';
 
 interface Message {
   message_id?: string;
@@ -12,7 +13,7 @@ interface Message {
 }
 
 const ChatBot: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { isChatOpen, openChat, closeChat, conversation: messages, setConversation: setMessages } = useChat();
   const [input, setInput] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedText, setSelectedText] = useState<string>('');
@@ -45,7 +46,7 @@ const ChatBot: React.FC = () => {
     if (storedSessionId) {
       fetchHistory(storedSessionId);
     }
-  }, []);
+  }, [setMessages]);
 
   const handleSendMessage = async (e: FormEvent) => {
     e.preventDefault();
@@ -88,140 +89,71 @@ const ChatBot: React.FC = () => {
     setInput(e.target.value);
   };
 
-  const handleTextSelection = () => {
-    const selection = window.getSelection()?.toString().trim();
-    if (selection) {
-      setSelectedText(selection);
-      alert(`Selected text: "${selection}"\nNow ask a question related to this selection.`);
-    } else {
-      setSelectedText('');
-    }
-  };
-
   const handleFeedback = async (messageId: string, rating: number) => {
     try {
       await sendFeedback(messageId, rating);
-      // Optionally, provide user feedback that the feedback was sent.
       console.log('Feedback sent successfully');
     } catch (error) {
       console.error('Failed to send feedback:', error);
     }
   };
 
+  if (!isChatOpen) {
+    return (
+      <button
+        onClick={openChat}
+        className="fixed bottom-5 right-5 bg-blue-500 text-white rounded-full w-14 h-14 text-2xl cursor-pointer shadow-lg z-50"
+      >
+        💬
+      </button>
+    );
+  }
+
   return (
-    <div style={{
-      border: '1px solid #ccc',
-      borderRadius: '8px',
-      padding: '16px',
-      maxWidth: '600px',
-      margin: '20px auto',
-      display: 'flex',
-      flexDirection: 'column',
-      fontFamily: 'sans-serif',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-    }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '16px', color: '#333' }}>Textbook AI Assistant</h2>
-      <div style={{
-        flexGrow: 1,
-        height: '300px',
-        overflowY: 'auto',
-        border: '1px solid #eee',
-        borderRadius: '4px',
-        padding: '8px',
-        marginBottom: '16px',
-        backgroundColor: '#f9f9f9',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '8px'
-      }}>
+    <div className="fixed bottom-5 right-5 w-96 h-[500px] border border-gray-300 rounded-lg bg-white flex flex-col font-sans shadow-lg z-50">
+      <div className="flex justify-between items-center p-2 border-b border-gray-300">
+        <h2 className="m-0 text-lg">Textbook AI Assistant</h2>
+        <button onClick={closeChat} className="bg-transparent border-none text-lg cursor-pointer">
+          &#x2715;
+        </button>
+      </div>
+      <div className="flex-grow overflow-y-auto p-2 bg-gray-100 flex flex-col gap-2">
         {messages.map((msg, index) => (
-          <div key={index} style={{
-            alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-          }}>
-            <div style={{
-              backgroundColor: msg.sender === 'user' ? '#dcf8c6' : (msg.isError ? '#ffdddd' : '#f1f1f1'),
-              borderRadius: '12px',
-              padding: '10px 14px',
-              maxWidth: '100%', // Let the container control the width
-              wordBreak: 'break-word',
-              color: msg.isError ? '#cc0000' : '#333'
-            }}>
+          <div key={index} className={`self-${msg.sender === 'user' ? 'end' : 'start'}`}>
+            <div className={`rounded-lg p-2 max-w-full break-words ${msg.sender === 'user' ? 'bg-green-200' : (msg.isError ? 'bg-red-200 text-red-800' : 'bg-gray-200')}`}>
               {msg.text}
             </div>
             {msg.sender === 'bot' && !msg.isError && msg.message_id && (
-              <div style={{ marginTop: '4px', display: 'flex', gap: '4px' }}>
-                <button onClick={() => handleFeedback(msg.message_id, 1)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>👍</button>
-                <button onClick={() => handleFeedback(msg.message_id, -1)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>👎</button>
+              <div className="mt-1 flex gap-1">
+                <button onClick={() => handleFeedback(msg.message_id, 1)} className="bg-transparent border-none cursor-pointer">👍</button>
+                <button onClick={() => handleFeedback(msg.message_id, -1)} className="bg-transparent border-none cursor-pointer">👎</button>
               </div>
             )}
           </div>
         ))}
         {loading && (
-          <div style={{ alignSelf: 'flex-start', backgroundColor: '#f1f1f1', borderRadius: '12px', padding: '10px 14px' }}>
+          <div className="self-start bg-gray-200 rounded-lg p-2">
             Typing...
           </div>
         )}
       </div>
-      {selectedText && (
-        <div style={{
-          backgroundColor: '#ffeeba',
-          border: '1px solid #ffcb6b',
-          borderRadius: '4px',
-          padding: '8px',
-          marginBottom: '10px',
-          fontSize: '0.9em'
-        }}>
-          Selected: "<em>{selectedText.substring(0, 100)}...</em>"
-          <button onClick={() => setSelectedText('')} style={{ marginLeft: '10px', background: 'none', border: 'none', cursor: 'pointer', color: '#cc0000' }}>x</button>
-        </div>
-      )}
-      <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '8px' }}>
+      <form onSubmit={handleSendMessage} className="flex gap-2 p-2">
         <input
           type="text"
           value={input}
           onChange={handleInputChange}
-          placeholder={selectedText ? 'Ask about the selected text...' : 'Ask a question...'}
+          placeholder='Ask a question...'
           disabled={loading}
-          style={{
-            flexGrow: 1,
-            padding: '10px',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            fontSize: '16px'
-          }}
+          className="flex-grow p-2 border border-gray-300 rounded-md text-base"
         />
         <button
           type="submit"
           disabled={!input.trim() || loading}
-          style={{
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            padding: '10px 15px',
-            cursor: 'pointer',
-            fontSize: '16px'
-          }}
+          className="bg-blue-500 text-white border-none rounded-md px-4 py-2 cursor-pointer text-base"
         >
           Send
         </button>
       </form>
-      <button
-        onClick={handleTextSelection}
-        disabled={loading}
-        style={{
-          marginTop: '10px',
-          backgroundColor: '#28a745',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          padding: '10px 15px',
-          cursor: 'pointer',
-          fontSize: '16px'
-        }}
-      >
-        Select Text from Page
-      </button>
     </div>
   );
 };

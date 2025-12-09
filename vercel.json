@@ -1,11 +1,26 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/index.py", "use": "@vercel/python" },
-    { "src": "textbook/package.json", "use": "@vercel/static-build", "config": { "distDir": "textbook/build" } }
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "textbook/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "textbook/build"
+      }
+    }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "api/index.py" },
-    { "src": "/(.*)", "dest": "textbook/build/$1" }
+    {
+      "src": "/api/(.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "textbook/build/$1"
+    }
   ]
 }

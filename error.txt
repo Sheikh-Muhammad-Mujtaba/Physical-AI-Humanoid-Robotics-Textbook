@@ -1,0 +1,11 @@
+
+[ERROR] Client bundle compiled with errors therefore further build is impossible.
+Loading PostCSS "tailwindcss/postcss" plugin failed: Package subpath './postcss' is not defined by "exports" in E:\mujtaba data\coding classes\proramming\my code\GitHub_Repo_Codes\AI-hackthon\AI-Spec-Driven\textbook\node_modules\tailwindcss\package.json
+(@E:\mujtaba data\coding classes\proramming\my code\GitHub_Repo_Codes\AI-hackthon\AI-Spec-Driven\textbook\.docusaurus\docusaurus-plugin-css-cascade-layers\default\layers.css)
+
+--------------------------
+
+Loading PostCSS "tailwindcss/postcss" plugin failed: Package subpath './postcss' is not defined by "exports" in E:\mujtaba data\coding classes\proramming\my code\GitHub_Repo_Codes\AI-hackthon\AI-Spec-Driven\textbook\node_modules\tailwindcss\package.json
+(@E:\mujtaba data\coding classes\proramming\my code\GitHub_Repo_Codes\AI-hackthon\AI-Spec-Driven\textbook\node_modules\@docusaurus\theme-classic\lib\nprogress.css)
+
+--------------------------

@@ -1,0 +1,29 @@
+openapi: 3.0.0
+info:
+  title: AI-Spec-Driven Book API
+  version: 1.0.0
+paths:
+  /api/ask-selection:
+    post:
+      summary: Ask a question based on a text selection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: The text selection to ask a question about.
+      responses:
+        '200':
+          description: The AI's answer.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  answer:
+                    type: string
+                    description: The AI's answer to the question.

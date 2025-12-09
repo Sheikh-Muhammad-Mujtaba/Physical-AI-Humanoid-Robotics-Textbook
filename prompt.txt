@@ -1,20 +1,7 @@
-Generate dependency-ordered tasks for the integration.
+Execute the implementation tasks.
 
-**Task Organization:**
+**Directives:**
+1.  **Build First**: Fix the `index.tsx` links and `vercel.json` first.
+2.  **Preserve Logic**: When refactoring `ChatBot.tsx`, keep the existing `chatWithBackend` calls that use the current API structure.
+3.  **UI Polish**: Ensure the floating chat bubble has a high z-index (`z-50`) to sit above documentation.
 
-* **Phase 1: Backend (Neon Postgres)**
-    * Task: Add `psycopg2-binary` and `sqlalchemy` to `requirements.txt`.
-    * Task: Create `utils/database.py` with the SQLAlchemy engine configured for the Neon connection string.
-    * Task: Create `utils/sql_models.py` (define `ChatHistory` table).
-    * Task: Update `api/index.py` to persist chats to Postgres.
-
-* **Phase 2: Frontend (Chat)**
-    * Task: Create `src/theme/Root.tsx` to wrap the app with the Chatbot component.
-    * Task: Update `src/lib/chatApi.ts` to handle session IDs and fetch history.
-
-* **Phase 3: Localization (Urdu)**
-    * Task: Update `docusaurus.config.ts` with `i18n` settings for Urdu (RTL).
-    * Task: Update `src/components/HomepageFeatures/index.tsx` to use `<Translate>`.
-    * Task: Run the setup command to scaffold the `i18n/ur` directory.
-
-**Crucial Note**: The database tasks MUST NOT fallback to SQLite. If the connection fails, the app should error out (fail fast).

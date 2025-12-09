@@ -9,6 +9,8 @@ tags: [AI, Robotics, Docusaurus, Book, AI-Native]
 
 As Sheikh Mujtaba, an AI/Robotics Enthusiast & Developer, I am thrilled to announce the successful generation of a new, comprehensive book titled "Physical AI & Humanoid Robotics – AI-Native Systems." This project leveraged the power of AI-driven development to create a detailed and attractive resource for understanding the intricate world where artificial intelligence meets physical embodiment.
 
+<!-- truncate -->
+
 ### Project Highlights and Key Achievements:
 
 My journey began with a clear vision: to produce a high-quality technical book using Docusaurus, focusing on modern Physical AI and Humanoid Robotics concepts. Key milestones achieved during this implementation include:

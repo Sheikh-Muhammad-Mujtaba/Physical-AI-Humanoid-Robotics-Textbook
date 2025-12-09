@@ -1,9 +1,9 @@
 <!--
 Sync Impact Report:
-Version change: 3.0.0 -> 3.1.0
-Modified principles: Added new principles for RAG Backend API development.
+Version change: 3.1.0 -> 4.0.0
+Modified principles: Overwritten with 5 new principles for final polish and feature integration.
 Added sections: None
-Removed sections: None
+Removed sections: All previous principles removed.
 Templates requiring updates:
   - .specify/templates/plan-template.md: ⚠ pending
   - .specify/templates/spec-template.md: ⚠ pending
@@ -28,37 +28,24 @@ These are hard rules and must ALWAYS be enforced to support a high-quality techn
 
 ## Core Principles
 
-### 1) Educational Clarity
-All content MUST be accessible to beginners while technically accurate. Complex concepts MUST include diagrams or examples.
+### 1) OpenAI-Compatible Architecture
+The backend MUST use the `openai` Python SDK (or `openai-agents`) configured with the Gemini Base URL (`generativelanguage.googleapis.com`) for all LLM operations. Do NOT rewrite this to the native Google GenAI SDK.
 
-### 2) Docusaurus-First Architecture
-Content MUST be structured for Docusaurus. Every Markdown file MUST include valid frontmatter (`id`, `title`, `sidebar_position`).
+### 2) Contextual Intelligence
+The AI assistant MUST be accessible via a "Select-to-Ask" flow. Highlighting text on any page MUST trigger a floating "Ask AI" button.
 
-### 3) Modular Content
-Large topics MUST be broken down into atomic, readable sub-chapters (files) rather than monolithic documents.
+### 3) Modern UI/UX
+The Chatbot MUST be a collapsible **Floating Widget** (bottom-right) using Tailwind CSS. Inline styles are FORBIDDEN.
 
-### 4) Single Source of Truth
-When importing content from a master file, the `docs/` folder becomes the new source of truth. The master file is archived after import.
+### 4) Hybrid Deployment
+The `vercel.json` MUST explicitly define:
+* A Python build for `api/` (including `api/utils/**`).
+* A Static build for `textbook/`.
 
-### 5) Asset Management
-Images and static assets MUST be stored in `textbook/static/img` and referenced with relative paths.
-
-### 6) Serverless Compatibility
-The backend MUST be stateless and structure the entry point (`api/index.py`) to be compatible with Vercel Serverless Functions. Global variables for database clients must use lazy initialization.
-
-### 7) Type Safety
-All backend data exchange MUST be defined using Pydantic models (`BaseModel`). No loose dictionaries for API request/response payloads.
-
-### 8) Modular Utilities
-Shared logic (database connections, embeddings, helpers) MUST be separated into a `utils/` directory, distinct from the route handlers in `api/`.
-
-### 9) Secure Configuration
-API Keys (Gemini, Qdrant) and sensitive configuration MUST be loaded from environment variables.
-
-### 10) Frontend/Backend Separation
-The frontend (React/Docusaurus) MUST communicate with the backend solely via the `/api` endpoints, defined in a dedicated TypeScript service file.
+### 5) Zero Broken Links
+The `npm run build` command must pass without error.
 
 ## Governance
 <!-- Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-**Version**: 3.1.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2025-12-07
+**Version**: 4.0.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2025-12-09
