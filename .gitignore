@@ -38,8 +38,9 @@ backend/venv/
 .claude/settings.json
 
 # Temporary files from agent execution or tests
-# error.txt
+error.txt
 prompt.txt
+exp.py
 
 # Python build artifacts
 dist/
