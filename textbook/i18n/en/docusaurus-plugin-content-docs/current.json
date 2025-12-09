@@ -1,0 +1,22 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.tutorialSidebar.category.Module 1: Introduction to Physical AI": {
+    "message": "Module 1: Introduction to Physical AI",
+    "description": "The label for category 'Module 1: Introduction to Physical AI' in sidebar 'tutorialSidebar'"
+  },
+  "sidebar.tutorialSidebar.category.Module 2: Hardware Requirements": {
+    "message": "Module 2: Hardware Requirements",
+    "description": "The label for category 'Module 2: Hardware Requirements' in sidebar 'tutorialSidebar'"
+  },
+  "sidebar.tutorialSidebar.category.Module 3: Cloud-Native Lab": {
+    "message": "Module 3: Cloud-Native Lab",
+    "description": "The label for category 'Module 3: Cloud-Native Lab' in sidebar 'tutorialSidebar'"
+  },
+  "sidebar.tutorialSidebar.category.Module 4: Economy Jetson Student Kit": {
+    "message": "Module 4: Economy Jetson Student Kit",
+    "description": "The label for category 'Module 4: Economy Jetson Student Kit' in sidebar 'tutorialSidebar'"
+  }
+}

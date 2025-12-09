@@ -14,6 +14,13 @@ Auto-generated from all feature plans. Last updated: 2025-12-07
 - PostgreSQL (for user accounts, authentication, and document metadata) (001-normalize-backend-arch)
 - Qdrant Cloud Free Tier (for vectors) (001-normalize-backend-arch)
 
+- Python 3.10+ + FastAPI, Google Gemini, Qdrant client, Pydantic, python-dotenv (001-rag-backend-chat)
+- Vercel Serverless Functions (001-rag-backend-chat)
+- React, Docusaurus (frontend integration) (001-rag-backend-chat)
+
+- PostgreSQL (Neon) + SQLAlchemy, psycopg2-binary (002-chatbot-history-l10n)
+- Docusaurus i18n (002-chatbot-history-l10n)
+
 ## Project Structure
 
 ```text
@@ -38,6 +45,13 @@ Node.js >=20.0, TypeScript ~5.6.2: Follow standard conventions
 - 001-normalize-backend-arch: Added Python 3.10+ + FastAPI, Gemini SDK, Qdrant client, SQLAlchemy, asyncpg, Alembic
 - 001-normalize-backend-arch: Added PostgreSQL (for user accounts, authentication, and document metadata)
 - 001-normalize-backend-arch: Added Qdrant Cloud Free Tier (for vectors)
+
+- 001-rag-backend-chat: Added Python 3.10+ + FastAPI, Google Gemini, Qdrant client, Pydantic, python-dotenv
+- 001-rag-backend-chat: Added Vercel Serverless Functions
+- 001-rag-backend-chat: Added React, Docusaurus (frontend integration)
+
+- 002-chatbot-history-l10n: Added PostgreSQL (Neon) + SQLAlchemy, psycopg2-binary
+- 002-chatbot-history-l10n: Added Docusaurus i18n
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
