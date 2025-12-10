@@ -8,6 +8,8 @@ Auto-generated from all feature plans. Last updated: 2025-12-07
 - Python 3.10+ + FastAPI, Gemini SDK, Qdrant client, SQLAlchemy, asyncpg, pgvector (001-gemini-rag-backend)
 - Qdrant Cloud Free Tier (for vectors), Postgres with Neon (for user data) (001-gemini-rag-backend)
 - Python 3.10, TypeScript 5.x + FastAPI, React, Docusaurus, Tailwind CSS (001-ui-polish-select-to-ask)
+- Python 3.10+ (for backend), TypeScript 5.x (for frontend) + FastAPI, React, Docusaurus, Tailwind CSS (001-global-chatbot-integration)
+- PostgreSQL (for user data, if applicable to existing backend), Qdrant (for vectors, if applicable to existing backend) (001-global-chatbot-integration)
 
 - Node.js >=20.0, TypeScript ~5.6.2 + Docusaurus 3.9.2, React 19.0.0 (001-fix-docusaurus-deployment)
 
@@ -38,6 +40,7 @@ npm test && npm run lint
 Node.js >=20.0, TypeScript ~5.6.2: Follow standard conventions
 
 ## Recent Changes
+- 001-global-chatbot-integration: Added Python 3.10+ (for backend), TypeScript 5.x (for frontend) + FastAPI, React, Docusaurus, Tailwind CSS
 - 001-ui-polish-select-to-ask: Added Python 3.10, TypeScript 5.x + FastAPI, React, Docusaurus, Tailwind CSS
 - 001-gemini-rag-backend: Added Python 3.10+ + FastAPI, Gemini SDK, Qdrant client, SQLAlchemy, asyncpg, pgvector
 

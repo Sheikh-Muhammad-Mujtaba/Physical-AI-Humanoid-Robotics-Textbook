@@ -39,3 +39,7 @@ GIT_USER=<Your GitHub username> yarn deploy
 ```
 
 If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+
+## Global Chatbot Integration
+
+This project now includes a globally integrated chatbot, accessible from any page within the website. The chatbot maintains its conversation state across page navigations and can be invoked contextually by selecting text on a page. This enhancement provides a seamless and interactive AI assistance experience throughout the Docusaurus application.

@@ -1,0 +1,143 @@
+// textbook/src/contexts/ChatContext.tsx
+
+import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+
+// Interface for Chat Message
+export interface ChatMessage {
+  content: string;
+  sender: 'user' | 'ai';
+  timestamp: Date;
+  status: 'sent' | 'received' | 'pending' | 'error';
+}
+
+// Interface for Chat Context State
+export interface ChatContextState {
+  isOpen: boolean;
+  sessionId: string | null;
+  messages: ChatMessage[];
+  selectedText: string | null;
+  isLoading: boolean; // Add isLoading property
+}
+
+// Interface for Chat Context Functions
+export interface ChatContextFunctions {
+  openChat: () => void;
+  closeChat: () => void;
+  handleSelection: (text: string | null) => void;
+  sendMessage: (text: string) => Promise<void>;
+}
+
+// Full Chat Context Interface combining state and functions
+export interface ChatContextType extends ChatContextState, ChatContextFunctions {}
+
+// Create the context
+const ChatContext = createContext<ChatContextType | undefined>(undefined);
+
+// Props for the ChatProvider
+interface ChatProviderProps {
+  children: ReactNode;
+}
+
+// Implement the ChatProvider component
+export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [selectedText, setSelectedText] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false); // Add isLoading state
+
+  // --- Functions exposed by the context ---
+
+  const openChat = useCallback(() => {
+    setIsOpen(true);
+  }, []);
+
+  const closeChat = useCallback(() => {
+    setIsOpen(false);
+  }, []);
+
+  const handleSelection = useCallback((text: string | null) => {
+    setSelectedText(text);
+    if (text) {
+      openChat(); // Open chat if text is selected
+    }
+  }, [openChat]);
+
+  const sendMessage = useCallback(async (text: string) => {
+    setIsLoading(true); // Set loading to true when message sending starts
+    try {
+      // Placeholder for sending message to backend
+      // In a real implementation, this would involve an API call
+      console.log("Sending message:", text);
+
+      const newUserMessage: ChatMessage = {
+        content: text,
+        sender: 'user',
+        timestamp: new Date(),
+        status: 'pending', // Will be updated to 'sent'/'error' after API call
+      };
+
+      setMessages((prevMessages) => [...prevMessages, newUserMessage]);
+
+      // Simulate API call and AI response
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
+
+      const aiResponse: ChatMessage = {
+        content: `AI response to "${text}"`,
+        sender: 'ai',
+        timestamp: new Date(),
+        status: 'received',
+      };
+      setMessages((prevMessages) => [...prevMessages, aiResponse]);
+
+    } catch (error) {
+      console.error("Error sending message:", error);
+      const errorMessage: ChatMessage = {
+        content: `Error: ${error instanceof Error ? error.message : String(error)}`,
+        sender: 'ai',
+        timestamp: new Date(),
+        status: 'error',
+      };
+      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+    } finally {
+      setIsLoading(false); // Set loading to false when message sending finishes
+    }
+  }, []);
+
+  // --- Session management placeholder ---
+  useEffect(() => {
+    // Simulate generating or loading a session ID
+    if (!sessionId) {
+      setSessionId(`session-${Date.now()}`); // Simple unique ID
+    }
+  }, [sessionId]);
+
+
+  // Value provided by the context
+  const contextValue: ChatContextType = {
+    isOpen,
+    sessionId,
+    messages,
+    selectedText,
+    isLoading, // Add isLoading to context value
+    openChat,
+    closeChat,
+    handleSelection,
+    sendMessage,
+  };
+
+  return (
+    <ChatContext.Provider value={contextValue}>
+      {children}
+    </ChatContext.Provider>
+  );
+};
+
+// Custom hook to use the ChatContext
+export const useChat = () => {
+  const context = useContext(ChatContext);
+  if (context === undefined) {
+    throw new Error('useChat must be used within a ChatProvider');
+  }
+  return context;
+};

@@ -1,11 +1,6 @@
+  Compiled successfully in 15.69s
 
-[ERROR] Client bundle compiled with errors therefore further build is impossible.
-Loading PostCSS "tailwindcss/postcss" plugin failed: Package subpath './postcss' is not defined by "exports" in E:\mujtaba data\coding classes\proramming\my code\GitHub_Repo_Codes\AI-hackthon\AI-Spec-Driven\textbook\node_modules\tailwindcss\package.json
-(@E:\mujtaba data\coding classes\proramming\my code\GitHub_Repo_Codes\AI-hackthon\AI-Spec-Driven\textbook\.docusaurus\docusaurus-plugin-css-cascade-layers\default\layers.css)
-
---------------------------
-
-Loading PostCSS "tailwindcss/postcss" plugin failed: Package subpath './postcss' is not defined by "exports" in E:\mujtaba data\coding classes\proramming\my code\GitHub_Repo_Codes\AI-hackthon\AI-Spec-Driven\textbook\node_modules\tailwindcss\package.json
-(@E:\mujtaba data\coding classes\proramming\my code\GitHub_Repo_Codes\AI-hackthon\AI-Spec-Driven\textbook\node_modules\@docusaurus\theme-classic\lib\nprogress.css)
-
---------------------------
+[WARNING] {"moduleIdentifier":"E:\\mujtaba data\\coding classes\\proramming\\my code\\GitHub_Repo_Codes\\AI-hackthon\\AI-Spec-Driven\\textbook\\node_modules\\babel-loader\\lib\\index.js??ruleSet[1].rules[5].use[0]!E:\\mujtaba data\\coding classes\\proramming\\my code\\GitHub_Repo_Codes\\AI-hackthon\\AI-Spec-Driven\\textbook\\src\\components\\ChatbotWidget.tsx","moduleName":"./src/components/ChatbotWidget.tsx","loc":"3:194-201","message":"export 'useChat' (imported as 'useChat') was not found in '../contexts/ChatContext' (module has no exports)"}
+[WARNING] {"moduleIdentifier":"E:\\mujtaba data\\coding classes\\proramming\\my code\\GitHub_Repo_Codes\\AI-hackthon\\AI-Spec-Driven\\textbook\\node_modules\\babel-loader\\lib\\index.js??ruleSet[1].rules[5].use[0]!E:\\mujtaba data\\coding classes\\proramming\\my code\\GitHub_Repo_Codes\\AI-hackthon\\AI-Spec-Driven\\textbook\\src\\components\\TextSelectionButton.tsx","moduleName":"./src/components/TextSelectionButton.tsx","loc":"2:228-235","message":"export 'useChat' (imported as 'useChat') was not found in '../contexts/ChatContext' (module has no exports)"}
+[WARNING] {"moduleIdentifier":"E:\\mujtaba data\\coding classes\\proramming\\my code\\GitHub_Repo_Codes\\AI-hackthon\\AI-Spec-Driven\\textbook\\node_modules\\babel-loader\\lib\\index.js??ruleSet[1].rules[5].use[0]!E:\\mujtaba data\\coding classes\\proramming\\my code\\GitHub_Repo_Codes\\AI-hackthon\\AI-Spec-Driven\\textbook\\src\\theme\\Root.tsx","moduleName":"./src/theme/Root.tsx","loc":"9:74-81","message":"export 'useChat' (imported as 'useChat') was not found in '../contexts/ChatContext' (module has no exports)"}
+[WARNING] {"moduleIdentifier":"E:\\mujtaba data\\coding classes\\proramming\\my code\\GitHub_Repo_Codes\\AI-hackthon\\AI-Spec-Driven\\textbook\\node_modules\\babel-loader\\lib\\index.js??ruleSet[1].rules[5].use[0]!E:\\mujtaba data\\coding classes\\proramming\\my code\\GitHub_Repo_Codes\\AI-hackthon\\AI-Spec-Driven\\textbook\\src\\theme\\Root.tsx","moduleName":"./src/theme/Root.tsx","loc":"36:218-230","message":"export 'ChatProvider' (imported as 'ChatProvider') was not found in '../contexts/ChatContext' (module has no exports)"}

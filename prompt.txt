@@ -1,7 +1,12 @@
-Execute the implementation tasks.
+Fix the critical build error in `textbook/src/contexts/ChatContext.tsx`.
+
+**The Issue:**
+The file currently has a circular dependency because it imports types from itself (`import ... from './ChatContext'`). This causes the build to fail with "module has no exports".
 
 **Directives:**
-1.  **Build First**: Fix the `index.tsx` links and `vercel.json` first.
-2.  **Preserve Logic**: When refactoring `ChatBot.tsx`, keep the existing `chatWithBackend` calls that use the current API structure.
-3.  **UI Polish**: Ensure the floating chat bubble has a high z-index (`z-50`) to sit above documentation.
+1.  **Remove Imports:** Delete the line `import { ChatContextType, ... } from './ChatContext';`.
+2.  **Define Interfaces Locally:** Move the interface definitions for `ChatMessage` and `ChatContextType` directly into this file at the top.
+3.  **Ensure Exports:** Verify that `ChatProvider` and `useChat` are exported using the `export` keyword.
+4.  **Preserve Logic:** Keep the existing state logic (isOpen, sessionId, etc.) and the mock `sendMessage` implementation.
 
+**Target File:** `textbook/src/contexts/ChatContext.tsx`
