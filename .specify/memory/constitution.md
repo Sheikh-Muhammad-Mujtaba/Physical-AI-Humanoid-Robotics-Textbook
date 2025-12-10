@@ -1,11 +1,12 @@
 <!--
 Sync Impact Report:
-Version change: 4.2.0 -> 4.3.0
-Modified principles: None
+Version change: 4.3.0 -> 4.4.0
+Modified principles:
+  - 6) TypeScript Import Standard -> Extension-Less Imports
+  - 11) Real Backend Integration -> Real Data Integration
+  - 12) Theme Consistency -> Docusaurus Native Theming
 Added principles:
-  - Real Backend Integration
-  - Theme Consistency
-  - Error Resilience
+  - 14) Safe CSS Configuration
 Removed principles: None
 Templates requiring updates:
   - .specify/templates/plan-template.md: ⚠ pending
@@ -46,8 +47,8 @@ The Chatbot MUST be a collapsible "Floating Action Button" (FAB) widget fixed to
 ### 5) Logic Preservation
 The refactored UI MUST retain the existing backend integration (chat history, session UUIDs, feedback) that uses the OpenAI SDK.
 
-### 6) TypeScript Import Standard
-All imports of local files MUST omit the `.tsx` or `.ts` file extension (e.g., `import X from './file'`, NOT `import X from './file.tsx'`).
+### 6) Extension-Less Imports
+All imports of local TypeScript/React files MUST omit the `.tsx` or `.ts` extension (e.g., `import X from './file'`, NOT `import X from './file.tsx'`).
 
 ### 7) Tailwind v3 Standard
 The project uses Tailwind CSS v3. It MUST rely on a `postcss.config.js` file for processing. Do NOT use `lightningcss` or Tailwind v4 packages.
@@ -63,18 +64,19 @@ The `vercel.json` MUST explicitly define:
 ### 10) Zero Broken Links
 The `npm run build` command must pass without error.
 
-### 11) Real Backend Integration
-The `ChatContext` MUST NOT use mock data or timeouts. It MUST import functions from `src/lib/chatApi` to communicate with the Python backend (`/api/chat`, `/api/ask-selection`).
+### 11) Real Data Integration
+The Frontend `ChatContext` MUST connect to the Backend API (`/api/chat`) using the `chatApi` library. Mock data is forbidden in the final build.
 
-### 12) Theme Consistency
-The Chatbot UI components MUST respect the Docusaurus Light/Dark mode.
-* Use Tailwind's `dark:` modifier for all background and text colors.
-* Match the primary brand color (e.g., buttons should use `var(--ifm-color-primary)` or the equivalent Tailwind class).
+### 12) Docusaurus Native Theming
+All custom UI components (Chatbot, Buttons) MUST support both Light and Dark modes using Tailwind's `dark:` modifiers.
 
 ### 13) Error Resilience
 If the backend is offline, the Chatbot MUST display a user-friendly error message in the chat window, not crash the app.
 
+### 14) Safe CSS Configuration
+The `tailwind.config.js` MUST have `corePlugins: { preflight: false }` to prevent breaking the Docusaurus layout.
+
 ## Governance
 <!-- Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-**Version**: 4.3.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2025-12-10
+**Version**: 4.4.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2025-12-10
