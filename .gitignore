@@ -35,7 +35,7 @@ backend/venv/
 .gemini/settings.json
 
 # Claude configuration
-.claude/settings.json
+.claude/settings.local.json
 
 # Temporary files from agent execution or tests
 error.txt

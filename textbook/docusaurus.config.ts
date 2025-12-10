@@ -17,18 +17,8 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: 'https://sheikh-muhammad-mujtaba.github.io',
+  url: 'https://ai-spec-driven.vercel.app',
   baseUrl: '/',
-
-  devServer: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-        pathRewrite: { '^/api': '/api' },
-      },
-    },
-  },
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
