@@ -1,5 +1,3 @@
-// textbook/src/contexts/ChatContext.tsx
-
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid'; // Import v4 as uuidv4
 import { chatWithBackend, askSelectionWithBackend, getHistory } from '../lib/chatApi';

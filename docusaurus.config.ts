@@ -51,27 +51,28 @@ const config: Config = {
     [
       'classic',
       {
-                            docs: {
-                              routeBasePath: '/', // Makes docs the main site
-                              path: 'docs',
-                              sidebarPath: './sidebars.ts',
-                              remarkPlugins: [remarkMath],
-                              rehypePlugins: [rehypeKatex],          // Please change this to your repo.
-                              // Remove this to remove the "edit this page" links.
-                            },
-                            blog: {
-                              showReadingTime: true,
-                              feedOptions: {
-                                type: ['rss', 'atom'],
-                                xslt: true,
-                              },
-                              // Please change this to your repo.
-                              // Remove this to remove the "edit this page" links.
-                              // Useful options to enforce blogging best practices
-                              onInlineTags: 'warn',
-                              onInlineAuthors: 'warn',
-                              onUntruncatedBlogPosts: 'warn',
-                            }, theme: {          customCss: './src/css/custom.css',
+        docs: {
+          routeBasePath: '/', // Makes docs the main site
+          path: 'docs',
+          sidebarPath: './sidebars.ts',
+          remarkPlugins: [remarkMath],
+          rehypePlugins: [rehypeKatex],          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+        },
+        blog: {
+          showReadingTime: true,
+          feedOptions: {
+            type: ['rss', 'atom'],
+            xslt: true,
+          },
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+          // Useful options to enforce blogging best practices
+          onInlineTags: 'warn',
+          onInlineAuthors: 'warn',
+          onUntruncatedBlogPosts: 'warn',
+        }, theme: {
+          customCss: './src/css/custom.css',
         },
       } satisfies Preset.Options,
     ],
@@ -119,8 +120,8 @@ const config: Config = {
           title: 'Docs',
           items: [
             {
-              label: 'Tutorial',
-              to: '/docs/intro',
+              label: 'Introduction',
+              to: '/intro',
             },
           ],
         },
@@ -140,15 +141,18 @@ const config: Config = {
         {
           title: 'More',
           items: [
-
+            {
+              label: 'Blog',
+              to: '/blog',
+            },
             {
               label: 'GitHub',
-              href: 'https://github.com/Sheikh-Muhammad-Mujtaba',
+              href: 'https://github.com/Sheikh-Muhammad-Mujtaba/Physical-AI-Humanoid-Robotics-Textbook',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Physical AI & Humanoid Robotics. Built with Docusaurus.`,
     }, prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,

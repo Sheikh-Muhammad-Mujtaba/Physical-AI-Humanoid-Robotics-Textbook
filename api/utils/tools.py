@@ -1,7 +1,7 @@
 from typing import List
 from qdrant_client.http.models import PointStruct
-from api.utils.config import config, Config
-from api.utils.models import TextChunk
+from config import config, Config
+from models import TextChunk
 import os
 
 COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "textbook_chunks")

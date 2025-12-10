@@ -1,5 +1,3 @@
-// textbook/src/lib/chatApi.ts
-
 const API_BASE_URL = '/api'; // Proxied by Vercel to the Python backend
 
 async function handleResponseError(response: Response, defaultMessage: string): Promise<Error> {

@@ -1,30 +1,17 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxDuration": 30,
-        "includeFiles": "api/utils/**"
-      }
-    },
-    {
-      "src": "textbook/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
-    }
-  ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/textbook/build/$1"
+      "src": "/api/.*",
+      "dest": "api/index.py"
     }
-  ]
+  ],
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 60,
+      "memory": 1024,
+      "includeFiles": "api/utils/**",
+      "excludeFiles": "**/__pycache__/**"
+    }
+  }
 }

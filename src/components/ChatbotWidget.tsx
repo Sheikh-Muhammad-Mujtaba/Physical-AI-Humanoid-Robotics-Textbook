@@ -1,5 +1,3 @@
-// textbook/src/components/ChatbotWidget.tsx
-
 import React, { useState } from 'react'; // Add useState
 import { useChat } from '../contexts/ChatContext';
 

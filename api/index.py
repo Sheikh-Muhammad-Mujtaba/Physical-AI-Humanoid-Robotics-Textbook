@@ -16,8 +16,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'util
 from config import Config
 from models import ChatRequest, ChatResponse, AskSelectionRequest, HistoryMessage, FeedbackRequest
 from tools import search_book_content, format_context
-from api.utils.database import create_tables, get_db
-from api.utils.sql_models import ChatHistory, Feedback
+from database import create_tables, get_db
+from sql_models import ChatHistory, Feedback
 
 # Initialize Config to load environment variables
 config = Config()
