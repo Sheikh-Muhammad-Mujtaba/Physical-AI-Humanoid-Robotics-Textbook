@@ -113,9 +113,11 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
   // --- Session management placeholder ---
   useEffect(() => {
-    // Simulate generating or loading a session ID
+    // Generate or load a session ID
     if (!sessionId) {
-      setSessionId(`session-${Date.now()}`); // Simple unique ID
+      // Use crypto.randomUUID() for a stronger, standard UUID
+      // Fallback for environments where crypto.randomUUID might not be available (though unlikely in modern browsers)
+      setSessionId(crypto.randomUUID ? crypto.randomUUID() : `session-${Date.now()}`);
     }
   }, [sessionId]);
 

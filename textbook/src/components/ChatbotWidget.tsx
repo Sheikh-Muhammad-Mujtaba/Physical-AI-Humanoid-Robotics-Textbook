@@ -25,7 +25,7 @@ const ChatbotWidget: React.FC = () => {
       ) : (
         // Expanded state (Chatbot Window placeholder)
         <div
-          className="w-80 h-[500px] bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-300 dark:border-gray-700"
+          className="w-80 h-[500px] bg-white text-gray-900 dark:bg-[#1b1b1d] dark:text-gray-100 rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700"
           // Equivalent to:
           // width: 350, height: 500, backgroundColor: 'white', borderRadius: '10px',
           // boxShadow: '0 8px 16px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column',
@@ -91,7 +91,7 @@ const ChatbotWidget: React.FC = () => {
             <input
               type="text"
               placeholder="Type a message..."
-              className="flex-grow p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded-md mr-2" // flex-grow and margin-right
+              className="flex-grow p-2 border border-gray-300 bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded-md mr-2" // flex-grow and margin-right
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={(e) => { // Send message on Enter key press
