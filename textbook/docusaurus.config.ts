@@ -101,6 +101,10 @@ const config: Config = {
           label: 'Chapters',
         },
         {
+          type: 'localeDropdown',
+          position: 'right',
+        },
+        {
           href: 'https://github.com/Sheikh-Muhammad-Mujtaba/Physical-AI-Humanoid-Robotics-Textbook', // Placeholder, update with actual repo
           label: 'GitHub',
           position: 'right',
