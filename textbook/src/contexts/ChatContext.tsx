@@ -1,6 +1,7 @@
 // textbook/src/contexts/ChatContext.tsx
 
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid'; // Import v4 as uuidv4
 import { chatWithBackend, askSelectionWithBackend, getHistory } from '../lib/chatApi';
 
 // Interface for Chat Message
@@ -76,12 +77,16 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
     try {
       let botResponseContent: string;
+      // Add console.log for API fetch attempts
+      console.log("Attempting to fetch chat/ask-selection API."); // Log general attempt
       if (selectedText && sessionId) {
         // Use askSelectionWithBackend if text is selected
+        console.log("Fetching /api/ask-selection with selected text and query:", selectedText, text);
         const response = await askSelectionWithBackend(selectedText, text, sessionId);
         botResponseContent = response.answer;
       } else if (sessionId) {
         // Use chatWithBackend for general chat
+        console.log("Fetching /api/chat with query:", text);
         const response = await chatWithBackend(text, sessionId);
         botResponseContent = response.answer;
       } else {
@@ -99,8 +104,17 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
     } catch (error) {
       console.error("Error sending message:", error);
+      let errorMessageContent: string;
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        errorMessageContent = "Error: Could not connect to Backend. Is it running on port 8000?";
+      } else if (error instanceof Error) {
+        errorMessageContent = `Error: ${error.message}`;
+      } else {
+        errorMessageContent = `Error: ${String(error)}`;
+      }
+
       const errorMessage: ChatMessage = {
-        content: `Error: ${error instanceof Error ? error.message : String(error)}`,
+        content: errorMessageContent,
         sender: 'ai',
         timestamp: new Date(),
         status: 'error',
@@ -115,9 +129,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   useEffect(() => {
     // Generate or load a session ID
     if (!sessionId) {
-      // Use crypto.randomUUID() for a stronger, standard UUID
-      // Fallback for environments where crypto.randomUUID might not be available (though unlikely in modern browsers)
-      setSessionId(crypto.randomUUID ? crypto.randomUUID() : `session-${Date.now()}`);
+      setSessionId(uuidv4()); // Use uuidv4()
     }
   }, [sessionId]);
 

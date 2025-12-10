@@ -10,8 +10,10 @@ async function handleResponseError(response: Response, defaultMessage: string): 
     try {
       const errorData = await response.json();
       errorDetail = errorData.detail || errorData.message || defaultMessage;
+      console.error('API Error (JSON):', errorData);
     } catch (e) {
       errorDetail = `Could not parse JSON error response: ${e instanceof Error ? e.message : String(e)}`;
+      console.error('API Error (JSON parse failed):', e);
     }
   } else {
     // If not JSON, read as plain text
@@ -19,6 +21,7 @@ async function handleResponseError(response: Response, defaultMessage: string): 
     if (!errorDetail) {
       errorDetail = `${defaultMessage} (Status: ${response.status})`;
     }
+    console.error(`API Error (Text - Status: ${response.status}):`, errorDetail);
   }
   return new Error(errorDetail);
 }

@@ -25,7 +25,7 @@ const ChatbotWidget: React.FC = () => {
       ) : (
         // Expanded state (Chatbot Window placeholder)
         <div
-          className="w-80 h-[500px] bg-white text-gray-900 dark:bg-[#1b1b1d] dark:text-gray-100 rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700"
+          className="w-80 h-[500px] bg-white text-gray-900 dark:bg-zinc-900 dark:text-gray-100 rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700"
           // Equivalent to:
           // width: 350, height: 500, backgroundColor: 'white', borderRadius: '10px',
           // boxShadow: '0 8px 16px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column',

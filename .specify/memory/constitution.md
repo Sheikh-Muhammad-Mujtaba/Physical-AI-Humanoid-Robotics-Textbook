@@ -1,12 +1,12 @@
 <!--
 Sync Impact Report:
-Version change: 4.3.0 -> 4.4.0
+Version change: 4.4.0 -> 4.5.0
 Modified principles:
-  - 6) TypeScript Import Standard -> Extension-Less Imports
-  - 11) Real Backend Integration -> Real Data Integration
-  - 12) Theme Consistency -> Docusaurus Native Theming
+  - 1) OpenAI-Compatible Architecture
+  - 5) Logic Preservation
+  - 12) Docusaurus Native Theming
 Added principles:
-  - 14) Safe CSS Configuration
+  - 15) Secure Connectivity
 Removed principles: None
 Templates requiring updates:
   - .specify/templates/plan-template.md: ⚠ pending
@@ -32,8 +32,8 @@ These are hard rules and must ALWAYS be enforced to support a high-quality techn
 
 ## Core Principles
 
-### 1) OpenAI-Compatible Architecture
-The backend MUST use the `openai` Python SDK (or `openai-agents`) configured with the Gemini Base URL (`generativelanguage.googleapis.com`) for all LLM operations. Do NOT rewrite this to the native Google GenAI SDK.
+### 1) OpenAI-Adapter Pattern
+The backend MUST use the `openai` Python SDK (or `openai-agents`) configured with the Gemini Base URL for all LLM operations. The `base_url` MUST be set to `"https://generativelanguage.googleapis.com/v1beta/openai/"` and authentication MUST use the `GOOGLE_API_KEY`. Do NOT rewrite this to the native Google GenAI SDK.
 
 ### 2) Root-Level Integration
 The Chatbot component MUST NOT be embedded in Markdown or Page files. It MUST be rendered solely in `src/theme/Root.tsx` so it persists globally across the entire application.
@@ -44,8 +44,8 @@ Chat visibility (`isOpen`) and context data MUST be managed via a React Context 
 ### 4) Floating Widget UX
 The Chatbot MUST be a collapsible "Floating Action Button" (FAB) widget fixed to the bottom-right of the viewport. Inline styles are FORBIDDEN; use Tailwind CSS.
 
-### 5) Logic Preservation
-The refactored UI MUST retain the existing backend integration (chat history, session UUIDs, feedback) that uses the OpenAI SDK.
+### 5) Robust Sessions & Logic Preservation
+The refactored UI MUST retain the existing backend integration (chat history, feedback). The Frontend MUST use the `uuid` library to generate version-4 UUIDs for `sessionId`. Simple timestamps are forbidden.
 
 ### 6) Extension-Less Imports
 All imports of local TypeScript/React files MUST omit the `.tsx` or `.ts` extension (e.g., `import X from './file'`, NOT `import X from './file.tsx'`).
@@ -68,7 +68,7 @@ The `npm run build` command must pass without error.
 The Frontend `ChatContext` MUST connect to the Backend API (`/api/chat`) using the `chatApi` library. Mock data is forbidden in the final build.
 
 ### 12) Docusaurus Native Theming
-All custom UI components (Chatbot, Buttons) MUST support both Light and Dark modes using Tailwind's `dark:` modifiers.
+All Chatbot UI components MUST use Tailwind `dark:` variants to perfectly match the Docusaurus theme.
 
 ### 13) Error Resilience
 If the backend is offline, the Chatbot MUST display a user-friendly error message in the chat window, not crash the app.
@@ -76,7 +76,10 @@ If the backend is offline, the Chatbot MUST display a user-friendly error messag
 ### 14) Safe CSS Configuration
 The `tailwind.config.js` MUST have `corePlugins: { preflight: false }` to prevent breaking the Docusaurus layout.
 
+### 15) Secure Connectivity
+The FastAPI backend MUST include `CORSMiddleware` allowing origins `["*"]` for development purposes. For production, specific domains MUST be whitelisted.
+
 ## Governance
 <!-- Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-**Version**: 4.4.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2025-12-10
+**Version**: 4.5.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2025-12-10

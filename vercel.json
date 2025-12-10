@@ -4,24 +4,27 @@
     {
       "src": "api/index.py",
       "use": "@vercel/python",
-      "config": { "includeFiles": "utils/**" }
+      "config": {
+        "maxDuration": 30,
+        "includeFiles": "api/utils/**"
+      }
     },
     {
       "src": "textbook/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "textbook/build"
+        "distDir": "build"
       }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "api/index.py"
+      "dest": "/api/index.py"
     },
     {
       "src": "/(.*)",
-      "dest": "textbook/build/$1"
+      "dest": "/textbook/build/$1"
     }
   ]
 }
