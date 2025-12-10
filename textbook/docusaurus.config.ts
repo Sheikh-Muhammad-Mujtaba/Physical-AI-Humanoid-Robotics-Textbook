@@ -52,6 +52,7 @@ const config: Config = {
       'classic',
       {
                             docs: {
+                              routeBasePath: '/', // Makes docs the main site
                               path: 'docs',
                               sidebarPath: './sidebars.ts',
                               remarkPlugins: [remarkMath],
