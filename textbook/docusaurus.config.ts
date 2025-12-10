@@ -25,7 +25,7 @@ const config: Config = {
   organizationName: 'Sheikh-Muhammad-Mujtaba', // Usually your GitHub org/user name.
   projectName: 'Physical-AI-Humanoid-Robotics-Textbook', // Usually your repo name.
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
 
   markdown: {
     hooks: {
@@ -139,10 +139,7 @@ const config: Config = {
         {
           title: 'More',
           items: [
-            {
-              label: 'Blog',
-              to: '/blog',
-            },
+
             {
               label: 'GitHub',
               href: 'https://github.com/Sheikh-Muhammad-Mujtaba',
