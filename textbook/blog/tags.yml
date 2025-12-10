@@ -1,0 +1,24 @@
+AI:
+  label: AI
+  permalink: /tags/ai
+  description: Posts related to Artificial Intelligence
+
+Robotics:
+  label: Robotics
+  permalink: /tags/robotics
+  description: Posts related to Robotics
+
+Docusaurus:
+  label: Docusaurus
+  permalink: /tags/docusaurus
+  description: Posts related to Docusaurus framework
+
+Book:
+  label: Book
+  permalink: /tags/book
+  description: Posts related to the Physical AI & Humanoid Robotics textbook
+
+AI-Native:
+  label: AI-Native
+  permalink: /tags/ai-native
+  description: Posts related to AI-Native systems and development

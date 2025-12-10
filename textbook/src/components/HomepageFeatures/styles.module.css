@@ -1,0 +1,24 @@
+.testimonials {
+  background-color: #f9f9f9;
+  padding: 4rem 0;
+}
+
+[data-theme='dark'] .testimonials {
+  background-color: #1a1a1a;
+}
+
+.testimonials blockquote {
+  font-style: italic;
+  font-size: 1.2rem;
+  margin: 0;
+  padding: 0;
+  border-left: 5px solid var(--ifm-color-primary);
+  padding-left: 1.5rem;
+}
+
+.testimonials cite {
+  display: block;
+  margin-top: 1rem;
+  font-weight: bold;
+  color: var(--ifm-color-primary);
+}

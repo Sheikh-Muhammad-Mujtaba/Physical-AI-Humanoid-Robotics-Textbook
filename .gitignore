@@ -1,0 +1,53 @@
+# Node.js/JavaScript/TypeScript
+node_modules/
+dist/
+build/
+*.log
+.env*
+package-lock.json
+.next/
+out/
+.nuxt/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Universal
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
+
+# Docusaurus
+.docusaurus/
+.cache-loader/
+
+# Backend (explicitly ignoring venv within backend)
+backend/venv/
+
+# Gemini CLI Agent configuration
+.gemini/settings.json
+
+# Claude configuration
+.claude/settings.json
+
+# Temporary files from agent execution or tests
+error.txt
+prompt.txt
+exp.py
+
+# Python build artifacts
+dist/
+
+# Test coverage reports
+coverage/
+
+# Node.js package manager lock files
+yarn.lock
+pnpm-lock.yaml

@@ -1,0 +1,130 @@
+openapi: 3.0.0
+info:
+  title: Normalized Gemini RAG Backend API
+  version: 1.0.0
+  description: API for ingesting, querying, and managing user accounts in a Gemini-augmented RAG system with normalized architecture.
+
+paths:
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: User successfully registered
+        '400':
+          description: Invalid input
+
+  /api/auth/login:
+    post:
+      summary: Authenticate user and get access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: User successfully logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+        '401':
+          description: Invalid credentials
+
+  /api/users/me:
+    get:
+      summary: Get current user information
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Current user details
+        '401':
+          description: Unauthorized
+
+  /api/ingest:
+    post:
+      summary: Ingest document content (metadata to PostgreSQL, embeddings to Qdrant)
+      # Existing ingestion schema, with implicit understanding that metadata goes to PG
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                doc_id:
+                  type: string
+                text:
+                  type: string
+                metadata:
+                  type: object # Additional metadata beyond chunk-level stored in PG
+      responses:
+        '200':
+          description: Content successfully ingested
+        '400':
+          description: Invalid input
+
+  /api/query:
+    post:
+      summary: Query textbook for answers (metadata from PostgreSQL, vectors from Qdrant)
+      # Existing query schema, with implicit understanding of data sources
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  type: string
+                selection:
+                  type: string
+                  nullable: true
+                top_k:
+                  type: integer
+                  nullable: true
+      responses:
+        '200':
+          description: Answer with citations
+        '400':
+          description: Invalid input
+
+  /api/health:
+    get:
+      summary: Check API health
+      responses:
+        '200':
+          description: API is healthy
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

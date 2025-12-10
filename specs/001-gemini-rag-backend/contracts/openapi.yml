@@ -1,0 +1,146 @@
+openapi: 3.0.0
+info:
+  title: Gemini RAG Backend API
+  version: 1.0.0
+  description: API for ingesting and querying a Gemini-augmented RAG system for the Physical-AI-Humanoid-Robotics textbook.
+
+paths:
+  /health:
+    get:
+      summary: Health Check
+      description: Returns the operational status of the service.
+      responses:
+        '200':
+          description: Service is operational.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /ingest:
+    post:
+      summary: Ingest Document
+      description: Ingests a new document, chunks it, creates embeddings, and stores them in the vector store.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngestRequest'
+      responses:
+        '200':
+          description: Document ingested successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestResponse'
+        '422':
+          description: Validation Error.
+
+  /query:
+    post:
+      summary: Query the RAG system
+      description: Asks a question to the RAG system and receives an answer based on the ingested documents.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequest'
+      responses:
+        '200':
+          description: Answer generated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '422':
+          description: Validation Error.
+
+components:
+  schemas:
+    IngestRequest:
+      type: object
+      properties:
+        doc_id:
+          type: string
+          description: A unique identifier for the document.
+          example: "chapter1-what-is-physical-ai"
+        text:
+          type: string
+          description: The full text content of the document.
+          example: "Physical AI is the study of intelligent agents that can physically interact with their environment..."
+        metadata:
+          type: object
+          description: Additional metadata about the document.
+          example:
+            chapter: "Module 1 / Chapter 1"
+            source_url: "/docs/module1-introduction-to-physical-ai/chapter1-what-is-physical-ai"
+      required:
+        - doc_id
+        - text
+
+    IngestResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        chunks_ingested:
+          type: integer
+          example: 15
+
+    QueryRequest:
+      type: object
+      properties:
+        question:
+          type: string
+          description: The natural language question to ask.
+          example: "What is the sense-plan-act cycle?"
+        selection:
+          type: object
+          description: Optional filter to restrict the search to a specific document or chapter.
+          example:
+            doc_id: "chapter2-the-sense-plan-act-cycle"
+        top_k:
+          type: integer
+          description: The number of top matching chunks to retrieve.
+          default: 3
+          example: 5
+      required:
+        - question
+
+    QueryResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+          example: "The sense-plan-act cycle is a fundamental concept in robotics where an agent perceives its environment (sense), formulates a course of action (plan), and then executes that action (act)."
+        citations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Citation'
+        raw_chunks:
+          type: array
+          items:
+            type: string
+          example:
+            - "The sense-plan-act cycle is a common paradigm..."
+            - "Sensing involves using various sensors to gather data..."
+
+    Citation:
+      type: object
+      properties:
+        doc_id:
+          type: string
+          example: "chapter2-the-sense-plan-act-cycle"
+        chapter:
+          type: string
+          example: "Module 1 / Chapter 2"
+        chunk_index:
+          type: integer
+          example: 3

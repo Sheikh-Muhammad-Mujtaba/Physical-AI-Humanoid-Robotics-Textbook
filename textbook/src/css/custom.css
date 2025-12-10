@@ -1,0 +1,195 @@
+/**
+ * Any CSS inside this file applies to all Docusaurus components in the project.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:wght@400;700&family=Open+Sans:wght@400;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+:root {
+  --ifm-color-primary: #ff0000; /* red */
+  --ifm-color-primary-dark: #cc0000;
+  --ifm-color-primary-darker: #990000;
+  --ifm-color-primary-darkest: #660000;
+  --ifm-color-primary-light: #ff3333;
+  --ifm-color-primary-lighter: #ff6666;
+  --ifm-color-primary-lightest: #ff9999;
+  --ifm-background-color: #ffffff; /* white */
+  --ifm-link-color: #ff0000; /* red */
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 204, 203, 0.3); /* light pink */
+  --ifm-color-success: #28a745; /* Ensure success color is defined */
+}
+
+/* For readability in dark mode */
+[data-theme='dark'] {
+  --ifm-color-primary: #d8b4fe; /* light purple */
+  --ifm-color-primary-dark: #c084fc;
+  --ifm-color-primary-darker: #a855f7;
+  --ifm-color-primary-darkest: #9333ea;
+  --ifm-color-primary-light: #e9d5ff;
+  --ifm-color-primary-lighter: #f3e8ff;
+  --ifm-color-primary-lightest: #faf5ff;
+  --ifm-background-color: #000000; /* black */
+  --ifm-link-color: #d8b4fe; /* light purple */
+  --ifm-font-color-base: #cccccc; /* light grey */
+  --docusaurus-highlighted-code-line-bg: rgba(204, 204, 204, 0.3); /* light grey */
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  line-height: 1.7;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+  margin-top: 32px;
+  margin-bottom: 24px;
+  font-weight: 700;
+}
+
+/* Hero Banner Enhancements */
+.heroBanner {
+  padding: 10rem 0;
+  background: linear-gradient(135deg, var(--ifm-color-primary-darkest), var(--ifm-color-primary));
+  color: white;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  margin-bottom: 5rem;
+}
+
+[data-theme='dark'] .heroBanner {
+    background: linear-gradient(135deg, #000000, var(--ifm-color-primary-darkest));
+}
+
+.hero__title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 5rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.8);
+}
+
+.hero__subtitle {
+    font-size: 1.75rem;
+}
+
+
+.buttons a.button {
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  border-radius: 50px;
+  padding: 1.2rem 2.5rem;
+  font-weight: bold;
+  background: linear-gradient(135deg, var(--ifm-color-primary-light), var(--ifm-color-primary-dark));
+  border: none;
+}
+.buttons a.button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+
+.features {
+    padding: 5rem 0;
+}
+
+.feature-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+}
+
+.module-card {
+  padding: 2rem;
+  border-radius: 15px;
+  border: none;
+  transition: all 0.3s ease;
+  height: 100%;
+  background: linear-gradient(135deg, var(--ifm-background-color), var(--ifm-color-primary-lightest));
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+[data-theme='dark'] .module-card {
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+}
+
+.module-card:hover {
+  box-shadow: 0 12px 35px rgba(216, 180, 254, 0.6);
+  transform: translateY(-8px);
+}
+
+[data-theme='dark'] .module-card:hover {
+    box-shadow: 0 12px 35px rgba(255, 0, 0, 0.6);
+}
+
+.module-card h3 {
+  margin-top: 0;
+  color: var(--ifm-color-primary);
+  font-size: 1.5rem;
+}
+
+.quick-links-section {
+    padding: 3rem 0;
+    background-color: var(--ifm-background-color);
+}
+
+[data-theme='dark'] .quick-links-section {
+    background-color: #0d0d0d;
+}
+
+.quick-links-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.quick-links-container a {
+  text-decoration: none;
+  color: var(--ifm-link-color);
+  font-weight: 500;
+  transition: all 0.3s ease-in-out;
+  padding: 0.8rem 1.5rem;
+  border: 2px solid var(--ifm-color-primary);
+  border-radius: 50px;
+}
+
+.quick-links-container a:hover {
+  text-decoration: none;
+  background-color: var(--ifm-color-primary);
+  color: white;
+  box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+}
+
+[data-theme='dark'] .quick-links-container a:hover {
+    box-shadow: 0 5px 15px rgba(216, 180, 254, 0.4);
+}
+
+
+.footer {
+    background: linear-gradient(135deg, var(--ifm-color-primary-darkest), var(--ifm-color-primary-dark));
+    color: white;
+}
+
+[data-theme='dark'] .footer {
+    background: linear-gradient(135deg, #000000, #1a1a1a);
+}
+
+/* Header styles */
+.navbar {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-theme='dark'] .navbar {
+  background: rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar__title, .navbar__link {
+    font-family: 'Orbitron', sans-serif;
+}
