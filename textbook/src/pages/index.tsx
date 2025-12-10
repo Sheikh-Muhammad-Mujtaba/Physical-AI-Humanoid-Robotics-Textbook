@@ -2,7 +2,6 @@ import type {ReactNode} from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import Layout from '@theme/Layout';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
 import Heading from '@theme/Heading';
 
@@ -32,9 +31,7 @@ function HomepageHeader() {
 export default function Home(): ReactNode {
   const {siteConfig} = useDocusaurusContext();
   return (
-    <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+    <>
       <HomepageHeader />
       <main>
         <div className="container">
@@ -43,6 +40,6 @@ export default function Home(): ReactNode {
 </div>
         </div>
       </main>
-    </Layout>
+    </>
   );
 }

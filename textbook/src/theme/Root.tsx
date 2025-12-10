@@ -3,15 +3,10 @@ import { ChatProvider, useChat } from '../contexts/ChatContext.tsx'; // Use new 
 import TextSelectionButton from '../components/TextSelectionButton';
 import ChatbotWidget from '../components/ChatbotWidget'; // Import the new ChatbotWidget
 import { askSelectionWithBackend } from '../lib/chatApi'; // Keep existing backend communication
-// REMOVE old ChatbotProvider related imports
-// import { ChatbotProvider, useChatbot } from '../lib/ChatbotProvider';
-// import FloatingChatbotIcon from '../components/FloatingChatbotIcon';
-// import ChatbotWindow from '../components/ChatbotWindow';
 
 function AppContent({ children }) {
   // Use new useChat hook
   const { isOpen, selectedText, openChat, closeChat, handleSelection, sendMessage } = useChat();
-  // const { isChatbotVisible } = useChatbot(); // REMOVE old useChatbot
 
   // TODO: Refactor handleAsk to use new sendMessage and selectedText from new context
   const handleAsk = async () => {
@@ -61,10 +56,7 @@ function AppContent({ children }) {
 export default function Root({ children }) {
   return (
     <ChatProvider> {/* Use new ChatProvider */}
-      {/* REMOVE old ChatbotProvider */}
-      {/* <ChatbotProvider> */}
         <AppContent>{children}</AppContent>
-      {/* </ChatbotProvider> */}
     </ChatProvider>
   );
 }

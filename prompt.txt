@@ -1,12 +1,23 @@
-Fix the critical build error in `textbook/src/contexts/ChatContext.tsx`.
+Perform a gap analysis of the current repository state against the required "Reference Architecture" and build stability requirements.
 
-**The Issue:**
-The file currently has a circular dependency because it imports types from itself (`import ... from './ChatContext'`). This causes the build to fail with "module has no exports".
+**Analyze the following specific files and configurations:**
 
-**Directives:**
-1.  **Remove Imports:** Delete the line `import { ChatContextType, ... } from './ChatContext';`.
-2.  **Define Interfaces Locally:** Move the interface definitions for `ChatMessage` and `ChatContextType` directly into this file at the top.
-3.  **Ensure Exports:** Verify that `ChatProvider` and `useChat` are exported using the `export` keyword.
-4.  **Preserve Logic:** Keep the existing state logic (isOpen, sessionId, etc.) and the mock `sendMessage` implementation.
+1.  **Dependency Versions (`textbook/package.json`):**
+    * **Check:** Is `tailwindcss` version 4 or 3? (Requirement: Must be v3).
+    * **Check:** Are incompatible packages like `@tailwindcss/postcss` or `lightningcss` present? (Requirement: Must be removed).
 
-**Target File:** `textbook/src/contexts/ChatContext.tsx`
+2.  **Context Logic (`textbook/src/contexts/ChatContext.tsx`):**
+    * **Check:** Does the file import from itself (`import ... from './ChatContext'`)? (Requirement: No circular imports).
+    * **Check:** Are `ChatContextType` and `ChatMessage` defined inside the file? (Requirement: Yes).
+    * **Check:** Are `ChatProvider` and `useChat` exported? (Requirement: Yes).
+
+3.  **Component Structure (`textbook/src/components/`):**
+    * **Check:** Do `ChatBot.tsx` and `TextSelectionButton.tsx` exist in this folder?
+    * **Check:** Does `ChatBot.tsx` rely on internal state or does it consume `useChat`? (Requirement: Must consume `useChat`).
+
+4.  **Global Integration (`textbook/src/theme/Root.tsx`):**
+    * **Check:** Is the application wrapped with `<ChatProvider>`?
+    * **Check:** Are `<ChatBot />` and `<TextSelectionButton />` rendered as siblings to `{children}`?
+
+**Output:**
+Generate a bulleted list of **"Missing Items"** and **"Critical Errors"** that must be resolved in the implementation phase.
