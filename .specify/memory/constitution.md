@@ -1,85 +1,55 @@
-<!--
-Sync Impact Report:
-Version change: 4.4.0 -> 4.5.0
-Modified principles:
-  - 1) OpenAI-Compatible Architecture
-  - 5) Logic Preservation
-  - 12) Docusaurus Native Theming
-Added principles:
-  - 15) Secure Connectivity
-Removed principles: None
-Templates requiring updates:
-  - .specify/templates/plan-template.md: ⚠ pending
-  - .specify/templates/spec-template.md: ⚠ pending
-  - .specify/templates/tasks-template.md: ⚠ pending
-  - .specify/templates/commands/sp.adr.md: ⚠ pending
-  - .specify/templates/commands/sp.analyze.md: ⚠ pending
-  - .specify/templates/commands/sp.checklist.md: ⚠ pending
-  - .specify/templates/commands/sp.clarify.md: ⚠ pending
-  - .specify/templates/commands/sp.git.commit_pr.md: ⚠ pending
-  - .specify/templates/commands/sp.implement.md: ⚠ pending
-  - .specify/templates/commands/sp.phr.md: ⚠ pending
-  - .specify/templates/commands/sp.plan.md: ⚠ pending
-  - .specify/templates/commands/sp.specify.md: ⚠ pending
-  - .specify/templates/commands/sp.tasks.md: ⚠ pending
-  - README.md: ⚠ pending
-Follow-up TODOs:
-  - TODO(RATIFICATION_DATE): Original adoption date unknown.
--->
-# Hackathon Project: AI/Spec-Driven Book + RAG Chatbot Constitution
-
-These are hard rules and must ALWAYS be enforced to support a high-quality technical textbook and RAG Backend API development.
+# [PROJECT_NAME] Constitution
+<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
 
 ## Core Principles
 
-### 1) OpenAI-Adapter Pattern
-The backend MUST use the `openai` Python SDK (or `openai-agents`) configured with the Gemini Base URL for all LLM operations. The `base_url` MUST be set to `"https://generativelanguage.googleapis.com/v1beta/openai/"` and authentication MUST use the `GOOGLE_API_KEY`. Do NOT rewrite this to the native Google GenAI SDK.
+### [PRINCIPLE_1_NAME]
+<!-- Example: I. Library-First -->
+[PRINCIPLE_1_DESCRIPTION]
+<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
 
-### 2) Root-Level Integration
-The Chatbot component MUST NOT be embedded in Markdown or Page files. It MUST be rendered solely in `src/theme/Root.tsx` so it persists globally across the entire application.
+### [PRINCIPLE_2_NAME]
+<!-- Example: II. CLI Interface -->
+[PRINCIPLE_2_DESCRIPTION]
+<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
 
-### 3) Global State Management
-Chat visibility (`isOpen`) and context data MUST be managed via a React Context (`ChatProvider`). This allows components like the "Selection Button" to control the Chatbot from anywhere.
+### [PRINCIPLE_3_NAME]
+<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
+[PRINCIPLE_3_DESCRIPTION]
+<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
 
-### 4) Floating Widget UX
-The Chatbot MUST be a collapsible "Floating Action Button" (FAB) widget fixed to the bottom-right of the viewport. Inline styles are FORBIDDEN; use Tailwind CSS.
+### [PRINCIPLE_4_NAME]
+<!-- Example: IV. Integration Testing -->
+[PRINCIPLE_4_DESCRIPTION]
+<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
 
-### 5) Robust Sessions & Logic Preservation
-The refactored UI MUST retain the existing backend integration (chat history, feedback). The Frontend MUST use the `uuid` library to generate version-4 UUIDs for `sessionId`. Simple timestamps are forbidden.
+### [PRINCIPLE_5_NAME]
+<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
+[PRINCIPLE_5_DESCRIPTION]
+<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
 
-### 6) Extension-Less Imports
-All imports of local TypeScript/React files MUST omit the `.tsx` or `.ts` extension (e.g., `import X from './file'`, NOT `import X from './file.tsx'`).
+### [PRINCIPLE_6_NAME]
 
-### 7) Tailwind v3 Standard
-The project uses Tailwind CSS v3. It MUST rely on a `postcss.config.js` file for processing. Do NOT use `lightningcss` or Tailwind v4 packages.
 
-### 8) Context-Driven UI
-UI components like `TextSelectionButton` and `ChatbotWidget` MUST consume `useChat()` directly to trigger actions. Parent components (like `Root`) MUST NOT pass down handler functions manually.
+[PRINCIPLE__DESCRIPTION]
 
-### 9) Hybrid Deployment
-The `vercel.json` MUST explicitly define:
-* A Python build for `api/` (including `api/utils/**`).
-* A Static build for `textbook/`.
+## [SECTION_2_NAME]
+<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 
-### 10) Zero Broken Links
-The `npm run build` command must pass without error.
+[SECTION_2_CONTENT]
+<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
 
-### 11) Real Data Integration
-The Frontend `ChatContext` MUST connect to the Backend API (`/api/chat`) using the `chatApi` library. Mock data is forbidden in the final build.
+## [SECTION_3_NAME]
+<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
 
-### 12) Docusaurus Native Theming
-All Chatbot UI components MUST use Tailwind `dark:` variants to perfectly match the Docusaurus theme.
-
-### 13) Error Resilience
-If the backend is offline, the Chatbot MUST display a user-friendly error message in the chat window, not crash the app.
-
-### 14) Safe CSS Configuration
-The `tailwind.config.js` MUST have `corePlugins: { preflight: false }` to prevent breaking the Docusaurus layout.
-
-### 15) Secure Connectivity
-The FastAPI backend MUST include `CORSMiddleware` allowing origins `["*"]` for development purposes. For production, specific domains MUST be whitelisted.
+[SECTION_3_CONTENT]
+<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
 
 ## Governance
-<!-- Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-**Version**: 4.5.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2025-12-10
+[GOVERNANCE_RULES]
+<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+
+**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
+<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->

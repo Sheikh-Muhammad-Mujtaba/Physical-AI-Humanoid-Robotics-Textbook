@@ -31,16 +31,7 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- **Educational Clarity**: Does the proposed content cater to beginners? Are there plans for diagrams or examples for complex topics?
-- **Docusaurus-First Architecture**: Is the content structured for Docusaurus? Is frontmatter (`id`, `title`, `sidebar_position`) planned for all Markdown files?
-- **Modular Content**: Are large topics broken down into smaller, atomic sub-chapters?
-- **Single Source of Truth**: Is there a clear plan for handling imported content and archiving the master file?
-- **Asset Management**: Is there a plan for storing images and static assets in `docs/static/img`?
-- **Serverless Compatibility**: Is the backend designed to be stateless and compatible with Vercel Serverless Functions? Are global variables for database clients lazily initialized?
-- **Type Safety**: Are all backend data exchanges defined using Pydantic models? Are loose dictionaries avoided for API payloads?
-- **Modular Utilities**: Is shared logic separated into a `utils/` directory?
-- **Secure Configuration**: Are API keys and sensitive configuration loaded from environment variables?
-- **Frontend/Backend Separation**: Will the frontend communicate with the backend solely via `/api` endpoints, defined in a dedicated TypeScript service file?
+[Gates determined based on constitution file]
 
 ## Project Structure
 

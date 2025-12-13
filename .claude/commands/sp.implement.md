@@ -110,7 +110,6 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **Validation checkpoints**: Verify each phase completion before proceeding
 
 7. Implementation execution rules:
-   - **User Permission**: Always ask for explicit permission before executing `npm install`, `npm build`, or `npm start` commands.
    - **Setup first**: Initialize project structure, dependencies, configuration
    - **Tests before code**: If you need to write tests for contracts, entities, and integration scenarios
    - **Core development**: Implement models, services, CLI commands, endpoints

@@ -1,6 +1,7 @@
 {
   "version": 2,
   "buildCommand": "npm install && npm run build",
+  "outputDirectory": "build",
   "routes": [
     {
       "src": "/api/.*",
@@ -8,7 +9,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/build/$1"
+      "dest": "/$1"
     }
   ],
   "functions": {

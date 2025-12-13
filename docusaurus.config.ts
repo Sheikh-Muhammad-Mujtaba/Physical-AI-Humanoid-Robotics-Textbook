@@ -53,7 +53,6 @@ const config: Config = {
       {
         docs: {
           routeBasePath: '/docs', // Docs available at /docs
-          path: 'docs',
           sidebarPath: './sidebars.ts',
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
