@@ -1,5 +1,4 @@
 ---
-id: robot-lab-options
 title: Robot Lab Options
 sidebar_position: 3
 ---

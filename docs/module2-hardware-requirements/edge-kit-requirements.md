@@ -1,5 +1,4 @@
 ---
-id: edge-kit-requirements
 title: Edge Kit Requirements
 sidebar_position: 2
 ---

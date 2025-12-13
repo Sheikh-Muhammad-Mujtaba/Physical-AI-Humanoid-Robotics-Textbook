@@ -1,5 +1,4 @@
 ---
-id: summary-of-architecture
 title: Summary of Architecture
 sidebar_position: 4
 ---

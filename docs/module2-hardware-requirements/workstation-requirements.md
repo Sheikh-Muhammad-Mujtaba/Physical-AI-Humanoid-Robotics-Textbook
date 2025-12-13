@@ -1,5 +1,4 @@
 ---
-id: workstation-requirements
 title: Workstation Requirements
 sidebar_position: 1
 ---

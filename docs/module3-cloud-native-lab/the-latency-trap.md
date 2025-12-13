@@ -1,5 +1,4 @@
 ---
-id: the-latency-trap
 title: The Latency Trap (Hidden Cost)
 sidebar_position: 3
 ---

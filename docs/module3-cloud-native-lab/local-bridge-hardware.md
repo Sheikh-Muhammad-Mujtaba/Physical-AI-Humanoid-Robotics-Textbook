@@ -1,5 +1,4 @@
 ---
-id: local-bridge-hardware
 title: Local "Bridge" Hardware
 sidebar_position: 2
 ---

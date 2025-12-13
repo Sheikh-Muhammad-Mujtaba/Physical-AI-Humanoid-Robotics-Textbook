@@ -18,7 +18,7 @@ const FeatureList: FeatureItem[] = [
         Explore the foundational concepts of Physical AI, its components, and the sense-plan-act cycle.
       </>
     ),
-    link: '/module1-introduction-to-physical-ai/what-is-physical-ai',
+    link: '/docs/module1-introduction-to-physical-ai/what-is-physical-ai',
   },
   {
     title: 'Module 2: Hardware Requirements',
@@ -27,7 +27,7 @@ const FeatureList: FeatureItem[] = [
         Understand the hardware necessary to build and run your own Physical AI projects.
       </>
     ),
-    link: '/module2-hardware-requirements/workstation-requirements',
+    link: '/docs/module2-hardware-requirements/workstation-requirements',
   },
   {
     title: 'Module 3: Cloud-Native Lab',
@@ -36,7 +36,7 @@ const FeatureList: FeatureItem[] = [
         Learn how to set up a cloud-native lab for Physical AI development.
       </>
     ),
-    link: '/module3-cloud-native-lab/cloud-workstations',
+    link: '/docs/module3-cloud-native-lab/cloud-workstations',
   },
   {
     title: 'Module 4: Economy Jetson Student Kit',
@@ -45,7 +45,7 @@ const FeatureList: FeatureItem[] = [
         Get a detailed breakdown of an affordable and powerful hardware kit for students.
       </>
     ),
-    link: '/module4-economy-jetson-student-kit/jetson-student-kit',
+    link: '/docs/module4-economy-jetson-student-kit/jetson-student-kit',
   },
 ];
 

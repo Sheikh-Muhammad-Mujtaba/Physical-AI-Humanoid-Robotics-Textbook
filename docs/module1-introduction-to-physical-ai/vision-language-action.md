@@ -1,6 +1,5 @@
 ---
-id: vision-language-action
-title: Vision-Language-Action (VLA)
+title: Vision-Language-Action Models
 sidebar_position: 5
 ---
 

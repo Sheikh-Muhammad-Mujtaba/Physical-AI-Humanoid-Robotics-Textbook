@@ -1,5 +1,4 @@
 ---
-id: the-digital-twin
 title: The Digital Twin (Gazebo & Unity)
 sidebar_position: 3
 ---

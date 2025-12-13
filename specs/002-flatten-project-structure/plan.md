@@ -75,3 +75,46 @@ The project structure will be flattened to move all Docusaurus files from the `t
    - Run `npm install` from the project root.
    - Run `npm run build` from the project root.
    - Run `npm start` from the project root to verify the site works locally.
+
+### Phase 4: Docusaurus Sidebar Configuration (CRITICAL)
+
+**Issue**: After migration, content was not appearing in the sidebar.
+
+**Root Cause Analysis**: The `id` frontmatter field in markdown files was incorrectly set to include folder paths (e.g., `id: module1-introduction-to-physical-ai/what-is-physical-ai`). This causes Docusaurus to generate different routes than expected by `sidebars.ts`.
+
+**Docusaurus Behavior** (per [official docs](https://docusaurus.io/docs/sidebar)):
+- When `id` is NOT set: Docusaurus auto-generates ID from file path (e.g., `docs/module1/file.md` → ID `module1/file`)
+- When `id` IS set: Docusaurus uses that ID directly AND changes the URL route to match
+- Setting `id: folder/filename` effectively duplicates the folder path, breaking the sidebar reference
+
+**Solution**: Remove all `id` fields from frontmatter. Let Docusaurus auto-generate IDs from file paths.
+
+**Correct Frontmatter Format**:
+```yaml
+---
+title: Document Title
+sidebar_position: 1
+---
+```
+
+**Incorrect Format** (DO NOT USE):
+```yaml
+---
+id: folder-name/document-name  # ❌ Causes routing issues
+title: Document Title
+sidebar_position: 1
+---
+```
+
+**Sidebar Reference Pattern** (in `sidebars.ts`):
+```typescript
+{
+  type: 'category',
+  label: 'Module 1',
+  items: [
+    'module1-folder/document-filename',  // No .md extension
+  ],
+}
+```
+
+**Key Takeaway**: The sidebar item string should match the folder structure from the `docs/` root, without the `.md` extension. Do not set explicit `id` fields unless you have a specific reason to override the URL.

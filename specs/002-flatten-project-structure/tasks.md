@@ -42,3 +42,47 @@
 - [ ] T017 Run `npm install` from the project root.
 - [ ] T018 Run `npm run build` from the project root.
 - [ ] T019 Run `npm start` from the project root to verify the site works locally.
+
+---
+
+## Phase 4: Docusaurus Sidebar Fix (Post-Migration)
+
+**Issue Discovered**: Content was not showing in sidebar after migration.
+
+**Root Cause**: Document frontmatter `id` fields contained folder paths (e.g., `id: module1-introduction-to-physical-ai/what-is-physical-ai`), which conflicts with how Docusaurus generates routes.
+
+**Fix Applied**: Remove `id` fields from all markdown frontmatter in `/docs/`. Docusaurus auto-generates IDs from file paths, which matches what `sidebars.ts` expects.
+
+### Files Fixed (13 total):
+
+- [x] T020 `docs/module1-introduction-to-physical-ai/what-is-physical-ai.md` - Remove `id` field
+- [x] T021 `docs/module1-introduction-to-physical-ai/the-ai-robot-brain.md` - Remove `id` field
+- [x] T022 `docs/module1-introduction-to-physical-ai/the-digital-twin.md` - Remove `id` field
+- [x] T023 `docs/module1-introduction-to-physical-ai/the-robotic-nervous-system.md` - Remove `id` field
+- [x] T024 `docs/module1-introduction-to-physical-ai/vision-language-action.md` - Remove `id` field
+- [x] T025 `docs/module2-hardware-requirements/workstation-requirements.md` - Remove `id` field
+- [x] T026 `docs/module2-hardware-requirements/edge-kit-requirements.md` - Remove `id` field
+- [x] T027 `docs/module2-hardware-requirements/robot-lab-options.md` - Remove `id` field
+- [x] T028 `docs/module2-hardware-requirements/summary-of-architecture.md` - Remove `id` field
+- [x] T029 `docs/module3-cloud-native-lab/cloud-workstations.md` - Remove `id` field
+- [x] T030 `docs/module3-cloud-native-lab/local-bridge-hardware.md` - Remove `id` field
+- [x] T031 `docs/module3-cloud-native-lab/the-latency-trap.md` - Remove `id` field
+- [x] T032 `docs/module4-economy-jetson-student-kit/jetson-student-kit.md` - Remove `id` field
+
+### Correct Frontmatter Pattern:
+
+```yaml
+---
+title: Document Title
+sidebar_position: 1
+---
+```
+
+**DO NOT USE** (causes sidebar/routing issues):
+```yaml
+---
+id: folder-name/document-name  # ❌ WRONG - don't include paths
+title: Document Title
+sidebar_position: 1
+---
+```

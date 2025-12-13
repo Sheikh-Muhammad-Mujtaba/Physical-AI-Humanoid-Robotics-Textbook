@@ -52,12 +52,11 @@ const config: Config = {
       'classic',
       {
         docs: {
-          routeBasePath: '/', // Makes docs the main site
+          routeBasePath: '/docs', // Docs available at /docs
           path: 'docs',
           sidebarPath: './sidebars.ts',
           remarkPlugins: [remarkMath],
-          rehypePlugins: [rehypeKatex],          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
+          rehypePlugins: [rehypeKatex],
         },
         blog: {
           showReadingTime: true,
@@ -71,7 +70,8 @@ const config: Config = {
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
           onUntruncatedBlogPosts: 'warn',
-        }, theme: {
+        },
+        theme: {
           customCss: './src/css/custom.css',
         },
       } satisfies Preset.Options,
@@ -121,7 +121,7 @@ const config: Config = {
           items: [
             {
               label: 'Introduction',
-              to: '/intro',
+              to: '/docs/intro',
             },
           ],
         },

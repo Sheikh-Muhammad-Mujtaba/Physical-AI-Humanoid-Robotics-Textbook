@@ -1,5 +1,4 @@
 ---
-id: cloud-workstations
 title: Cloud Workstations
 sidebar_position: 1
 ---

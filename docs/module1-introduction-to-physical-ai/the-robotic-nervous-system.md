@@ -1,6 +1,5 @@
 ---
-id: the-robotic-nervous-system
-title: The Robotic Nervous System (ROS 2)
+title: The Robotic Nervous System
 sidebar_position: 2
 ---
 

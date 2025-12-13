@@ -1,5 +1,4 @@
 ---
-id: the-ai-robot-brain
 title: The AI-Robot Brain (NVIDIA Isaac™)
 sidebar_position: 4
 ---

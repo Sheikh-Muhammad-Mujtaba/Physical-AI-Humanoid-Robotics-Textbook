@@ -1,5 +1,4 @@
 ---
-id: jetson-student-kit
 title: The Economy Jetson Student Kit
 sidebar_position: 1
 ---

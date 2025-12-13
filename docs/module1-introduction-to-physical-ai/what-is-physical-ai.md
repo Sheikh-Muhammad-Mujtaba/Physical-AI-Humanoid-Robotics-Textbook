@@ -1,5 +1,4 @@
 ---
-id: what-is-physical-ai
 title: What is Physical AI?
 sidebar_position: 1
 ---

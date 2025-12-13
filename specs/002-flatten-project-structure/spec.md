@@ -97,3 +97,26 @@ As a user, I want to access the Docusaurus site from the root of the domain, so 
 - **SC-002**: The API routes at `/api/*` are still working as expected.
 - **SC-003**: The local development environment can be started with `npm start` from the project root.
 - **SC-004**: The project builds successfully with `npm run build` from the project root.
+
+---
+
+## Known Issues & Solutions
+
+### Issue: Sidebar Not Displaying Content (Fixed 2025-12-13)
+
+**Symptom**: After migration, the Docusaurus sidebar shows categories but documents don't appear or navigation fails.
+
+**Root Cause**: Document frontmatter contained `id` fields with folder paths (e.g., `id: module1-intro/what-is-physical-ai`). In Docusaurus, the `id` field also affects the URL route, causing a mismatch with what `sidebars.ts` expects.
+
+**Solution**: Remove all `id` fields from markdown frontmatter. Use only `title` and `sidebar_position`:
+
+```yaml
+---
+title: What is Physical AI?
+sidebar_position: 1
+---
+```
+
+**Files Affected**: All 13 markdown files in `docs/` subdirectories.
+
+**Reference**: [Docusaurus Sidebar Documentation](https://docusaurus.io/docs/sidebar), [GitHub Issue #10496](https://github.com/facebook/docusaurus/issues/10496)
