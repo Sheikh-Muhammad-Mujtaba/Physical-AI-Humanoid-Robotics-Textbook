@@ -1,116 +1,151 @@
-import React, { useState } from 'react'; // Add useState
+import React, { useState, useRef, useEffect } from 'react';
 import { useChat } from '../contexts/ChatContext';
 
 const ChatbotWidget: React.FC = () => {
-  const { isOpen, openChat, closeChat, messages, selectedText, sendMessage, isLoading } = useChat(); // Add sendMessage and isLoading
-  const [inputMessage, setInputMessage] = useState(''); // State for input field
+  const { isOpen, openChat, closeChat, messages, selectedText, sendMessage, isLoading, handleSelection } = useChat();
+  const [inputMessage, setInputMessage] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isLoading]);
+
+  // Handle sending message with selection context
+  const handleSendMessage = () => {
+    if (inputMessage.trim()) {
+      sendMessage(inputMessage);
+      setInputMessage('');
+    }
+  };
+
+  // Clear selection tag
+  const clearSelection = () => {
+    handleSelection(null);
+  };
+
+  // Truncate text for display
+  const truncateText = (text: string, maxLength: number = 100) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
 
   return (
     <div className="fixed bottom-5 right-5 z-[1000]">
       {!isOpen ? (
-        // Collapsed state (Floating Action Button placeholder)
         <button
           onClick={openChat}
-          className="w-20 h-20 rounded-full bg-primary text-white border-none text-2xl cursor-pointer flex items-center justify-center shadow-lg"
-          // Equivalent to:
-          // width: 60, height: 60, borderRadius: '50%', backgroundColor: '#007bff',
-          // color: 'white', border: 'none', fontSize: '24px', cursor: 'pointer',
-          // display: 'flex', alignItems: 'center', justifyContent: 'center',
-          // boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+          className="w-16 h-16 rounded-full bg-primary text-white border-none text-2xl cursor-pointer flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
         >
           💬
         </button>
       ) : (
-        // Expanded state (Chatbot Window placeholder)
-        <div
-          className="w-80 h-[500px] bg-white text-gray-900 dark:bg-zinc-900 dark:text-gray-100 rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700"
-          // Equivalent to:
-          // width: 350, height: 500, backgroundColor: 'white', borderRadius: '10px',
-          // boxShadow: '0 8px 16px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column',
-          // overflow: 'hidden',
-        >
-          <div
-            className="bg-primary text-white p-2 flex justify-between items-center"
-            // Equivalent to:
-            // backgroundColor: '#007bff', color: 'white', padding: '10px',
-            // display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          >
-            Chatbot
+        <div className="w-96 h-[550px] bg-white text-gray-900 dark:bg-zinc-900 dark:text-gray-100 rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700">
+          {/* Header */}
+          <div className="bg-primary text-white p-3 flex justify-between items-center">
+            <span className="font-semibold">AI Tutor</span>
             <button
               onClick={closeChat}
-              className="bg-transparent border-none text-white text-xl cursor-pointer"
-              // Equivalent to:
-              // background: 'none', border: 'none', color: 'white',
-              // fontSize: '20px', cursor: 'pointer',
+              className="bg-transparent border-none text-white text-xl cursor-pointer hover:opacity-80"
             >
               &times;
             </button>
           </div>
-          <div className="flex-grow p-2 overflow-y-auto border-b border-gray-200 dark:border-gray-700">
-            {/* Equivalent to: flexGrow: 1, padding: '10px', overflowY: 'auto', borderBottom: '1px solid #eee' */}
-            {messages.length === 0 && selectedText ? (
-              <div className="mb-2 text-left">
-                <span className="inline-block rounded-md px-3 py-2 bg-gray-100 dark:bg-gray-700">
-                  You selected: "{selectedText}". How can I help with this?
-                </span>
+
+          {/* Messages Area */}
+          <div className="flex-grow p-3 overflow-y-auto">
+            {messages.length === 0 && !selectedText ? (
+              <div className="h-full flex items-center justify-center">
+                <p className="text-center text-gray-500 dark:text-gray-400">
+                  Select text from the book or ask a question to get started!
+                </p>
               </div>
-            ) : messages.length === 0 ? (
-              <p className="text-center text-gray-500">No messages yet.</p>
-              // Equivalent to: textAlign: 'center', color: '#888'
             ) : (
-              messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`mb-2 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}
-                  // Equivalent to: marginBottom: '8px', textAlign: msg.sender === 'user' ? 'right' : 'left',
-                >
-                  <span
-                    className={`inline-block rounded-md px-3 py-2 ${
-                      msg.sender === 'user' ? 'bg-blue-100 dark:bg-blue-800' : 'bg-gray-100 dark:bg-gray-700'
-                    }`}
-                    // Equivalent to: display: 'inline-block', borderRadius: '5px', padding: '8px 12px',
-                    // backgroundColor: msg.sender === 'user' ? '#e0f7fa' : '#f0f0f0',
+              <>
+                {messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`mb-3 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}
                   >
-                    {msg.content}
-                  </span>
-                </div>
-              ))
-            )}
-            {isLoading && ( // Conditional rendering for typing indicator
-              <div className="mb-2 text-left">
-                <span className="inline-block rounded-md px-3 py-2 bg-gray-100 dark:bg-gray-700 italic">
-                  AI is typing...
-                </span>
-              </div>
+                    <div
+                      className={`inline-block rounded-lg px-3 py-2 max-w-[85%] ${
+                        msg.sender === 'user'
+                          ? 'bg-primary text-white'
+                          : 'bg-gray-100 dark:bg-gray-700'
+                      }`}
+                    >
+                      <p className="whitespace-pre-wrap break-words text-sm">{msg.content}</p>
+                    </div>
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="mb-3 text-left">
+                    <div className="inline-block rounded-lg px-3 py-2 bg-gray-100 dark:bg-gray-700">
+                      <div className="flex items-center gap-1">
+                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </>
             )}
           </div>
-          <div className="p-2 border-t border-gray-200 dark:border-gray-700 flex items-center"> {/* Add flex for button */}
-            {/* Equivalent to: padding: '10px', borderTop: '1px solid #eee' */}
-            <input
-              type="text"
-              placeholder="Type a message..."
-              className="flex-grow p-2 border border-gray-300 bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded-md mr-2" // flex-grow and margin-right
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={(e) => { // Send message on Enter key press
-                if (e.key === 'Enter' && inputMessage.trim()) {
-                  sendMessage(inputMessage);
-                  setInputMessage('');
-                }
-              }}
-              // Removed disabled
-            />
-            <button
-              onClick={() => { // Send message on button click
-                if (inputMessage.trim()) {
-                  sendMessage(inputMessage);
-                  setInputMessage('');
-                }
-              }}
-              className="bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-80"
-            >
-              Send
-            </button>
+
+          {/* Input Area */}
+          <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+            {/* WhatsApp-style Selection Tag */}
+            {selectedText && (
+              <div className="mb-2 p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg border-l-4 border-primary">
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs font-medium text-primary dark:text-blue-400 block mb-1">
+                      Selected from book:
+                    </span>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 italic line-clamp-2">
+                      "{truncateText(selectedText, 120)}"
+                    </p>
+                  </div>
+                  <button
+                    onClick={clearSelection}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 flex-shrink-0"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Input Field */}
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder={selectedText ? "Ask about the selection..." : "Type a message..."}
+                className="flex-grow p-2 border border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
+                disabled={isLoading}
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={isLoading || !inputMessage.trim()}
+                className="bg-primary text-white p-2 rounded-lg hover:bg-opacity-80 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       )}

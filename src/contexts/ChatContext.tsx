@@ -65,8 +65,14 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
   const sendMessage = useCallback(async (text: string) => {
     setIsLoading(true);
+
+    // Create user message - include selection context if present
+    const userMessageContent = selectedText
+      ? `Re: "${selectedText.length > 50 ? selectedText.substring(0, 50) + '...' : selectedText}"\n\n${text}`
+      : text;
+
     const newUserMessage: ChatMessage = {
-      content: text,
+      content: userMessageContent,
       sender: 'user',
       timestamp: new Date(),
       status: 'pending',
@@ -75,13 +81,15 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
     try {
       let botResponseContent: string;
-      // Add console.log for API fetch attempts
-      console.log("Attempting to fetch chat/ask-selection API."); // Log general attempt
+      console.log("Attempting to fetch chat/ask-selection API.");
+
       if (selectedText && sessionId) {
         // Use askSelectionWithBackend if text is selected
         console.log("Fetching /api/ask-selection with selected text and query:", selectedText, text);
         const response = await askSelectionWithBackend(selectedText, text, sessionId);
         botResponseContent = response.answer;
+        // Clear selection after sending
+        setSelectedText(null);
       } else if (sessionId) {
         // Use chatWithBackend for general chat
         console.log("Fetching /api/chat with query:", text);
@@ -104,7 +112,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       console.error("Error sending message:", error);
       let errorMessageContent: string;
       if (error instanceof TypeError && error.message === 'Failed to fetch') {
-        errorMessageContent = "Error: Could not connect to Backend. Is it running on port 8000?";
+        errorMessageContent = "Error: Could not connect to the AI service. Please try again later.";
       } else if (error instanceof Error) {
         errorMessageContent = `Error: ${error.message}`;
       } else {
@@ -121,7 +129,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedText, sessionId]); // Add selectedText and sessionId to dependencies
+  }, [selectedText, sessionId]);
 
   // --- Session management placeholder ---
   useEffect(() => {

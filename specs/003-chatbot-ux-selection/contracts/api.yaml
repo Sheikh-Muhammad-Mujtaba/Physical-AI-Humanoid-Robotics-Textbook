@@ -1,0 +1,226 @@
+openapi: 3.0.3
+info:
+  title: Physical AI Textbook Chatbot API
+  description: API for the AI tutor chatbot with text selection support
+  version: 1.0.0
+
+servers:
+  - url: /api
+    description: Vercel serverless API
+
+paths:
+  /chat:
+    post:
+      summary: Send a general chat message
+      description: Send a question to the AI tutor without selection context
+      operationId: chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /ask-selection:
+    post:
+      summary: Ask about selected text
+      description: Send a question about a specific text selection from the textbook
+      operationId: askSelection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AskSelectionRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /history/{session_id}:
+    get:
+      summary: Get chat history
+      description: Retrieve chat history for a specific session
+      operationId: getHistory
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoryMessage'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /feedback:
+    post:
+      summary: Submit feedback
+      description: Submit rating feedback for an AI response
+      operationId: feedback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackRequest'
+      responses:
+        '200':
+          description: Feedback received
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "Feedback received"
+        '404':
+          description: Message not found
+        '500':
+          description: Server error
+
+  /health:
+    get:
+      summary: Health check
+      description: Check if the API is running
+      operationId: healthCheck
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required:
+        - query
+        - session_id
+      properties:
+        query:
+          type: string
+          description: The user's question
+          example: "What is Physical AI?"
+        session_id:
+          type: string
+          format: uuid
+          description: Unique session identifier
+
+    AskSelectionRequest:
+      type: object
+      required:
+        - selection
+        - question
+        - session_id
+      properties:
+        selection:
+          type: string
+          description: The text selected from the textbook
+          example: "Physical AI refers to artificial intelligence systems that interact with the physical world"
+        question:
+          type: string
+          description: The user's question about the selection
+          example: "Can you explain this in simpler terms?"
+        session_id:
+          type: string
+          format: uuid
+          description: Unique session identifier
+
+    ChatResponse:
+      type: object
+      properties:
+        message_id:
+          type: string
+          format: uuid
+          description: Unique identifier for this response message
+        answer:
+          type: string
+          description: The AI's response
+        context:
+          type: array
+          items:
+            type: object
+          description: RAG context chunks used (if any)
+
+    HistoryMessage:
+      type: object
+      properties:
+        message_id:
+          type: string
+          format: uuid
+        session_id:
+          type: string
+          format: uuid
+        sender:
+          type: string
+          enum: [user, bot]
+        text:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    FeedbackRequest:
+      type: object
+      required:
+        - message_id
+        - rating
+      properties:
+        message_id:
+          type: string
+          format: uuid
+          description: The message being rated
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Rating from 1-5
+
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error message

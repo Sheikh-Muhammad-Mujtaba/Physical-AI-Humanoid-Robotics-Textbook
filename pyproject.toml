@@ -1,0 +1,20 @@
+[project]
+name = "physical-ai-backend"
+version = "1.0.0"
+description = "Physical AI Textbook Backend API"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "qdrant-client",
+    "openai",
+    "openai-agents",
+    "pydantic",
+    "python-dotenv",
+    "sqlalchemy",
+    "psycopg2-binary",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

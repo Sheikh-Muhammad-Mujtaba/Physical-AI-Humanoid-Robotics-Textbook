@@ -155,19 +155,31 @@ async def chat(request: ChatRequest, db: Session = Depends(get_db)):
 async def ask_selection(request: AskSelectionRequest, db: Session = Depends(get_db)):
     if not agent:
         raise HTTPException(status_code=500, detail="Agent not configured.")
-    
+
     user_message_text = f"Selection: {request.selection}\nQuestion: {request.question}"
     user_message = ChatHistory(session_id=request.session_id, sender="user", text=user_message_text)
     db.add(user_message)
     db.commit()
 
-    prompt = f"""The user has selected the following text from the textbook:
-"{request.selection}"
+    prompt = f"""You are an expert AI tutor helping students understand Physical AI and Humanoid Robotics concepts.
 
-And asked the following question about it:
+The student has highlighted/selected the following text from the textbook:
+---
+"{request.selection}"
+---
+
+The student's question about this selection:
 "{request.question}"
 
-Use the search_tool to find relevant context and answer the question.
+Instructions:
+1. First, acknowledge what the student has selected and show you understand the context.
+2. Directly answer their specific question about the selected text.
+3. Explain the concept in simple, clear terms - assume the student is learning this for the first time.
+4. If relevant, provide examples or analogies to make the concept easier to understand.
+5. If the selection contains technical terms, briefly define them.
+6. Use the search_tool to find additional relevant context from the textbook if needed.
+
+Be concise but thorough. Focus on helping the student truly understand the selected content.
 """
     try:
         result = await Runner.run(agent, prompt)
@@ -177,7 +189,7 @@ Use the search_tool to find relevant context and answer the question.
         db.add(bot_message)
         db.commit()
         db.refresh(bot_message)
-        
+
         return ChatResponse(message_id=bot_message.message_id, answer=llm_answer, context=[])
     except Exception as e:
         print(f"Error during agent run: {e}")

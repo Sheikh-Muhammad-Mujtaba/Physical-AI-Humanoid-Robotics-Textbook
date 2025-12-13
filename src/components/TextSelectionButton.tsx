@@ -8,14 +8,14 @@ interface TextSelectionButtonProps {
 }
 
 const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
-  const { selectedText, handleSelection, openChat, sendMessage } = useChat();
+  const { handleSelection, openChat } = useChat();
   const [buttonPosition, setButtonPosition] = useState<{ x: number; y: number } | null>(null);
+  const [currentSelection, setCurrentSelection] = useState<string | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const getSelectionCoords = useCallback(() => {
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
-      handleSelection(null);
       return null;
     }
 
@@ -29,24 +29,36 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
       x: rect.left + scrollX + rect.width / 2,
       y: rect.top + scrollY - 30, // 30px above selection
     };
-  }, [handleSelection]);
+  }, []);
 
   const handleMouseUp = useCallback(() => {
-    const coords = getSelectionCoords();
-    if (coords && window.getSelection()?.toString().trim().length > 0) {
-      setButtonPosition(coords);
-      handleSelection(window.getSelection()?.toString() || null);
+    const selection = window.getSelection();
+    const selectedText = selection?.toString().trim() || '';
+
+    if (selectedText.length > 0) {
+      const coords = getSelectionCoords();
+      if (coords) {
+        setButtonPosition(coords);
+        setCurrentSelection(selectedText);
+      }
     } else {
       setButtonPosition(null);
-      handleSelection(null);
+      setCurrentSelection(null);
     }
-  }, [getSelectionCoords, handleSelection]);
+  }, [getSelectionCoords]);
 
   const handleClick = useCallback(() => {
-    if (selectedText) {
-      sendMessage(selectedText); // Send the selected text as a message
+    if (currentSelection) {
+      // Set the selection in context and open chat
+      handleSelection(currentSelection);
+      openChat();
+      // Clear the button
+      setButtonPosition(null);
+      setCurrentSelection(null);
+      // Clear browser selection
+      window.getSelection()?.removeAllRanges();
     }
-  }, [selectedText, sendMessage]); // Add sendMessage to dependencies
+  }, [currentSelection, handleSelection, openChat]);
 
   useEffect(() => {
     document.addEventListener('mouseup', handleMouseUp);
@@ -55,7 +67,7 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
     };
   }, [handleMouseUp]);
 
-  if (!buttonPosition || !selectedText) {
+  if (!buttonPosition || !currentSelection) {
     return null;
   }
 
