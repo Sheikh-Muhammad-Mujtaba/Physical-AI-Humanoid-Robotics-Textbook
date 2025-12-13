@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from "react"
-import { Send, X, Maximize2, MessageCircle, Sparkles, CheckCircle } from "lucide-react"
+import React, { useState, useRef, useEffect, useMemo } from "react"
+import { Send, X, Maximize2, MessageCircle, Sparkles } from "lucide-react"
 
 interface Message {
   id: string
@@ -12,16 +12,13 @@ interface Message {
 
 interface ChatRequest {
   query: string
-  top_k?: number
-  chapter_slug?: string | null
+  session_id: string
 }
 
 interface ChatResponse {
+  message_id: string
   answer: string
-  contexts?: Array<{
-    content: string
-    metadata: Record<string, any>
-  }>
+  context: string[]
 }
 
 // Dynamically determine API URL based on environment
@@ -37,13 +34,11 @@ const getApiUrl = () => {
 
 async function sendChatMessage(
   query: string,
-  topK: number = 3,
-  chapterSlug: string | null = null
+  sessionId: string
 ): Promise<ChatResponse> {
   const requestBody: ChatRequest = {
     query,
-    top_k: topK,
-    chapter_slug: chapterSlug,
+    session_id: sessionId,
   }
 
   const apiUrl = getApiUrl()
@@ -71,6 +66,15 @@ const SUGGESTED_QUESTIONS = [
   "What is ROS 2?",
 ]
 
+// Generate a UUID v4
+function generateUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0
+    const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return v.toString(16)
+  })
+}
+
 interface ChatBotProps {
   selectedText?: string
 }
@@ -90,6 +94,9 @@ export default function ChatBot({ selectedText }: ChatBotProps) {
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [capturedText, setCapturedText] = useState(selectedText || "")
+
+  // Generate session ID once per component mount
+  const sessionId = useMemo(() => generateUUID(), [])
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -120,10 +127,10 @@ export default function ChatBot({ selectedText }: ChatBotProps) {
     setIsLoading(true)
 
     try {
-      const response = await sendChatMessage(message)
-      
+      const response = await sendChatMessage(message, sessionId)
+
       const botResponse: Message = {
-        id: (Date.now() + 1).toString(),
+        id: response.message_id || (Date.now() + 1).toString(),
         type: "bot",
         content: response.answer,
         timestamp: new Date(),

@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npm run build",
+  "buildCommand": "npm run build",
   "outputDirectory": "build",
+  "installCommand": "npm install",
   "routes": [
     {
-      "src": "/api/.*",
-      "dest": "api/index.py"
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
     },
     {
       "src": "/(.*)",
@@ -14,9 +15,9 @@
   ],
   "functions": {
     "api/index.py": {
+      "runtime": "python3.11",
       "maxDuration": 60,
-      "includeFiles": "api/utils/**",
-      "excludeFiles": "**/__pycache__/**"
+      "includeFiles": "api/utils/**"
     }
   }
 }
