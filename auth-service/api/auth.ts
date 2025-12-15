@@ -77,16 +77,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.setHeader(key, value);
     });
 
+    // Handle redirects (OAuth callbacks return 302)
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('location');
+      if (location) {
+        res.redirect(response.status, location);
+        return;
+      }
+    }
+
     // Send response
     res.status(response.status);
 
     const contentType = response.headers.get('content-type');
     if (contentType?.includes('application/json')) {
-      const json = await response.json();
-      res.json(json);
+      // Clone the response to safely read the body
+      const text = await response.text();
+      if (text && text.length > 0) {
+        try {
+          const json = JSON.parse(text);
+          res.json(json);
+        } catch {
+          // If JSON parse fails, send as text
+          res.send(text);
+        }
+      } else {
+        // Empty response body
+        res.end();
+      }
     } else {
       const text = await response.text();
-      res.send(text);
+      if (text && text.length > 0) {
+        res.send(text);
+      } else {
+        res.end();
+      }
     }
   } catch (error) {
     console.error('Auth handler error:', error);
