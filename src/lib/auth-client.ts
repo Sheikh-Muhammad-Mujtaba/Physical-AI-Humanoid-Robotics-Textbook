@@ -1,35 +1,31 @@
 /**
  * BetterAuth client for authentication
  * Handles sign-in, sign-up, sign-out, and token management
+ *
+ * Configure via environment variable BETTER_AUTH_URL in Vercel dashboard
  */
 
 import { createAuthClient } from "better-auth/react";
 import { jwtClient } from "better-auth/client/plugins";
 
-// Production auth service URL - update this when deploying
-const PRODUCTION_AUTH_URL = "https://physical-ai-humanoid-robotics-textbook.vercel.app";
+// Default fallback URL for local development
 const DEV_AUTH_URL = "http://localhost:3001";
 
-// Get the auth service URL
+// Get the auth service URL from Docusaurus config (set via BETTER_AUTH_URL env var)
 const getAuthUrl = (): string => {
-  // Server-side rendering - return production URL
+  // Server-side rendering - use fallback
   if (typeof window === 'undefined') {
-    return PRODUCTION_AUTH_URL;
-  }
-
-  // Check if we're in development (localhost)
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return DEV_AUTH_URL;
   }
 
-  // Check if Docusaurus has injected the config
+  // Check if Docusaurus has injected the config (from BETTER_AUTH_URL env var)
   const docusaurusConfig = (window as any).__DOCUSAURUS__;
   if (docusaurusConfig?.siteConfig?.customFields?.betterAuthUrl) {
     return docusaurusConfig.siteConfig.customFields.betterAuthUrl;
   }
 
-  // Production - use the deployed auth service
-  return PRODUCTION_AUTH_URL;
+  // Fallback to localhost for development
+  return DEV_AUTH_URL;
 };
 
 const BETTER_AUTH_URL = getAuthUrl();

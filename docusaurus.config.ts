@@ -12,9 +12,10 @@ const config: Config = {
   favicon: 'img/favicon.ico',
 
   // Custom fields for runtime configuration
+  // Set BETTER_AUTH_URL and API_BASE_URL in Vercel environment variables
   customFields: {
-    betterAuthUrl: process.env.BETTER_AUTH_URL || 'https://physical-ai-humanoid-robotics-textbook.vercel.app',
-    apiBaseUrl: process.env.API_BASE_URL || 'https://ai-spec-driven.vercel.app/api',
+    betterAuthUrl: process.env.BETTER_AUTH_URL || 'http://localhost:3001',
+    apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8000',
   },
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
