@@ -12,7 +12,7 @@ import { jwtClient } from "better-auth/client/plugins";
 const DEV_AUTH_URL = "http://localhost:3001";
 
 // Get the auth service URL from Docusaurus config (set via BETTER_AUTH_URL env var)
-const getAuthUrl = (): string => {
+export const getAuthUrl = (): string => {
   // Server-side rendering - use fallback
   if (typeof window === 'undefined') {
     return DEV_AUTH_URL;
@@ -21,27 +21,59 @@ const getAuthUrl = (): string => {
   // Check if Docusaurus has injected the config (from BETTER_AUTH_URL env var)
   const docusaurusConfig = (window as any).__DOCUSAURUS__;
   if (docusaurusConfig?.siteConfig?.customFields?.betterAuthUrl) {
-    return docusaurusConfig.siteConfig.customFields.betterAuthUrl;
+    const url = docusaurusConfig.siteConfig.customFields.betterAuthUrl;
+    // Ensure we don't use localhost in production
+    if (url && url !== 'http://localhost:3001') {
+      return url;
+    }
+  }
+
+  // Check if we're on production domain - fail safe
+  if (typeof window !== 'undefined' &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1') {
+    // We're on production but don't have the URL - log error
+    console.error('BETTER_AUTH_URL not configured! Set it in Vercel environment variables.');
   }
 
   // Fallback to localhost for development
   return DEV_AUTH_URL;
 };
 
-const BETTER_AUTH_URL = getAuthUrl();
+// Lazy singleton for auth client
+let _authClient: ReturnType<typeof createAuthClient> | null = null;
 
-export const authClient = createAuthClient({
-  baseURL: BETTER_AUTH_URL,
-  fetchOptions: {
-    credentials: 'include', // Include cookies in cross-origin requests
-  },
-  plugins: [
-    jwtClient(),
-  ],
-});
+export const getAuthClient = () => {
+  if (!_authClient) {
+    const baseURL = getAuthUrl();
+    console.log('Initializing auth client with URL:', baseURL);
+    _authClient = createAuthClient({
+      baseURL,
+      fetchOptions: {
+        credentials: 'include', // Include cookies in cross-origin requests
+      },
+      plugins: [
+        jwtClient(),
+      ],
+    });
+  }
+  return _authClient;
+};
 
-// Export auth methods and hooks
-export const { signIn, signUp, signOut, useSession } = authClient;
+// For backward compatibility - but prefer using getAuthClient()
+export const authClient = typeof window !== 'undefined'
+  ? getAuthClient()
+  : createAuthClient({
+      baseURL: DEV_AUTH_URL,
+      fetchOptions: { credentials: 'include' },
+      plugins: [jwtClient()],
+    });
+
+// Export auth methods and hooks - these will use the lazy client
+export const signIn = authClient.signIn;
+export const signUp = authClient.signUp;
+export const signOut = authClient.signOut;
+export const useSession = authClient.useSession;
 
 // Token storage key
 const TOKEN_KEY = "auth_token";
