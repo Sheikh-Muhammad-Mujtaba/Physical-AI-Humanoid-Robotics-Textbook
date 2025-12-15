@@ -24,11 +24,24 @@ if (isNeonDb && connectionString && !connectionString.includes('sslmode=require'
   connectionString = `${connectionString}?sslmode=require`;
 }
 
-// Debug logging (only log non-sensitive info)
-console.log('Auth service starting...');
-console.log('Environment:', isProduction ? 'production' : 'development');
-console.log('Database configured:', !!connectionString);
-console.log('Trusted origins:', process.env.FRONTEND_URL || 'http://localhost:3000 (default)');
+// Debug logging for environment variables (only log presence of secrets, not values)
+function logEnvironmentVariables() {
+  console.log('--- Environment Variables Check (Auth Service) ---');
+  console.log(`DATABASE_URL is set: ${!!process.env.DATABASE_URL}`);
+  console.log(`BETTER_AUTH_SECRET is set: ${!!process.env.BETTER_AUTH_SECRET}`);
+  console.log(`BETTER_AUTH_URL: ${process.env.BETTER_AUTH_URL || 'Not set, using http://localhost:3001'}`);
+  console.log(`FRONTEND_URL: ${process.env.FRONTEND_URL || 'Not set, using http://localhost:3000 (default)'}`);
+  console.log(`API_BASE_URL: ${process.env.API_BASE_URL || 'Not set, using http://localhost:8000'}`);
+  console.log(`GOOGLE_CLIENT_ID is set: ${!!process.env.GOOGLE_CLIENT_ID}`);
+  console.log(`GOOGLE_CLIENT_SECRET is set: ${!!process.env.GOOGLE_CLIENT_SECRET}`);
+  console.log(`GITHUB_CLIENT_ID is set: ${!!process.env.GITHUB_CLIENT_ID}`);
+  console.log(`GITHUB_CLIENT_SECRET is set: ${!!process.env.GITHUB_CLIENT_SECRET}`);
+  console.log('--------------------------------------------------');
+}
+
+// Call the logging function at startup
+logEnvironmentVariables();
+
 
 // Use the same DATABASE_URL as FastAPI backend (Neon PostgreSQL)
 const pool = new Pool({

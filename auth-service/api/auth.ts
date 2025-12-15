@@ -114,7 +114,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
   } catch (error) {
-    console.error('Auth handler error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Auth handler error:', error.message || error);
+    // Optionally, log the full error object for more details in server logs
+    // console.error('Auth handler detailed error:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 }
