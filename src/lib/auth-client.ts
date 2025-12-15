@@ -3,19 +3,24 @@
  * Handles sign-in, sign-up, sign-out, and token management
  *
  * Configure via environment variable BETTER_AUTH_URL in Vercel dashboard
+ *
+ * IMPORTANT: Use createClientForUrl() inside React components with useDocusaurusContext
+ * to ensure the correct URL is used. Do NOT use the exported authClient directly
+ * as it may be initialized before Docusaurus context is available.
  */
 
 import { createAuthClient } from "better-auth/react";
 import { jwtClient } from "better-auth/client/plugins";
 
 // Default fallback URL for local development
-const DEV_AUTH_URL = "http://localhost:3001";
+export const DEV_AUTH_URL = "http://localhost:3001";
 
 // Cache for auth client instances by URL
 const clientCache = new Map<string, ReturnType<typeof createAuthClient>>();
 
 /**
  * Create or get cached auth client for a specific URL
+ * Use this inside React components with the URL from useDocusaurusContext
  */
 export const createClientForUrl = (baseURL: string) => {
   if (!clientCache.has(baseURL)) {
@@ -31,50 +36,6 @@ export const createClientForUrl = (baseURL: string) => {
   }
   return clientCache.get(baseURL)!;
 };
-
-/**
- * Get the auth service URL from Docusaurus config
- * Call this AFTER Docusaurus has initialized (inside components)
- */
-export const getAuthUrl = (): string => {
-  if (typeof window === 'undefined') {
-    return DEV_AUTH_URL;
-  }
-
-  // Read from Docusaurus runtime config
-  const docusaurusConfig = (window as any).__DOCUSAURUS__;
-  const betterAuthUrl = docusaurusConfig?.siteConfig?.customFields?.betterAuthUrl;
-
-  if (betterAuthUrl && betterAuthUrl !== DEV_AUTH_URL) {
-    return betterAuthUrl;
-  }
-
-  return DEV_AUTH_URL;
-};
-
-/**
- * Get the auth client - use this in components after Docusaurus is loaded
- */
-export const getAuthClient = () => {
-  return createClientForUrl(getAuthUrl());
-};
-
-// Default client for SSR and initial load
-const defaultClient = createAuthClient({
-  baseURL: DEV_AUTH_URL,
-  fetchOptions: { credentials: 'include' },
-  plugins: [jwtClient()],
-});
-
-// For backward compatibility - components should prefer getAuthClient()
-export const authClient = typeof window !== 'undefined' ? getAuthClient() : defaultClient;
-
-// Export auth methods - these use the default client
-// Components should use getAuthClient() for proper URL resolution
-export const signIn = authClient.signIn;
-export const signUp = authClient.signUp;
-export const signOut = authClient.signOut;
-export const useSession = authClient.useSession;
 
 // Token storage key
 const TOKEN_KEY = "auth_token";
@@ -113,8 +74,9 @@ export function isAuthenticated(): boolean {
 /**
  * Get a fresh JWT token from BetterAuth
  * Call this before making API requests
+ * Requires the auth client to be passed in (from useAuth context)
  */
-export async function refreshToken(): Promise<string | null> {
+export async function refreshToken(authClient: ReturnType<typeof createAuthClient>): Promise<string | null> {
   try {
     const result = await authClient.token();
     if (result.data?.token) {
@@ -122,8 +84,7 @@ export async function refreshToken(): Promise<string | null> {
       return result.data.token;
     }
     return null;
-  } catch (error) {
-    console.error("Failed to refresh token:", error);
+  } catch {
     return null;
   }
 }
@@ -131,8 +92,9 @@ export async function refreshToken(): Promise<string | null> {
 /**
  * Ensure we have a valid token, refreshing if needed
  * Returns the token or null if not authenticated
+ * Requires the auth client to be passed in (from useAuth context)
  */
-export async function ensureToken(): Promise<string | null> {
+export async function ensureToken(authClient: ReturnType<typeof createAuthClient>): Promise<string | null> {
   // First check if we have a stored token
   const existingToken = getAuthToken();
   if (existingToken) {
@@ -140,5 +102,5 @@ export async function ensureToken(): Promise<string | null> {
   }
 
   // Try to get a fresh token
-  return refreshToken();
+  return refreshToken(authClient);
 }

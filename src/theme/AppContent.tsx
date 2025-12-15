@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useSession, isAuthenticated as checkAuthToken } from '../lib/auth-client';
+import { useAuth } from '../components/AuthProvider';
+import { isAuthenticated as checkAuthToken } from '../lib/auth-client';
 import TextSelectionButton from '../components/TextSelectionButton';
 import ChatbotWidget from '../components/ChatbotWidget';
 
@@ -9,7 +10,7 @@ function isPublicPath(pathname: string): boolean {
 }
 
 export default function AppContent({ children }: { children: React.ReactNode }) {
-  const { data: session, isPending } = useSession();
+  const { isAuthenticated: isSessionAuthenticated, isLoading: isPending } = useAuth();
   const [pathname, setPathname] = useState<string>('');
   const [hasToken, setHasToken] = useState<boolean>(false);
 
@@ -46,7 +47,7 @@ export default function AppContent({ children }: { children: React.ReactNode }) 
   }, []);
 
   // User is authenticated if we have a session with a user OR we have an auth token
-  const isAuthenticated = (!isPending && !!session?.user) || hasToken;
+  const isAuthenticated = (!isPending && isSessionAuthenticated) || hasToken;
   const showChatFeatures = isAuthenticated && pathname !== '' && !isPublicPath(pathname);
 
   return (
