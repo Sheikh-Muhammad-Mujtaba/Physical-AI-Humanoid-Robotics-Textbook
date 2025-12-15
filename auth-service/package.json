@@ -4,9 +4,9 @@
   "description": "BetterAuth authentication service for AI-Spec-Driven project",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch src/index.local.ts",
     "build:local": "tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/index.local.js",
     "migrate": "npx @better-auth/cli migrate",
     "generate": "npx @better-auth/cli generate"
   },

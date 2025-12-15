@@ -14,7 +14,7 @@
     "sourceMap": true
   },
   "include": ["src/auth.ts", "api/**/*"],
-  "exclude": ["node_modules", "dist", "src/index.ts"],
+  "exclude": ["node_modules", "dist", "src/index.local.ts"],
   "ts-node": {
     "esm": true
   }
