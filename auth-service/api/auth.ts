@@ -1,6 +1,27 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { auth } from '../src/auth.js';
 
+// Debug logging helper
+function debugLog(context: string, data: Record<string, unknown>) {
+  const timestamp = new Date().toISOString();
+  console.log(`[AUTH-DEBUG][${timestamp}][${context}]`, JSON.stringify(data, null, 2));
+}
+
+// Extract token info for logging (without exposing full token)
+function extractTokenInfo(req: VercelRequest): Record<string, unknown> {
+  const authHeader = req.headers.authorization;
+  const cookies = req.headers.cookie;
+
+  return {
+    hasAuthHeader: !!authHeader,
+    authHeaderType: authHeader ? authHeader.split(' ')[0] : null,
+    tokenPreview: authHeader ? `${authHeader.substring(0, 20)}...` : null,
+    hasCookies: !!cookies,
+    cookieNames: cookies ? cookies.split(';').map(c => c.trim().split('=')[0]) : [],
+    hasBetterAuthCookie: cookies?.includes('better-auth') || false,
+  };
+}
+
 // CORS helper - Parse allowed origins from environment
 const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',').map((origin) => origin.trim())
@@ -31,11 +52,25 @@ function setCorsHeaders(req: VercelRequest, res: VercelResponse) {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const requestId = `req-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
+  // Log incoming request
+  debugLog('REQUEST_START', {
+    requestId,
+    method: req.method,
+    url: req.url,
+    origin: req.headers.origin,
+    host: req.headers.host,
+    tokenInfo: extractTokenInfo(req),
+    userAgent: req.headers['user-agent'],
+  });
+
   // Set CORS headers
   setCorsHeaders(req, res);
 
   // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
+    debugLog('PREFLIGHT', { requestId, status: 200 });
     res.status(200).end();
     return;
   }
@@ -45,6 +80,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const protocol = req.headers['x-forwarded-proto'] || 'https';
     const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost';
     const url = `${protocol}://${host}${req.url}`;
+
+    debugLog('REQUEST_DETAILS', {
+      requestId,
+      constructedUrl: url,
+      protocol,
+      host,
+      originalUrl: req.url,
+    });
 
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
@@ -69,8 +112,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: body,
     });
 
+    debugLog('CALLING_AUTH_HANDLER', {
+      requestId,
+      webRequestMethod: webRequest.method,
+      webRequestUrl: webRequest.url,
+      hasBody: !!body,
+      bodyPreview: body ? body.substring(0, 100) + '...' : null,
+    });
+
     // Call Better Auth handler
     const response = await auth.handler(webRequest);
+
+    debugLog('AUTH_HANDLER_RESPONSE', {
+      requestId,
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries()),
+    });
 
     // Copy response headers
     response.headers.forEach((value: string, key: string) => {
@@ -93,30 +151,83 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (contentType?.includes('application/json')) {
       // Clone the response to safely read the body
       const text = await response.text();
+
+      debugLog('JSON_RESPONSE_BODY', {
+        requestId,
+        contentType,
+        bodyLength: text?.length || 0,
+        bodyPreview: text ? text.substring(0, 200) : null,
+      });
+
       if (text && text.length > 0) {
         try {
           const json = JSON.parse(text);
+
+          // Log specific auth-related response data
+          if (json.error || json.message) {
+            debugLog('AUTH_ERROR_RESPONSE', {
+              requestId,
+              error: json.error,
+              message: json.message,
+              code: json.code,
+            });
+          }
+
+          if (json.user || json.session) {
+            debugLog('AUTH_SUCCESS_RESPONSE', {
+              requestId,
+              hasUser: !!json.user,
+              hasSession: !!json.session,
+              userId: json.user?.id,
+              sessionId: json.session?.id,
+            });
+          }
+
           res.json(json);
-        } catch {
+        } catch (parseError) {
+          debugLog('JSON_PARSE_ERROR', {
+            requestId,
+            error: String(parseError),
+            rawText: text.substring(0, 200),
+          });
           // If JSON parse fails, send as text
           res.send(text);
         }
       } else {
+        debugLog('EMPTY_JSON_RESPONSE', { requestId });
         // Empty response body
         res.end();
       }
     } else {
       const text = await response.text();
+      debugLog('NON_JSON_RESPONSE', {
+        requestId,
+        contentType,
+        bodyLength: text?.length || 0,
+      });
       if (text && text.length > 0) {
         res.send(text);
       } else {
         res.end();
       }
     }
+
+    debugLog('REQUEST_COMPLETE', {
+      requestId,
+      finalStatus: response.status,
+    });
   } catch (error) {
-    console.error('Auth handler error:', error.message || error);
-    // Optionally, log the full error object for more details in server logs
-    // console.error('Auth handler detailed error:', error);
-    res.status(500).json({ error: 'Internal server error', details: error.message });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    debugLog('REQUEST_ERROR', {
+      requestId,
+      error: errorMessage,
+      stack: errorStack,
+      errorType: error?.constructor?.name,
+    });
+
+    console.error('Auth handler error:', errorMessage);
+    res.status(500).json({ error: 'Internal server error', details: errorMessage });
   }
 }
