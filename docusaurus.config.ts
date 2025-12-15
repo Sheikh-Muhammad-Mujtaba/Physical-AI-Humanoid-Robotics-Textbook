@@ -11,6 +11,12 @@ const config: Config = {
   tagline: 'AI-Native Systems for a New Era',
   favicon: 'img/favicon.ico',
 
+  // Custom fields for runtime configuration
+  customFields: {
+    betterAuthUrl: process.env.BETTER_AUTH_URL || 'http://localhost:3001',
+    apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8000',
+  },
+
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
     v4: true, // Improve compatibility with the upcoming Docusaurus v4
@@ -78,6 +84,15 @@ const config: Config = {
   ],
 
   themes: ['@easyops-cn/docusaurus-search-local'],
+
+  plugins: [
+    [
+      './src/plugins/auth-plugin.ts',
+      {
+        // options
+      },
+    ],
+  ],
 
   // Removed custom Tailwind CSS plugin as it was redundant with postcss.config.js
   // and potentially causing issues.

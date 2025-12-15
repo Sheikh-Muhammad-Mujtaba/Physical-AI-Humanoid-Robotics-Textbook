@@ -1,55 +1,31 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+SYNC IMPACT REPORT
+==================
+Version Change: none -> 1.0.0
+Added Principles:
+- Secure API Access (Bearer Token)
+- Model Context Protocol (MCP)
+Templates Requiring Updates:
+- ⚠ .specify/templates/plan-template.md (Needs constitution check section updated for security)
+- ⚠ .specify/templates/spec-template.md (Needs to prompt for security requirements)
+- ⚠ .specify/templates/tasks-template.md (Needs to include security-related task types)
+Follow-up TODOs:
+- RATIFICATION_DATE: Set initial adoption date
+-->
+# AI-Spec-Driven Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### Secure API Access (Bearer Token)
+1.  **Method**: All requests from the chatbot frontend to protected backend endpoints (`/api/chat`, `/api/ask-selection`, `/api/feedback`) MUST include an `Authorization: Bearer <TOKEN>` header.
+2.  **Backend Enforcement**: The FastAPI server (`api/index.py`) MUST implement a dependency injection (`fastapi.security.HTTPBearer`) to validate the token against an environment variable (`BETTER_AUTH_SECRET_KEY`). Invalid or missing tokens must return a 401 Unauthorized response.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
-
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
-
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
-
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
-
-### [PRINCIPLE_6_NAME]
-
-
-[PRINCIPLE__DESCRIPTION]
-
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
-
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### Model Context Protocol (MCP)
+1.  **Tooling**: use context7 mcp to get updated betterauth `https://www.better-auth.com/` documentaion for the implementation
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This constitution is the supreme source of truth for project standards. All development, reviews, and artifacts must comply with its principles.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+Amendments require a formal proposal, review, and an update to the version number. All pull requests must verify compliance with the constitution.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): Set initial adoption date | **Last Amended**: 2025-12-13

@@ -1,4 +1,26 @@
+import { getAuthToken, clearAuthToken } from './auth-client';
+
 const API_BASE_URL = '/api'; // Proxied by Vercel to the Python backend
+
+/**
+ * Get the current auth token or throw if not authenticated
+ */
+function requireAuthToken(): string {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error("Not authenticated. Please sign in.");
+  }
+  return token;
+}
+
+/**
+ * Handle 401 responses by clearing token and redirecting to login
+ */
+function handleUnauthorized(): never {
+  clearAuthToken();
+  window.location.href = '/login';
+  throw new Error("Session expired. Please sign in again.");
+}
 
 async function handleResponseError(response: Response, defaultMessage: string): Promise<Error> {
   let errorDetail = defaultMessage;
@@ -25,7 +47,17 @@ async function handleResponseError(response: Response, defaultMessage: string): 
 }
 
 export async function getHistory(sessionId: string): Promise<any> {
-  const response = await fetch(`${API_BASE_URL}/history/${sessionId}`);
+  const token = requireAuthToken();
+
+  const response = await fetch(`${API_BASE_URL}/history/${sessionId}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (response.status === 401) {
+    handleUnauthorized();
+  }
 
   if (!response.ok) {
     throw await handleResponseError(response, 'Failed to get chat history');
@@ -35,13 +67,20 @@ export async function getHistory(sessionId: string): Promise<any> {
 }
 
 export async function chatWithBackend(query: string, sessionId: string): Promise<any> {
+  const token = requireAuthToken();
+
   const response = await fetch(`${API_BASE_URL}/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify({ query, session_id: sessionId }),
   });
+
+  if (response.status === 401) {
+    handleUnauthorized();
+  }
 
   if (!response.ok) {
     throw await handleResponseError(response, 'Failed to get chat response');
@@ -51,13 +90,20 @@ export async function chatWithBackend(query: string, sessionId: string): Promise
 }
 
 export async function askSelectionWithBackend(selection: string, question: string, sessionId: string): Promise<any> {
+  const token = requireAuthToken();
+
   const response = await fetch(`${API_BASE_URL}/ask-selection`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify({ selection, question, session_id: sessionId }),
   });
+
+  if (response.status === 401) {
+    handleUnauthorized();
+  }
 
   if (!response.ok) {
     throw await handleResponseError(response, 'Failed to get explanation');
@@ -67,13 +113,20 @@ export async function askSelectionWithBackend(selection: string, question: strin
 }
 
 export async function sendFeedback(messageId: string, rating: number): Promise<any> {
+  const token = requireAuthToken();
+
   const response = await fetch(`${API_BASE_URL}/feedback`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify({ message_id: messageId, rating }),
   });
+
+  if (response.status === 401) {
+    handleUnauthorized();
+  }
 
   if (!response.ok) {
     throw await handleResponseError(response, 'Failed to send feedback');

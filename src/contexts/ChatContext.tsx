@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid'; // Import v4 as uuidv4
 import { chatWithBackend, askSelectionWithBackend, getHistory } from '../lib/chatApi';
+import { isAuthenticated as checkIsAuthenticated } from '../lib/auth-client';
 
 // Interface for Chat Message
 export interface ChatMessage {
@@ -45,6 +46,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [selectedText, setSelectedText] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false); // Add isLoading state
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState<boolean>(checkIsAuthenticated());
+  const [historyLoaded, setHistoryLoaded] = useState<boolean>(false);
 
   // --- Functions exposed by the context ---
 
@@ -139,31 +142,70 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     }
   }, [sessionId]);
 
-  // --- Load chat history when session ID is available ---
+  // --- Poll for authentication changes (e.g., after login) ---
   useEffect(() => {
-    if (sessionId) {
+    const checkAuth = () => {
+      const currentAuthState = checkIsAuthenticated();
+      if (currentAuthState !== isUserAuthenticated) {
+        setIsUserAuthenticated(currentAuthState);
+        // Reset history loaded flag when auth state changes
+        if (currentAuthState) {
+          setHistoryLoaded(false);
+        }
+      }
+    };
+
+    // Check immediately
+    checkAuth();
+
+    // Poll for changes (handles login in different tab or async token storage)
+    const interval = setInterval(checkAuth, 1000);
+
+    // Also listen for storage events (token changes)
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'auth_token') {
+        checkAuth();
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, [isUserAuthenticated]);
+
+  // --- Load chat history when session ID is available AND user is authenticated ---
+  useEffect(() => {
+    if (sessionId && isUserAuthenticated && !historyLoaded) {
       const loadHistory = async () => {
         try {
           const history = await getHistory(sessionId);
           // Assuming history is an array of messages compatible with ChatMessage[]
           setMessages(history);
+          setHistoryLoaded(true);
         } catch (error) {
           console.error("Error loading chat history:", error);
-          // Optionally, display an error message in the chat
-          setMessages((prev) => [
-            ...prev,
-            {
-              content: `Error loading history: ${error instanceof Error ? error.message : String(error)}`,
-              sender: 'ai',
-              timestamp: new Date(),
-              status: 'error',
-            },
-          ]);
+          // Only show error if it's not an auth error (user might not be logged in yet)
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          if (!errorMessage.includes('Not authenticated')) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                content: `Error loading history: ${errorMessage}`,
+                sender: 'ai',
+                timestamp: new Date(),
+                status: 'error',
+              },
+            ]);
+          }
+          // Mark as loaded even on error to prevent infinite retries
+          setHistoryLoaded(true);
         }
       };
       loadHistory();
     }
-  }, [sessionId]); // Rerun when sessionId changes
+  }, [sessionId, isUserAuthenticated, historyLoaded]); // Rerun when sessionId or auth state changes
 
 
   // Value provided by the context

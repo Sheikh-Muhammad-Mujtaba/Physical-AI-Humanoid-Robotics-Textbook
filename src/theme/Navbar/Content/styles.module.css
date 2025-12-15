@@ -1,0 +1,13 @@
+/**
+ * Navbar Content Styles
+ */
+
+.colorModeToggle {
+  margin-right: 0.5rem;
+}
+
+@media screen and (max-width: 996px) {
+  .colorModeToggle {
+    margin-right: 0.25rem;
+  }
+}

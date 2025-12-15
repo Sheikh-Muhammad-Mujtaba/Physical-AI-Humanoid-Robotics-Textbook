@@ -53,6 +53,11 @@ coverage/
 yarn.lock
 pnpm-lock.yaml
 
+# Auth service
+auth-service/node_modules/
+auth-service/dist/
+auth-service/.env
+auth-service/*.db
 
 # Dependencies
 /node_modules

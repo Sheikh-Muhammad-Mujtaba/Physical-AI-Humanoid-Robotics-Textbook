@@ -1,0 +1,43 @@
+{
+  "name": "auth-service",
+  "version": "1.0.0",
+  "description": "BetterAuth authentication service for AI-Spec-Driven project",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "migrate": "npx @better-auth/cli migrate",
+    "generate": "npx @better-auth/cli generate",
+    "vercel-build": "tsc"
+  },
+  "keywords": [
+    "auth",
+    "betterauth",
+    "jwt"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "better-auth": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.5.0",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^25.0.2",
+    "@types/pg": "^8.16.0",
+    "@vercel/node": "^3.0.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -28,18 +28,22 @@ function HomepageHeader() {
   );
 }
 
-export default function Home(): ReactNode {
+import Layout from '@theme/Layout';
+
+export default function Home(): React.ReactElement {
   const {siteConfig} = useDocusaurusContext();
   return (
-    <>
+    <Layout
+      title={`Hello from ${siteConfig.title}`}
+      description="Description will go into a meta tag in <head />">
       <HomepageHeader />
       <main>
         <div className="container">
           <div>
-    <HomepageFeatures />
-</div>
+            <HomepageFeatures />
+          </div>
         </div>
       </main>
-    </>
+    </Layout>
   );
 }
