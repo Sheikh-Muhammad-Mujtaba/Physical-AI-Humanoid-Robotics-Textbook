@@ -11,65 +11,66 @@ import { jwtClient } from "better-auth/client/plugins";
 // Default fallback URL for local development
 const DEV_AUTH_URL = "http://localhost:3001";
 
-// Get the auth service URL from Docusaurus config (set via BETTER_AUTH_URL env var)
-export const getAuthUrl = (): string => {
-  // Server-side rendering - use fallback
-  if (typeof window === 'undefined') {
-    return DEV_AUTH_URL;
-  }
+// Cache for auth client instances by URL
+const clientCache = new Map<string, ReturnType<typeof createAuthClient>>();
 
-  // Check if Docusaurus has injected the config (from BETTER_AUTH_URL env var)
-  const docusaurusConfig = (window as any).__DOCUSAURUS__;
-  if (docusaurusConfig?.siteConfig?.customFields?.betterAuthUrl) {
-    const url = docusaurusConfig.siteConfig.customFields.betterAuthUrl;
-    // Ensure we don't use localhost in production
-    if (url && url !== 'http://localhost:3001') {
-      return url;
-    }
-  }
-
-  // Check if we're on production domain - fail safe
-  if (typeof window !== 'undefined' &&
-      window.location.hostname !== 'localhost' &&
-      window.location.hostname !== '127.0.0.1') {
-    // We're on production but don't have the URL - log error
-    console.error('BETTER_AUTH_URL not configured! Set it in Vercel environment variables.');
-  }
-
-  // Fallback to localhost for development
-  return DEV_AUTH_URL;
-};
-
-// Lazy singleton for auth client
-let _authClient: ReturnType<typeof createAuthClient> | null = null;
-
-export const getAuthClient = () => {
-  if (!_authClient) {
-    const baseURL = getAuthUrl();
-    console.log('Initializing auth client with URL:', baseURL);
-    _authClient = createAuthClient({
+/**
+ * Create or get cached auth client for a specific URL
+ */
+export const createClientForUrl = (baseURL: string) => {
+  if (!clientCache.has(baseURL)) {
+    clientCache.set(baseURL, createAuthClient({
       baseURL,
       fetchOptions: {
-        credentials: 'include', // Include cookies in cross-origin requests
+        credentials: 'include',
       },
       plugins: [
         jwtClient(),
       ],
-    });
+    }));
   }
-  return _authClient;
+  return clientCache.get(baseURL)!;
 };
 
-// For backward compatibility - but prefer using getAuthClient()
-export const authClient = typeof window !== 'undefined'
-  ? getAuthClient()
-  : createAuthClient({
-      baseURL: DEV_AUTH_URL,
-      fetchOptions: { credentials: 'include' },
-      plugins: [jwtClient()],
-    });
+/**
+ * Get the auth service URL from Docusaurus config
+ * Call this AFTER Docusaurus has initialized (inside components)
+ */
+export const getAuthUrl = (): string => {
+  if (typeof window === 'undefined') {
+    return DEV_AUTH_URL;
+  }
 
-// Export auth methods and hooks - these will use the lazy client
+  // Read from Docusaurus runtime config
+  const docusaurusConfig = (window as any).__DOCUSAURUS__;
+  const betterAuthUrl = docusaurusConfig?.siteConfig?.customFields?.betterAuthUrl;
+
+  if (betterAuthUrl && betterAuthUrl !== DEV_AUTH_URL) {
+    return betterAuthUrl;
+  }
+
+  return DEV_AUTH_URL;
+};
+
+/**
+ * Get the auth client - use this in components after Docusaurus is loaded
+ */
+export const getAuthClient = () => {
+  return createClientForUrl(getAuthUrl());
+};
+
+// Default client for SSR and initial load
+const defaultClient = createAuthClient({
+  baseURL: DEV_AUTH_URL,
+  fetchOptions: { credentials: 'include' },
+  plugins: [jwtClient()],
+});
+
+// For backward compatibility - components should prefer getAuthClient()
+export const authClient = typeof window !== 'undefined' ? getAuthClient() : defaultClient;
+
+// Export auth methods - these use the default client
+// Components should use getAuthClient() for proper URL resolution
 export const signIn = authClient.signIn;
 export const signUp = authClient.signUp;
 export const signOut = authClient.signOut;

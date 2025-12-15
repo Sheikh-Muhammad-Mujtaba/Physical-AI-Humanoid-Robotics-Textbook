@@ -4,17 +4,25 @@
  * Responsive design with header/footer visible
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
-import { signIn, setAuthToken, authClient } from '../lib/auth-client';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import { createClientForUrl, setAuthToken } from '../lib/auth-client';
 
 export default function LoginOverlay() {
+  const { siteConfig } = useDocusaurusContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
+
+  // Get auth URL from Docusaurus config (set via BETTER_AUTH_URL env var)
+  const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || 'http://localhost:3001';
+
+  // Create auth client with the correct URL
+  const authClient = useMemo(() => createClientForUrl(authUrl), [authUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +30,7 @@ export default function LoginOverlay() {
     setIsLoading(true);
 
     try {
-      await signIn.email(
+      await authClient.signIn.email(
         { email, password },
         {
           onSuccess: async () => {
@@ -32,7 +40,7 @@ export default function LoginOverlay() {
                 setAuthToken(tokenResult.data.token);
               }
             } catch (tokenError) {
-              console.error('Failed to fetch token:', tokenError);
+              // Token fetch failed, but login succeeded
             }
             window.location.reload();
           },
@@ -53,7 +61,7 @@ export default function LoginOverlay() {
     setSocialLoading(provider);
 
     try {
-      await signIn.social({
+      await authClient.signIn.social({
         provider,
         callbackURL: window.location.pathname,
       });

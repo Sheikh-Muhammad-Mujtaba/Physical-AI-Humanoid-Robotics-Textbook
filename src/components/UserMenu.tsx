@@ -7,11 +7,20 @@
  * to avoid Docusaurus router context issues when rendered in the navbar.
  */
 
-import React, { useState, useRef, useEffect } from 'react';
-import { useSession, signOut, clearAuthToken } from '../lib/auth-client';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import { createClientForUrl, clearAuthToken } from '../lib/auth-client';
 
 export default function UserMenu() {
-  const { data: session, isPending } = useSession();
+  const { siteConfig } = useDocusaurusContext();
+
+  // Get auth URL from Docusaurus config (set via BETTER_AUTH_URL env var)
+  const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || 'http://localhost:3001';
+
+  // Create auth client with the correct URL
+  const authClient = useMemo(() => createClientForUrl(authUrl), [authUrl]);
+
+  const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
   const isAuthenticated = !!user;
   const isLoading = isPending;
@@ -22,13 +31,13 @@ export default function UserMenu() {
   const handleSignOut = async () => {
     try {
       // Use BetterAuth's signOut method - it handles cookie clearing via Set-Cookie headers
-      await signOut({
+      await authClient.signOut({
         fetchOptions: {
           credentials: 'include', // Ensure cookies are sent and received
         },
       });
     } catch (err) {
-      console.error('Sign out from server failed:', err);
+      // Sign out from server failed, continue with local cleanup
     }
 
     // Clear our custom auth token from localStorage
