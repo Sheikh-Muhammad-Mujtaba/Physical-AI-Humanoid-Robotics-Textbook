@@ -14,9 +14,9 @@
 
 **Purpose**: Review existing deployment configuration.
 
-- [ ] T001 Review root `vercel.json` for the Docusaurus frontend and Python API.
-- [ ] T002 Review `auth-service/vercel.json` for the TypeScript authentication service.
-- [ ] T003 Review `package.json` for existing build scripts.
+- [x] T001 Review root `vercel.json` for the Docusaurus frontend and Python API.
+- [x] T002 Review `auth-service/vercel.json` for the TypeScript authentication service.
+- [x] T003 Review `package.json` for existing build scripts.
 
 ---
 
@@ -24,9 +24,9 @@
 
 **Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented.
 
-- [ ] T004 Create/update the root `vercel.json` to ensure correct routing and function definitions for the Docusaurus frontend and Python API.
-- [ ] T005 Create/update the `auth-service/vercel.json` to ensure correct build commands, function definitions, and routing for the authentication service.
-- [ ] T006 Ensure the `package.json` contains the necessary build commands for a Vercel deployment (e.g., `build:vercel`).
+- [x] T004 Create/update the root `vercel.json` to ensure correct routing and function definitions for the Docusaurus frontend and Python API.
+- [x] T005 Create/update the `auth-service/vercel.json` to ensure correct build commands, function definitions, and routing for the authentication service.
+- [x] T006 Ensure the `package.json` contains the necessary build commands for a Vercel deployment (e.g., `build:vercel`).
 
 ---
 
@@ -38,11 +38,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T007 [US1] Trigger a Vercel deployment by pushing to a new branch.
-- [ ] T008 [US1] Verify that the deployment completes successfully without any build errors.
-- [ ] T009 [US1] Access the Vercel URL and verify that the Docusaurus frontend is rendered correctly.
-- [ ] T010 [US1] Access the `/api/` endpoint and verify that the Python FastAPI backend responds.
-- [ ] T011 [US1] Access the `auth-service` URL and verify that the TypeScript authentication service responds.
+- [x] T007 [US1] Trigger a Vercel deployment by pushing to a new branch.
+- [x] T008 [US1] Verify that the deployment completes successfully without any build errors.
+- [x] T009 [US1] Access the Vercel URL and verify that the Docusaurus frontend is rendered correctly.
+- [x] T010 [US1] Access the `/api/` endpoint and verify that the Python FastAPI backend responds.
+- [x] T011 [US1] Access the `auth-service` URL and verify that the TypeScript authentication service responds.
 
 ---
 
@@ -54,9 +54,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T012 [US2] Verify that all necessary environment variables (`DATABASE_URL`, `QDRANT_URL`, `QDRANT_API_KEY`, `GEMINI_API_KEY`, `JWT_SECRET`, `AUTH_SERVICE_URL`) are correctly configured in the Vercel project settings.
-- [ ] T013 [US2] Perform a test login with a new user to ensure the authentication flow is working correctly.
-- [ ] T014 [US2] Make a request to a protected API endpoint with the authentication token to verify access.
+- [x] T012 [US2] Verify that all necessary environment variables (`DATABASE_URL`, `QDRANT_URL`, `QDRANT_API_KEY`, `GEMINI_API_KEY`, `JWT_SECRET`, `AUTH_SERVICE_URL`) are correctly configured in the Vercel project settings.
+- [x] T013 [US2] Perform a test login with a new user to ensure the authentication flow is working correctly.
+- [x] T014 [US2] Make a request to a protected API endpoint with the authentication token to verify access.
 
 ---
 
@@ -64,9 +64,9 @@
 
 **Purpose**: Finalize the deployment and merge the changes.
 
-- [ ] T015 Run quickstart.md validation.
-- [ ] T016 Create a pull request from the `001-vercel-deployment` branch to `main`.
-- [ ] T017 Merge the pull request after a successful review.
+- [x] T015 Run quickstart.md validation.
+- [x] T016 Create a pull request from the `001-vercel-deployment` branch to `main`.
+- [x] T017 Merge the pull request after a successful review.
 
 ---
 
