@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { auth } from '../src/auth';
+import { auth } from '../src/auth.js';
 
 // CORS helper - Parse allowed origins from environment
 const allowedOrigins = process.env.FRONTEND_URL
@@ -73,7 +73,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const response = await auth.handler(webRequest);
 
     // Copy response headers
-    response.headers.forEach((value, key) => {
+    response.headers.forEach((value: string, key: string) => {
       res.setHeader(key, value);
     });
 
