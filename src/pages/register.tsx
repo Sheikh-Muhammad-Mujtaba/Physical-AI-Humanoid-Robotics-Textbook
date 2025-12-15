@@ -3,14 +3,19 @@
  * Handles new user registration via email/password and social providers
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import { useHistory } from '@docusaurus/router';
-import { signUp, signIn, useSession } from '../lib/auth-client';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import { createClientForUrl, DEV_AUTH_URL } from '../lib/auth-client';
 import styles from './auth.module.css';
 
 export default function RegisterPage(): React.ReactElement {
+  const { siteConfig } = useDocusaurusContext();
+  const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || DEV_AUTH_URL;
+  const authClient = useMemo(() => createClientForUrl(authUrl), [authUrl]);
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,7 +24,7 @@ export default function RegisterPage(): React.ReactElement {
   const [isLoading, setIsLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
   const history = useHistory();
-  const { data: session, isPending } = useSession();
+  const { data: session, isPending } = authClient.useSession();
 
   // Redirect if already logged in
   useEffect(() => {
@@ -55,7 +60,7 @@ export default function RegisterPage(): React.ReactElement {
     setIsLoading(true);
 
     try {
-      await signUp.email(
+      await authClient.signUp.email(
         {
           email,
           password,
@@ -84,7 +89,7 @@ export default function RegisterPage(): React.ReactElement {
     setSocialLoading(provider);
 
     try {
-      await signIn.social({
+      await authClient.signIn.social({
         provider,
         callbackURL: '/docs/intro',
       });
