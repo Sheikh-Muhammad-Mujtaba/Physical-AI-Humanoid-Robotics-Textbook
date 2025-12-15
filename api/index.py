@@ -91,8 +91,15 @@ app = FastAPI(lifespan=lifespan)
 
 # Configure CORS for production security
 # In production, restrict to specific origins
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
-if allowed_origins == ["*"]:
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "*")
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
+
+# Add Vercel preview deployment URLs if they exist
+vercel_url = os.getenv("VERCEL_URL")
+if vercel_url and f"https://{vercel_url}" not in allowed_origins:
+    allowed_origins.append(f"https://{vercel_url}")
+
+if "*" in allowed_origins:
     # Development mode - allow all origins
     app.add_middleware(
         CORSMiddleware,
@@ -105,7 +112,7 @@ else:
     # Production mode - restrict to specific origins
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[origin.strip() for origin in allowed_origins],
+        allow_origins=allowed_origins,
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["Content-Type", "Authorization"],
