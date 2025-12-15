@@ -61,9 +61,11 @@ export default function LoginOverlay() {
     setSocialLoading(provider);
 
     try {
+      // Use full URL for OAuth callback (origin + pathname)
+      const callbackURL = window.location.origin + window.location.pathname;
       await authClient.signIn.social({
         provider,
-        callbackURL: window.location.pathname,
+        callbackURL,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : `Failed to sign in with ${provider}`);

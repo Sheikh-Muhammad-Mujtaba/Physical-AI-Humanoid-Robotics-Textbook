@@ -16,6 +16,9 @@ export default function RegisterPage(): React.ReactElement {
   const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || DEV_AUTH_URL;
   const authClient = useMemo(() => createClientForUrl(authUrl), [authUrl]);
 
+  // Get frontend URL for OAuth callbacks (use current origin in browser, fallback to siteConfig.url)
+  const frontendUrl = typeof window !== 'undefined' ? window.location.origin : siteConfig.url;
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -91,7 +94,7 @@ export default function RegisterPage(): React.ReactElement {
     try {
       await authClient.signIn.social({
         provider,
-        callbackURL: '/docs/intro',
+        callbackURL: `${frontendUrl}/docs/intro`,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : `Failed to sign up with ${provider}`);

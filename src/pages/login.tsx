@@ -16,6 +16,9 @@ export default function LoginPage(): React.ReactElement {
   const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || DEV_AUTH_URL;
   const authClient = useMemo(() => createClientForUrl(authUrl), [authUrl]);
 
+  // Get frontend URL for OAuth callbacks (use current origin in browser, fallback to siteConfig.url)
+  const frontendUrl = typeof window !== 'undefined' ? window.location.origin : siteConfig.url;
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -74,7 +77,7 @@ export default function LoginPage(): React.ReactElement {
     try {
       await authClient.signIn.social({
         provider,
-        callbackURL: '/docs/intro',
+        callbackURL: `${frontendUrl}/docs/intro`,
       });
       // Fetch and store the JWT token after social login
       try {

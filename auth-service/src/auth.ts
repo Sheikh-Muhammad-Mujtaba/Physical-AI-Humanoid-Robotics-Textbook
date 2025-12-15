@@ -46,6 +46,10 @@ const trustedOrigins = envOrigins.includes(PRODUCTION_FRONTEND)
   ? envOrigins
   : [...envOrigins, PRODUCTION_FRONTEND];
 
+// Get the primary frontend URL for OAuth redirects
+// Use first FRONTEND_URL or fall back to production
+const primaryFrontendUrl = envOrigins[0] || PRODUCTION_FRONTEND;
+
 export const auth = betterAuth({
   database: pool,
   secret: process.env.BETTER_AUTH_SECRET,
