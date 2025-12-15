@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { auth } from '../src/auth.js';
+import { auth } from '../src/auth';
 
 // CORS helper - Parse allowed origins from environment
 const allowedOrigins = process.env.FRONTEND_URL

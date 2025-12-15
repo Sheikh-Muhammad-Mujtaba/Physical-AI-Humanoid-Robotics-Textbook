@@ -2,15 +2,16 @@ import { betterAuth } from "better-auth";
 import { bearer } from "better-auth/plugins";
 import { jwt } from "better-auth/plugins";
 import { Pool } from "pg";
-import dotenv from "dotenv";
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-// Get the directory name of the current module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+// Only load dotenv in development (not needed on Vercel - uses env vars directly)
+if (process.env.NODE_ENV !== "production") {
+  try {
+    const dotenv = await import("dotenv");
+    dotenv.config();
+  } catch {
+    // dotenv not available, using environment variables directly
+  }
+}
 
 // Determine if we're in production
 const isProduction = process.env.NODE_ENV === "production";
@@ -19,12 +20,14 @@ const isProduction = process.env.NODE_ENV === "production";
 const isNeonDb = process.env.DATABASE_URL?.includes("neon.tech");
 
 let connectionString = process.env.DATABASE_URL;
-if (isNeonDb && !connectionString?.includes('sslmode=require')) {
+if (isNeonDb && connectionString && !connectionString.includes('sslmode=require')) {
   connectionString = `${connectionString}?sslmode=require`;
 }
 
-console.log('DATABASE_URL:', connectionString);
-console.log('isNeonDb:', isNeonDb);
+// Debug logging (only log non-sensitive info)
+console.log('Auth service starting...');
+console.log('Environment:', isProduction ? 'production' : 'development');
+console.log('Database configured:', !!connectionString);
 console.log('Trusted origins:', process.env.FRONTEND_URL || 'http://localhost:3000 (default)');
 
 // Use the same DATABASE_URL as FastAPI backend (Neon PostgreSQL)
