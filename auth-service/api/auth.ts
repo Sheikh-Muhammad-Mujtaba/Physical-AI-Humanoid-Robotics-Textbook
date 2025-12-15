@@ -1,21 +1,33 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { auth } from '../src/auth.js';
 
-// CORS helper
+// CORS helper - Parse allowed origins from environment
 const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',').map((origin) => origin.trim())
-  : ['http://localhost:3000'];
+  : ['http://localhost:3000', 'http://localhost:3001'];
+
+// Always allow the production frontend
+const PRODUCTION_FRONTEND = 'https://ai-spec-driven.vercel.app';
+if (!allowedOrigins.includes(PRODUCTION_FRONTEND)) {
+  allowedOrigins.push(PRODUCTION_FRONTEND);
+}
 
 function setCorsHeaders(req: VercelRequest, res: VercelResponse) {
   const origin = req.headers.origin;
 
+  // Check if origin is allowed
   if (origin && (allowedOrigins.includes(origin) || allowedOrigins.includes('*'))) {
     res.setHeader('Access-Control-Allow-Origin', origin);
+  } else if (origin) {
+    // Log unrecognized origins for debugging
+    console.log('Unrecognized origin:', origin, 'Allowed:', allowedOrigins);
   }
 
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Cookie');
+  res.setHeader('Access-Control-Expose-Headers', 'Set-Cookie');
+  res.setHeader('Access-Control-Max-Age', '86400'); // Cache preflight for 24 hours
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {

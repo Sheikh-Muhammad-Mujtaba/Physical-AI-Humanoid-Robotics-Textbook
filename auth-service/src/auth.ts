@@ -33,9 +33,15 @@ const pool = new Pool({
 });
 
 // Parse trusted origins from environment variable or use defaults
-const trustedOrigins = process.env.FRONTEND_URL
+const envOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(",").map((origin) => origin.trim())
   : ["http://localhost:3000"];
+
+// Always include the production frontend
+const PRODUCTION_FRONTEND = "https://ai-spec-driven.vercel.app";
+const trustedOrigins = envOrigins.includes(PRODUCTION_FRONTEND)
+  ? envOrigins
+  : [...envOrigins, PRODUCTION_FRONTEND];
 
 export const auth = betterAuth({
   database: pool,
@@ -66,6 +72,16 @@ export const auth = betterAuth({
   advanced: {
     useSecureCookies: isProduction,
     cookiePrefix: "better-auth",
+    // Cross-origin cookie settings for separate auth domain
+    crossSubDomainCookies: {
+      enabled: false, // Different domains, not subdomains
+    },
+    defaultCookieAttributes: {
+      sameSite: isProduction ? "none" : "lax", // "none" required for cross-origin in production
+      secure: isProduction, // Must be secure when sameSite is "none"
+      httpOnly: true,
+      path: "/",
+    },
   },
   plugins: [
     bearer(),
