@@ -75,22 +75,13 @@ export default function LoginPage(): React.ReactElement {
     setSocialLoading(provider);
 
     try {
+      // Social login redirects to OAuth provider, then back to our callback handler
+      // The callback handler will extract the token and redirect to the final destination
       await authClient.signIn.social({
         provider,
-        callbackURL: `${frontendUrl}/docs/intro`,
+        callbackURL: `${frontendUrl}/auth-callback?redirect=/docs/intro`,
       });
-      // Fetch and store the JWT token after social login
-      try {
-        const tokenResult = await authClient.token();
-        if (tokenResult.data?.token) {
-          setAuthToken(tokenResult.data.token);
-        }
-      } catch {
-        // Token fetch failed
-      }
-      // Manually refetch session after social login
-      await refetch();
-      history.push('/docs/intro');
+      // Note: Code after this line won't execute because social login causes a redirect
     } catch (err) {
       setError(err instanceof Error ? err.message : `Failed to sign in with ${provider}`);
       setSocialLoading(null);
