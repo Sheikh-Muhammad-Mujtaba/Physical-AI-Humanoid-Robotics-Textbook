@@ -28,13 +28,24 @@ export const createClientForUrl = (baseURL: string) => {
       baseURL,
       fetchOptions: {
         credentials: 'include',
+        // Use Bearer token authentication for cross-origin requests
+        auth: {
+          type: 'Bearer',
+          token: () => getAuthToken() || '',
+        },
         onSuccess: async (context) => {
-          // Capture token from set-auth-token header if present
+          // Capture token from set-auth-token header (sent after login/OAuth)
           const token = context.response.headers.get('set-auth-token');
           if (token) {
             console.log('[AUTH] Token received in header, storing...');
             setAuthToken(decodeURIComponent(token));
           }
+        },
+        onError: (context) => {
+          console.error('[AUTH] Request failed:', {
+            status: context.response?.status,
+            url: context.request?.url,
+          });
         },
       },
       plugins: [
