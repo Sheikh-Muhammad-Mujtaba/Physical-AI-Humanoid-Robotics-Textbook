@@ -79,7 +79,7 @@ export const auth = betterAuth({
   database: pool,
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3001",
-  allowedOrigins: trustedOrigins,
+  trustedOrigins: trustedOrigins,
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
