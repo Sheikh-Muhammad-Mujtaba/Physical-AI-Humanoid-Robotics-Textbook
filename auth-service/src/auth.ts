@@ -1,4 +1,4 @@
-import logger from './logging';
+import logger from './logging.js';
 import { betterAuth } from "better-auth";
 import { bearer } from "better-auth/plugins";
 import { jwt } from "better-auth/plugins";
