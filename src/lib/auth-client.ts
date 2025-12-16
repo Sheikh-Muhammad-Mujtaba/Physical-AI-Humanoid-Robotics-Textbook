@@ -27,18 +27,46 @@ export const createClientForUrl = (baseURL: string) => {
     clientCache.set(baseURL, createAuthClient({
       baseURL,
       fetchOptions: {
-        credentials: 'include',
-        // Use Bearer token authentication for cross-origin requests
-        auth: {
-          type: 'Bearer',
-          token: () => getAuthToken() || '',
-        },
+        credentials: 'include', // Always include cookies for session management
         onSuccess: async (context) => {
-          // Capture token from set-auth-token header (sent after login/OAuth)
+          // Check if the backend sent a JWT token in the set-auth-token header
           const token = context.response.headers.get('set-auth-token');
           if (token) {
-            console.log('[AUTH] Token received in header, storing...');
-            setAuthToken(decodeURIComponent(token));
+            const decodedToken = decodeURIComponent(token);
+            console.log('[AUTH] JWT token received from server, storing...');
+            setAuthToken(decodedToken);
+          } else {
+            // Fallback: If no token in header and this was a sign-in, try fetching it
+            const url = context.request?.url || '';
+            if (url.includes('/sign-in/')) {
+              console.log('[AUTH] No token in header, attempting to fetch JWT token...');
+
+              // Wait a moment for session to be established
+              await new Promise(resolve => setTimeout(resolve, 500));
+
+              // Get JWT token using the session (cookies)
+              try {
+                const tokenResponse = await fetch(`${baseURL}/api/auth/token`, {
+                  method: 'GET',
+                  credentials: 'include', // Send cookies
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                });
+
+                if (tokenResponse.ok) {
+                  const tokenData = await tokenResponse.json();
+                  if (tokenData?.token) {
+                    console.log('[AUTH] JWT token obtained successfully via fallback');
+                    setAuthToken(tokenData.token);
+                  }
+                } else {
+                  console.warn('[AUTH] Failed to get JWT token:', tokenResponse.status);
+                }
+              } catch (error) {
+                console.error('[AUTH] Error fetching JWT token:', error);
+              }
+            }
           }
         },
         onError: (context) => {
@@ -91,35 +119,45 @@ export function isAuthenticated(): boolean {
 }
 
 /**
- * Get a fresh JWT token from BetterAuth
- * Call this before making API requests
- * Requires the auth client to be passed in (from useAuth context)
+ * Get a fresh JWT token from BetterAuth using the session (cookies)
+ * This should be called when making API requests to the backend
+ * The baseURL parameter should be the auth service URL
  */
-export async function refreshToken(authClient: ReturnType<typeof createAuthClient>): Promise<string | null> {
+export async function getJWTToken(baseURL: string): Promise<string | null> {
   try {
-    const result = await authClient.token();
-    if (result.data?.token) {
-      setAuthToken(result.data.token);
-      return result.data.token;
+    const response = await fetch(`${baseURL}/api/auth/token`, {
+      method: 'GET',
+      credentials: 'include', // Send cookies with session
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data?.token) {
+        setAuthToken(data.token);
+        return data.token;
+      }
     }
     return null;
-  } catch {
+  } catch (error) {
+    console.error('[AUTH] Error fetching JWT token:', error);
     return null;
   }
 }
 
 /**
- * Ensure we have a valid token, refreshing if needed
- * Returns the token or null if not authenticated
- * Requires the auth client to be passed in (from useAuth context)
+ * Get JWT token for API calls
+ * First checks localStorage, then fetches a fresh one if needed
  */
-export async function ensureToken(authClient: ReturnType<typeof createAuthClient>): Promise<string | null> {
+export async function ensureJWTToken(baseURL: string): Promise<string | null> {
   // First check if we have a stored token
   const existingToken = getAuthToken();
   if (existingToken) {
     return existingToken;
   }
 
-  // Try to get a fresh token
-  return refreshToken(authClient);
+  // Try to get a fresh token from the session
+  return getJWTToken(baseURL);
 }

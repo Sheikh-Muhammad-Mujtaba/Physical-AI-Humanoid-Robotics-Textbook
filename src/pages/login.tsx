@@ -47,15 +47,14 @@ export default function LoginPage(): React.ReactElement {
         },
         {
           onSuccess: async () => {
-            try {
-              const tokenResult = await authClient.token();
-              if (tokenResult.data?.token) {
-                setAuthToken(tokenResult.data.token);
-                refetch();
-              }
-            } catch {
-              // Token fetch failed
-            }
+            // The global onSuccess handler in auth-client will automatically fetch JWT token
+            // Wait a moment for the token to be stored
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Refetch session to update UI
+            await refetch();
+
+            // Redirect to dashboard
             history.push('/docs/intro');
           },
           onError: (ctx) => {
