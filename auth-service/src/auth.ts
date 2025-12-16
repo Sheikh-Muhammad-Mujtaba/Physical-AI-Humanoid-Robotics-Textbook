@@ -79,7 +79,7 @@ export const auth = betterAuth({
   database: pool,
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3001",
-  trustedOrigins: trustedOrigins,
+  allowedOrigins: trustedOrigins,
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
@@ -112,6 +112,7 @@ export const auth = betterAuth({
     },
   },
   advanced: {
+    crossDomain: true,
     useSecureCookies: isProduction,
     cookiePrefix: "better-auth",
     defaultCookieAttributes: {

@@ -130,9 +130,17 @@ export default function UserMenu() {
     );
   }
 
-  const initials = user?.name
-    ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-    : user?.email?.slice(0, 2).toUpperCase() || '??';
+  const getInitials = () => {
+    if (!user) return '??';
+    if (user.name) {
+      return user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    }
+    if (user.email) {
+      return user.email.slice(0, 2).toUpperCase();
+    }
+    return '??';
+  };
+  const initials = getInitials();
 
   return (
     <div className="user-menu" ref={menuRef}>

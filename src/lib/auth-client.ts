@@ -49,18 +49,7 @@ export const createClientForUrl = (baseURL: string) => {
         },
       },
       plugins: [
-        jwtClient({
-          fetchOptions: {
-            onSuccess: async (context) => {
-              // Also capture from JWT plugin responses
-              const token = context.response.headers.get('set-auth-token');
-              if (token) {
-                console.log('[AUTH-JWT] Token received in header, storing...');
-                setAuthToken(decodeURIComponent(token));
-              }
-            },
-          },
-        }),
+        jwtClient(),
       ],
     }));
   }
