@@ -97,6 +97,7 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: authServiceUrl,
   trustedOrigins: trustedOrigins,
+  log: logger.info, // Integrate custom logger
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
