@@ -36,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (tokenResponse) {
         // Extract redirect URL from query params
         const redirectTo = (req.query.redirect as string) || '/docs/intro';
-        const frontendUrl = process.env.FRONTEND_URL || 'https://ai-spec-driven.vercel.app';
+        const frontendUrl = process.env.FRONTEND_URL;
 
         // Encode token for URL
         const encodedToken = encodeURIComponent(tokenResponse as any);
@@ -52,11 +52,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // If no session or token, redirect to login
     console.error('[TOKEN-RELAY] No session or token, redirecting to login');
-    const frontendUrl = process.env.FRONTEND_URL || 'https://ai-spec-driven.vercel.app';
+    const frontendUrl = process.env.FRONTEND_URL;
     res.redirect(302, `${frontendUrl}/login?error=no_session`);
   } catch (error) {
     console.error('[TOKEN-RELAY] Error:', error);
-    const frontendUrl = process.env.FRONTEND_URL || 'https://ai-spec-driven.vercel.app';
+    const frontendUrl = process.env.FRONTEND_URL;
     res.redirect(302, `${frontendUrl}/login?error=token_relay_failed`);
   }
 }

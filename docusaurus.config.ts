@@ -24,7 +24,7 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: 'https://ai-spec-driven.vercel.app',
+  url: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000',
   baseUrl: '/',
 
   // GitHub pages deployment config.

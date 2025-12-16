@@ -27,14 +27,10 @@ const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',').map((origin) => origin.trim())
   : ['http://localhost:3000', 'http://localhost:3001'];
 
-// Always allow the production frontend and backend API
-const PRODUCTION_FRONTEND = 'https://ai-spec-driven.vercel.app';
+// Always allow the backend API
 const BACKEND_API_URL = process.env.API_BASE_URL || 'http://localhost:8000';
 
 // Add production origins if not already present
-if (!allowedOrigins.includes(PRODUCTION_FRONTEND)) {
-  allowedOrigins.push(PRODUCTION_FRONTEND);
-}
 if (!allowedOrigins.includes(BACKEND_API_URL)) {
   allowedOrigins.push(BACKEND_API_URL);
 }

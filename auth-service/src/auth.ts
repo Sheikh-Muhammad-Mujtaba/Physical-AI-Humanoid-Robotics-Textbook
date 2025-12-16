@@ -48,22 +48,23 @@ const pool = new Pool({
   connectionString: connectionString,
 });
 
-// Parse trusted origins from environment variable or use defaults
-const envOrigins = process.env.FRONTEND_URL
+// Parse trusted origins from environment variable
+// FRONTEND_URL can be comma-separated for multiple origins
+const frontendOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(",").map((origin) => origin.trim())
   : ["http://localhost:3000"];
 
-// Always include the production frontend and backend API
-const PRODUCTION_FRONTEND = "https://ai-spec-driven.vercel.app";
-const BACKEND_API_URL = process.env.API_BASE_URL || "http://localhost:8000";
+// Get backend API URL
+const backendApiUrl = process.env.API_BASE_URL || "http://localhost:8000";
 
-// Build list of trusted origins
+// Get auth service URL
+const authServiceUrl = process.env.BETTER_AUTH_URL || "http://localhost:3001";
+
+// Build list of trusted origins (no hardcoded values)
 const trustedOrigins = [
-  ...envOrigins,
-  PRODUCTION_FRONTEND,
-  BACKEND_API_URL,
-  // Also trust the auth service itself for internal calls
-  process.env.BETTER_AUTH_URL || "http://localhost:3001"
+  ...frontendOrigins,
+  backendApiUrl,
+  authServiceUrl,
 ].filter((origin, index, self) =>
   // Remove duplicates
   self.indexOf(origin) === index
@@ -71,14 +72,10 @@ const trustedOrigins = [
 
 console.log('[AUTH] Trusted origins:', trustedOrigins);
 
-// Get the primary frontend URL for OAuth redirects
-// Use first FRONTEND_URL or fall back to production
-const primaryFrontendUrl = envOrigins[0] || PRODUCTION_FRONTEND;
-
 export const auth = betterAuth({
   database: pool,
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3001",
+  baseURL: authServiceUrl,
   trustedOrigins: trustedOrigins,
   emailAndPassword: {
     enabled: true,

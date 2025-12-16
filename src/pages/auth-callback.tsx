@@ -25,60 +25,57 @@ export default function AuthCallbackPage(): React.ReactElement {
       try {
         const searchParams = new URLSearchParams(location.search);
 
-        // Check if token is in URL (from token-relay endpoint)
-        const tokenFromUrl = searchParams.get('token');
+        // Wait a moment for the OAuth flow to complete
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-        if (tokenFromUrl) {
-          console.log('[AUTH-CALLBACK] Token found in URL, storing...');
-          setAuthToken(decodeURIComponent(tokenFromUrl));
-
-          // Redirect to the intended destination
-          const redirectTo = searchParams.get('redirect') || '/docs/intro';
-          console.log('[AUTH-CALLBACK] Redirecting to:', redirectTo);
-          history.push(redirectTo);
-          return;
-        }
-
-        // Fallback: Try to get token from session (for backwards compatibility)
-        console.log('[AUTH-CALLBACK] No token in URL, trying session-based approach...');
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        let tokenResult;
+        // Try to get session - the onSuccess handler in auth-client will capture the Bearer token
+        // from set-auth-token header automatically
+        let sessionResult;
         let retries = 0;
         const maxRetries = 3;
 
         while (retries < maxRetries) {
           try {
-            console.log(`[AUTH-CALLBACK] Attempt ${retries + 1}/${maxRetries}...`);
-            tokenResult = await authClient.token();
+            console.log(`[AUTH-CALLBACK] Checking session (attempt ${retries + 1}/${maxRetries})...`);
 
-            if (tokenResult.data?.token) {
-              console.log('[AUTH-CALLBACK] Token received!');
+            sessionResult = await authClient.getSession({
+              fetchOptions: {
+                onSuccess: (ctx) => {
+                  // The global onSuccess handler already captures set-auth-token
+                  // But we can also capture it here for redundancy
+                  const token = ctx.response.headers.get('set-auth-token');
+                  if (token) {
+                    console.log('[AUTH-CALLBACK] Token captured from session check');
+                    setAuthToken(decodeURIComponent(token));
+                  }
+                }
+              }
+            });
+
+            if (sessionResult.data) {
+              console.log('[AUTH-CALLBACK] Session established successfully');
               break;
             }
 
-            console.warn('[AUTH-CALLBACK] No token in response, retrying...');
+            console.warn('[AUTH-CALLBACK] No session data, retrying...');
           } catch (err) {
-            console.error(`[AUTH-CALLBACK] Token request attempt ${retries + 1} failed:`, err);
+            console.error(`[AUTH-CALLBACK] Session check attempt ${retries + 1} failed:`, err);
 
             if (retries < maxRetries - 1) {
-              await new Promise(resolve => setTimeout(resolve, 500));
+              await new Promise(resolve => setTimeout(resolve, 1000));
             }
           }
 
           retries++;
         }
 
-        if (tokenResult?.data?.token) {
-          console.log('[AUTH-CALLBACK] Token successfully obtained, storing...');
-          setAuthToken(tokenResult.data.token);
-
+        if (sessionResult?.data) {
           const redirectTo = searchParams.get('redirect') || '/docs/intro';
-          console.log('[AUTH-CALLBACK] Redirecting to:', redirectTo);
+          console.log('[AUTH-CALLBACK] Authentication successful, redirecting to:', redirectTo);
           history.push(redirectTo);
         } else {
-          console.error('[AUTH-CALLBACK] Failed to get token after all retries');
-          setError('Authentication completed but could not obtain access token. Third-party cookies may be blocked by your browser. Please try a different browser or enable third-party cookies.');
+          console.error('[AUTH-CALLBACK] Failed to establish session after all retries');
+          setError('Authentication completed but session could not be established. Please try signing in again.');
         }
       } catch (err) {
         console.error('[AUTH-CALLBACK] Unexpected error during callback:', err);
