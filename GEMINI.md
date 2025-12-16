@@ -15,6 +15,8 @@ Auto-generated from all feature plans. Last updated: 2025-12-07
 - Docusaurus (TypeScript), Python 3.10+, TypeScript 5.x + Docusaurus, FastAPI, SQLAlchemy, Qdrant, PyJWT, Next.js (in `auth-service`) (001-vercel-deployment)
 - PostgreSQL (for user data), Qdrant (for vectors) (001-vercel-deployment)
 
+- TypeScript 5.x + jose, pg library, @vercel/functions (001-fix-betterauth-session)
+
 - Node.js >=20.0, TypeScript ~5.6.2 + Docusaurus 3.9.2, React 19.0.0 (001-fix-docusaurus-deployment)
 
 - Python 3.10+ + FastAPI, Gemini SDK, Qdrant client, SQLAlchemy, asyncpg, Alembic (001-normalize-backend-arch)

@@ -1,0 +1,122 @@
+openapi: 3.0.0
+info:
+  title: BetterAuth Authentication API Contracts
+  version: 1.0.0
+  description: API contracts for the authentication service, focusing on resolving session persistence failures.
+
+servers:
+  - url: /api/auth
+    description: Authentication Service Base URL
+
+paths:
+  /login:
+    post:
+      summary: User Login
+      description: Authenticates a user with provided credentials and establishes a session.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: User's username or email.
+                password:
+                  type: string
+                  format: password
+                  description: User's password.
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Successful authentication. A session cookie is set.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "sessionid=xyz; HttpOnly; Secure; SameSite=None; Partitioned"
+        '401':
+          description: Unauthorized - Invalid credentials.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid credentials"
+  /token:
+    get:
+      summary: Retrieve Authentication Token
+      description: Retrieves a JSON Web Token (JWT) for an active session.
+      security:
+        - CookieAuth: []
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved JWT.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: The issued JWT.
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '401':
+          description: Unauthorized - No active session or invalid bearer token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized"
+  /profile: # Example of a protected resource endpoint
+    get:
+      summary: Access User Profile
+      description: Accesses a protected user profile resource.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved user profile.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  email:
+                    type: string
+        '401':
+          description: Unauthorized - Missing or invalid authentication token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized"
+
+components:
+  securitySchemes:
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid # The name of the session cookie
+      description: Session cookie for authentication.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Bearer token (JWT) for authentication.

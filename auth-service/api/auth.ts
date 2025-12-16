@@ -191,10 +191,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               }
             }
           } else {
+            const errorBody = await tokenResponse.text(); // Capture error body
+            const errorHeaders = Object.fromEntries(tokenResponse.headers.entries()); // Capture headers
             debugLog('JWT_TOKEN_GENERATION_FAILED', {
               requestId,
               status: tokenResponse.status,
               message: 'Token endpoint returned non-200 status',
+              errorBody,
+              errorHeaders,
             });
           }
         }

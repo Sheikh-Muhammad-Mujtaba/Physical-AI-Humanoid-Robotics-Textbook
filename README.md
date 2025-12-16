@@ -41,6 +41,19 @@ This project adheres to a strict constitution to ensure quality and consistency.
 14. **Safe CSS Configuration**: The `tailwind.config.js` MUST have `corePlugins: { preflight: false }`.
 15. **Secure Connectivity**: The FastAPI backend MUST include `CORSMiddleware`.
 
+### Vercel Deployment Best Practices (Authentication)
+
+For secure and consistent authentication across Vercel deployments, especially for sensitive configurations like `BETTER_AUTH_SECRET`, `DATABASE_URL`, JWT `issuer`, and `audience`, adhere to the following:
+
+*   **Vercel's Built-in Management**: Utilize the Vercel Dashboard/CLI for secure storage and injection of environment variables.
+*   **Never Commit `.env` Files**: Exclude `.env` files from version control.
+*   **Differentiate Environments**: Maintain distinct environment variables for `development`, `preview`, and `production`.
+*   **Mark Sensitive Variables**: Use Vercel's "sensitive" flag for critical secrets.
+*   **Redeploy After Changes**: Environment variable changes require redeployment to take effect.
+*   **Build-Time vs. Runtime**: Use `env` for runtime and `build.env` for build-time variables, referencing Vercel secrets for sensitive values in `vercel.json`.
+
+For more in-depth information, refer to `specs/001-fix-betterauth-session/research.md`.
+
 ### Environment Variables
 
 To run this project, you will need to add the following environment variables to your `.env` file in the `api` directory:

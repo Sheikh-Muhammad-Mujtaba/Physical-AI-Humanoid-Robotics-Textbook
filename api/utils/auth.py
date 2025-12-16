@@ -4,10 +4,13 @@ Validates JWT tokens from BetterAuth service using JWKS endpoint.
 """
 
 import os
+import logging
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
 from jwt import PyJWKClient
+
+logger = logging.getLogger(__name__)
 
 # BetterAuth JWKS configuration
 JWKS_URL = os.getenv("BETTER_AUTH_JWKS_URL", "http://localhost:3001/api/auth/jwks")
@@ -45,24 +48,28 @@ async def validate_jwt(credentials: HTTPAuthorizationCredentials = Depends(secur
         )
         return payload
     except jwt.ExpiredSignatureError:
+        logger.error(f"JWT validation failed: Token has expired. Token preview: {token[:10]}...")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token has expired",
             headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
         )
     except jwt.InvalidAudienceError:
+        logger.error(f"JWT validation failed: Invalid token audience. Expected: {AUDIENCE}, Token preview: {token[:10]}...")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token audience",
             headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
         )
     except jwt.InvalidIssuerError:
+        logger.error(f"JWT validation failed: Invalid token issuer. Expected: {ISSUER}, Token preview: {token[:10]}...")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token issuer",
             headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
         )
     except jwt.PyJWTError as e:
+        logger.error(f"JWT validation failed: {e}. Token preview: {token[:10]}...")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
@@ -78,6 +85,7 @@ def get_current_user_id(payload: dict = Depends(validate_jwt)) -> str:
     """
     user_id = payload.get("sub")
     if not user_id:
+        logger.error("JWT payload missing user identifier ('sub' claim).")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token missing user identifier",

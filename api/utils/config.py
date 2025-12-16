@@ -1,29 +1,31 @@
 import os
-from dotenv import load_dotenv
-from qdrant_client import QdrantClient
-from typing import Optional
+import logging
 
-# Load environment variables from .env file
-load_dotenv()
+logger = logging.getLogger(__name__)
 
 class Config:
-    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    QDRANT_URL: str = os.getenv("QDRANT_URL", "")
-    QDRANT_API_KEY: str = os.getenv("QDRANT_API_KEY", "")
+    DATABASE_URL: str
+    BETTER_AUTH_ISSUER: str
+    BETTER_AUTH_JWKS_URL: str
 
-    # Lazy initialization for Qdrant client
-    _qdrant_client: Optional[QdrantClient] = None
+    def __init__(self):
+        self.DATABASE_URL = os.getenv("DATABASE_URL")
+        self.BETTER_AUTH_ISSUER = os.getenv("BETTER_AUTH_ISSUER")
+        self.BETTER_AUTH_JWKS_URL = os.getenv("BETTER_AUTH_JWKS_URL")
+        self._validate()
 
-    @classmethod
-    def get_qdrant_client(cls) -> QdrantClient:
-        if cls._qdrant_client is None:
-            if not cls.QDRANT_URL or not cls.QDRANT_API_KEY:
-                raise ValueError("Qdrant URL and API Key must be set in environment variables")
-            cls._qdrant_client = QdrantClient(
-                url=cls.QDRANT_URL,
-                api_key=cls.QDRANT_API_KEY,
-            )
-        return cls._qdrant_client
+    def _validate(self):
+        errors = []
+        if not self.DATABASE_URL:
+            errors.append("Missing environment variable: DATABASE_URL")
+        if not self.BETTER_AUTH_ISSUER:
+            errors.append("Missing environment variable: BETTER_AUTH_ISSUER")
+        if not self.BETTER_AUTH_JWKS_URL:
+            errors.append("Missing environment variable: BETTER_AUTH_JWKS_URL")
 
-# Ensure config is loaded when imported
+        if errors:
+            for error in errors:
+                logger.error(error)
+            raise EnvironmentError("Critical environment variables are missing. Please check your .env file or Vercel configuration.")
+
 config = Config()

@@ -1,7 +1,9 @@
+import logger from './logging';
 import { betterAuth } from "better-auth";
 import { bearer } from "better-auth/plugins";
 import { jwt } from "better-auth/plugins";
 import { Pool } from "pg";
+import { attachDatabasePool } from "@vercel/functions"; // Import attachDatabasePool
 
 // Only load dotenv in development (not needed on Vercel - uses env vars directly)
 if (process.env.NODE_ENV !== "production") {
@@ -26,17 +28,17 @@ if (isNeonDb && connectionString && !connectionString.includes('sslmode=require'
 
 // Debug logging for environment variables (only log presence of secrets, not values)
 function logEnvironmentVariables() {
-  console.log('--- Environment Variables Check (Auth Service) ---');
-  console.log(`DATABASE_URL is set: ${!!process.env.DATABASE_URL}`);
-  console.log(`BETTER_AUTH_SECRET is set: ${!!process.env.BETTER_AUTH_SECRET}`);
-  console.log(`BETTER_AUTH_URL: ${process.env.BETTER_AUTH_URL || 'Not set, using http://localhost:3001'}`);
-  console.log(`FRONTEND_URL: ${process.env.FRONTEND_URL || 'Not set, using http://localhost:3000 (default)'}`);
-  console.log(`API_BASE_URL: ${process.env.API_BASE_URL || 'Not set, using http://localhost:8000'}`);
-  console.log(`GOOGLE_CLIENT_ID is set: ${!!process.env.GOOGLE_CLIENT_ID}`);
-  console.log(`GOOGLE_CLIENT_SECRET is set: ${!!process.env.GOOGLE_CLIENT_SECRET}`);
-  console.log(`GITHUB_CLIENT_ID is set: ${!!process.env.GITHUB_CLIENT_ID}`);
-  console.log(`GITHUB_CLIENT_SECRET is set: ${!!process.env.GITHUB_CLIENT_SECRET}`);
-  console.log('--------------------------------------------------');
+  logger.info('--- Environment Variables Check (Auth Service) ---');
+  logger.info(`DATABASE_URL is set: ${!!process.env.DATABASE_URL}`);
+  logger.info(`BETTER_AUTH_SECRET is set: ${!!process.env.BETTER_AUTH_SECRET}`);
+  logger.info(`BETTER_AUTH_URL: ${process.env.BETTER_AUTH_URL || 'Not set, using http://localhost:3001'}`);
+  logger.info(`FRONTEND_URL: ${process.env.FRONTEND_URL || 'Not set, using http://localhost:3000 (default)'}`);
+  logger.info(`API_BASE_URL: ${process.env.API_BASE_URL || 'Not set, using http://localhost:8000'}`);
+  logger.info(`GOOGLE_CLIENT_ID is set: ${!!process.env.GOOGLE_CLIENT_ID}`);
+  logger.info(`GOOGLE_CLIENT_SECRET is set: ${!!process.env.GOOGLE_CLIENT_SECRET}`);
+  logger.info(`GITHUB_CLIENT_ID is set: ${!!process.env.GITHUB_CLIENT_ID}`);
+  logger.info(`GITHUB_CLIENT_SECRET is set: ${!!process.env.GITHUB_CLIENT_SECRET}`);
+  logger.info('--------------------------------------------------');
 }
 
 // Call the logging function at startup
@@ -46,7 +48,25 @@ logEnvironmentVariables();
 // Use the same DATABASE_URL as FastAPI backend (Neon PostgreSQL)
 const pool = new Pool({
   connectionString: connectionString,
+  idleTimeoutMillis: 5000, // Configure a low idle timeout (5 seconds)
 });
+
+// Attach the pool to ensure idle connections close before suspension
+attachDatabasePool(pool);
+
+// Explicit PostgreSQL connection test
+async function testPgConnection() {
+  try {
+    const client = await pool.connect();
+    client.release();
+    logger.info('PostgreSQL connection to DATABASE_URL successful.');
+  } catch (error) {
+    logger.error(`Failed to connect to PostgreSQL at DATABASE_URL: ${error.message}`);
+    // Optionally re-throw or exit process if DB connection is critical for startup
+    // process.exit(1); 
+  }
+}
+testPgConnection();
 
 // Parse trusted origins from environment variable
 // FRONTEND_URL can be comma-separated for multiple origins
@@ -70,7 +90,7 @@ const trustedOrigins = [
   self.indexOf(origin) === index
 );
 
-console.log('[AUTH] Trusted origins:', trustedOrigins);
+logger.info(`[AUTH] Trusted origins: ${trustedOrigins.join(', ')}`);
 
 export const auth = betterAuth({
   database: pool,
@@ -140,3 +160,5 @@ export const auth = betterAuth({
     }),
   ],
 });
+
+logger.info('BetterAuth handler initialized successfully.');
