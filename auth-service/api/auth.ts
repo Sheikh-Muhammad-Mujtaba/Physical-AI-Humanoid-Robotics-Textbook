@@ -163,17 +163,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         try {
           const json = JSON.parse(text);
 
-          // Log specific auth-related response data
-          if (json.error || json.message) {
+          // Log specific auth-related response data (handle null responses)
+          if (json === null) {
+            debugLog('AUTH_NULL_RESPONSE', {
+              requestId,
+              message: 'Auth handler returned null (no session found)',
+            });
+          } else if (json.error || json.message) {
             debugLog('AUTH_ERROR_RESPONSE', {
               requestId,
               error: json.error,
               message: json.message,
               code: json.code,
             });
-          }
-
-          if (json.user || json.session) {
+          } else if (json.user || json.session) {
             debugLog('AUTH_SUCCESS_RESPONSE', {
               requestId,
               hasUser: !!json.user,

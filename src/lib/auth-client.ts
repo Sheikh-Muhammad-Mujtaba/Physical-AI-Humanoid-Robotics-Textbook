@@ -28,9 +28,28 @@ export const createClientForUrl = (baseURL: string) => {
       baseURL,
       fetchOptions: {
         credentials: 'include',
+        onSuccess: async (context) => {
+          // Capture token from set-auth-token header if present
+          const token = context.response.headers.get('set-auth-token');
+          if (token) {
+            console.log('[AUTH] Token received in header, storing...');
+            setAuthToken(decodeURIComponent(token));
+          }
+        },
       },
       plugins: [
-        jwtClient(),
+        jwtClient({
+          fetchOptions: {
+            onSuccess: async (context) => {
+              // Also capture from JWT plugin responses
+              const token = context.response.headers.get('set-auth-token');
+              if (token) {
+                console.log('[AUTH-JWT] Token received in header, storing...');
+                setAuthToken(decodeURIComponent(token));
+              }
+            },
+          },
+        }),
       ],
     }));
   }
