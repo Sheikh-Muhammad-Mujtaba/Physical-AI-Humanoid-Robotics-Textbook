@@ -95,6 +95,16 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
     },
   },
+  // Account configuration to handle cross-origin OAuth
+  account: {
+    // Skip state cookie check for cross-origin OAuth (state cookies are blocked by browsers)
+    // This is necessary when frontend and auth service are on different domains
+    // WARNING: This has security implications - only enable for cross-origin setups
+    skipStateCookieCheck: isProduction, // Only skip in production where domains differ
+    accountLinking: {
+      enabled: true,
+    },
+  },
   session: {
     cookieCache: {
       enabled: true,

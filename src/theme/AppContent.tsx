@@ -25,14 +25,17 @@ export default function AppContent({ children }: { children: React.ReactNode }) 
         setPathname(window.location.pathname);
       };
 
+      // Listen for storage changes (when token is updated in another tab or by login)
+      const handleStorageChange = (e: StorageEvent) => {
+        if (e.key === 'auth_token') {
+          setHasToken(checkAuthToken());
+        }
+      };
+
       window.addEventListener('popstate', handleRouteChange);
+      window.addEventListener('storage', handleStorageChange);
 
-      // Poll for auth token changes
-      const tokenInterval = setInterval(() => {
-        setHasToken(checkAuthToken());
-      }, 500);
-
-      // Use interval to check pathname for client-side navigation
+      // Use interval to check pathname for client-side navigation (keep this for SPA routing)
       const pathInterval = setInterval(() => {
         const currentPath = window.location.pathname;
         setPathname(prev => prev !== currentPath ? currentPath : prev);
@@ -40,7 +43,7 @@ export default function AppContent({ children }: { children: React.ReactNode }) 
 
       return () => {
         window.removeEventListener('popstate', handleRouteChange);
-        clearInterval(tokenInterval);
+        window.removeEventListener('storage', handleStorageChange);
         clearInterval(pathInterval);
       };
     }

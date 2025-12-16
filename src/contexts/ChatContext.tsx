@@ -142,38 +142,31 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     }
   }, [sessionId]);
 
-  // --- Poll for authentication changes (e.g., after login) ---
+  // --- Check authentication on mount and listen for changes ---
   useEffect(() => {
-    const checkAuth = () => {
-      const currentAuthState = checkIsAuthenticated();
-      if (currentAuthState !== isUserAuthenticated) {
-        setIsUserAuthenticated(currentAuthState);
-        // Reset history loaded flag when auth state changes
-        if (currentAuthState) {
-          setHistoryLoaded(false);
-        }
-      }
-    };
+    // Check auth on mount
+    const currentAuthState = checkIsAuthenticated();
+    setIsUserAuthenticated(currentAuthState);
+    if (currentAuthState) {
+      setHistoryLoaded(false);
+    }
 
-    // Check immediately
-    checkAuth();
-
-    // Poll for changes (handles login in different tab or async token storage)
-    const interval = setInterval(checkAuth, 1000);
-
-    // Also listen for storage events (token changes)
+    // Listen for storage events (token changes from other tabs or login flow)
     const handleStorage = (e: StorageEvent) => {
       if (e.key === 'auth_token') {
-        checkAuth();
+        const newAuthState = checkIsAuthenticated();
+        setIsUserAuthenticated(newAuthState);
+        if (newAuthState) {
+          setHistoryLoaded(false);
+        }
       }
     };
     window.addEventListener('storage', handleStorage);
 
     return () => {
-      clearInterval(interval);
       window.removeEventListener('storage', handleStorage);
     };
-  }, [isUserAuthenticated]);
+  }, []); // Empty deps - only run on mount, storage event handles changes
 
   // --- Load chat history when session ID is available AND user is authenticated ---
   useEffect(() => {
