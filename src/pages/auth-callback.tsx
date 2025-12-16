@@ -23,15 +23,41 @@ export default function AuthCallbackPage(): React.ReactElement {
       console.log('[AUTH-CALLBACK] Processing OAuth callback...');
 
       try {
-        // Wait a moment for cookies to be set
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Wait for cookies to be set (increased from 500ms to 1000ms)
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // Try to get a JWT token
-        console.log('[AUTH-CALLBACK] Requesting JWT token...');
-        const tokenResult = await authClient.token();
+        // Try to get a JWT token with retry logic
+        console.log('[AUTH-CALLBACK] Requesting JWT token with retries...');
 
-        if (tokenResult.data?.token) {
-          console.log('[AUTH-CALLBACK] Token received, storing...');
+        let tokenResult;
+        let retries = 0;
+        const maxRetries = 3;
+
+        while (retries < maxRetries) {
+          try {
+            console.log(`[AUTH-CALLBACK] Attempt ${retries + 1}/${maxRetries}...`);
+            tokenResult = await authClient.token();
+
+            if (tokenResult.data?.token) {
+              console.log('[AUTH-CALLBACK] Token received!');
+              break;
+            }
+
+            console.warn('[AUTH-CALLBACK] No token in response, retrying...');
+          } catch (err) {
+            console.error(`[AUTH-CALLBACK] Token request attempt ${retries + 1} failed:`, err);
+
+            // Wait before retry (except on last attempt)
+            if (retries < maxRetries - 1) {
+              await new Promise(resolve => setTimeout(resolve, 500));
+            }
+          }
+
+          retries++;
+        }
+
+        if (tokenResult?.data?.token) {
+          console.log('[AUTH-CALLBACK] Token successfully obtained, storing...');
           setAuthToken(tokenResult.data.token);
 
           // Redirect to the intended destination or home
@@ -40,12 +66,12 @@ export default function AuthCallbackPage(): React.ReactElement {
           console.log('[AUTH-CALLBACK] Redirecting to:', redirectTo);
           history.push(redirectTo);
         } else {
-          console.error('[AUTH-CALLBACK] No token in response');
-          setError('Authentication completed but no token received. Please try logging in again.');
+          console.error('[AUTH-CALLBACK] Failed to get token after all retries');
+          setError('Authentication completed but could not obtain access token. This may be a cross-origin cookie issue. Please try again or contact support.');
         }
       } catch (err) {
-        console.error('[AUTH-CALLBACK] Error during callback:', err);
-        setError(err instanceof Error ? err.message : 'Authentication failed');
+        console.error('[AUTH-CALLBACK] Unexpected error during callback:', err);
+        setError(err instanceof Error ? err.message : 'Authentication failed unexpectedly');
       }
     };
 

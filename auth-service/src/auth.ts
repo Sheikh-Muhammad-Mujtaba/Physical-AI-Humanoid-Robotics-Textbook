@@ -104,10 +104,6 @@ export const auth = betterAuth({
   advanced: {
     useSecureCookies: isProduction,
     cookiePrefix: "better-auth",
-    // Cross-origin cookie settings for separate auth domain
-    crossSubDomainCookies: {
-      enabled: false, // Different domains, not subdomains
-    },
     defaultCookieAttributes: {
       sameSite: isProduction ? "none" : "lax", // "none" required for cross-origin in production
       secure: isProduction, // Must be secure when sameSite is "none"
