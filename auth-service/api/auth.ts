@@ -27,11 +27,19 @@ const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',').map((origin) => origin.trim())
   : ['http://localhost:3000', 'http://localhost:3001'];
 
-// Always allow the production frontend
+// Always allow the production frontend and backend API
 const PRODUCTION_FRONTEND = 'https://ai-spec-driven.vercel.app';
+const BACKEND_API_URL = process.env.API_BASE_URL || 'http://localhost:8000';
+
+// Add production origins if not already present
 if (!allowedOrigins.includes(PRODUCTION_FRONTEND)) {
   allowedOrigins.push(PRODUCTION_FRONTEND);
 }
+if (!allowedOrigins.includes(BACKEND_API_URL)) {
+  allowedOrigins.push(BACKEND_API_URL);
+}
+
+console.log('[AUTH-API] Allowed CORS origins:', allowedOrigins);
 
 function setCorsHeaders(req: VercelRequest, res: VercelResponse) {
   const origin = req.headers.origin;
@@ -41,13 +49,14 @@ function setCorsHeaders(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   } else if (origin) {
     // Log unrecognized origins for debugging
-    console.log('Unrecognized origin:', origin, 'Allowed:', allowedOrigins);
+    console.log('[CORS] Unrecognized origin:', origin, 'Allowed:', allowedOrigins);
   }
 
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Cookie');
-  res.setHeader('Access-Control-Expose-Headers', 'Set-Cookie');
+  // IMPORTANT: Expose both Set-Cookie and set-auth-token headers for cross-origin requests
+  res.setHeader('Access-Control-Expose-Headers', 'Set-Cookie, set-auth-token');
   res.setHeader('Access-Control-Max-Age', '86400'); // Cache preflight for 24 hours
 }
 

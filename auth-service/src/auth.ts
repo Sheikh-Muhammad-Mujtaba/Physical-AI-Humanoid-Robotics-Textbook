@@ -53,11 +53,23 @@ const envOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(",").map((origin) => origin.trim())
   : ["http://localhost:3000"];
 
-// Always include the production frontend
+// Always include the production frontend and backend API
 const PRODUCTION_FRONTEND = "https://ai-spec-driven.vercel.app";
-const trustedOrigins = envOrigins.includes(PRODUCTION_FRONTEND)
-  ? envOrigins
-  : [...envOrigins, PRODUCTION_FRONTEND];
+const BACKEND_API_URL = process.env.API_BASE_URL || "http://localhost:8000";
+
+// Build list of trusted origins
+const trustedOrigins = [
+  ...envOrigins,
+  PRODUCTION_FRONTEND,
+  BACKEND_API_URL,
+  // Also trust the auth service itself for internal calls
+  process.env.BETTER_AUTH_URL || "http://localhost:3001"
+].filter((origin, index, self) =>
+  // Remove duplicates
+  self.indexOf(origin) === index
+);
+
+console.log('[AUTH] Trusted origins:', trustedOrigins);
 
 // Get the primary frontend URL for OAuth redirects
 // Use first FRONTEND_URL or fall back to production
