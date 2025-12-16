@@ -140,6 +140,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.setHeader(key, value);
     });
 
+    // For successful OAuth sign-in, generate and send JWT token in response header
+    // This allows the frontend to capture the token directly without relying on cookies
+    if (req.url?.includes('/sign-in/social') && response.status === 200) {
+      try {
+        // Try to get session from the response cookies
+        const setCookieHeader = response.headers.get('set-cookie');
+        if (setCookieHeader) {
+          // Create a new request with the session cookie to get the JWT token
+          const tokenRequest = new Request(`${protocol}://${host}/api/auth/token`, {
+            method: 'GET',
+            headers: {
+              'cookie': setCookieHeader,
+            },
+          });
+
+          const tokenResponse = await auth.handler(tokenRequest);
+          if (tokenResponse.status === 200) {
+            const tokenText = await tokenResponse.text();
+            if (tokenText) {
+              try {
+                const tokenData = JSON.parse(tokenText);
+                if (tokenData?.token) {
+                  // Send token in custom header for frontend to capture
+                  res.setHeader('set-auth-token', encodeURIComponent(tokenData.token));
+                  debugLog('JWT_TOKEN_SENT', {
+                    requestId,
+                    message: 'JWT token generated and sent in set-auth-token header',
+                  });
+                }
+              } catch (e) {
+                debugLog('JWT_TOKEN_PARSE_ERROR', {
+                  requestId,
+                  error: String(e),
+                });
+              }
+            }
+          }
+        }
+      } catch (e) {
+        debugLog('JWT_TOKEN_GENERATION_ERROR', {
+          requestId,
+          error: String(e),
+          message: 'Failed to generate JWT token after OAuth sign-in',
+        });
+      }
+    }
+
     // Handle redirects (OAuth callbacks return 302)
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get('location');

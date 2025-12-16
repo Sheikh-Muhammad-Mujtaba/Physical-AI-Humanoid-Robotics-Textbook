@@ -102,6 +102,9 @@ export const auth = betterAuth({
       enabled: true,
     },
   },
+  rateLimit: {
+    enabled: false, // Disable rate limiting to avoid 401 errors during token fetching
+  },
   session: {
     cookieCache: {
       enabled: true,

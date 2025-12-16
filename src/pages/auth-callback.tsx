@@ -25,58 +25,65 @@ export default function AuthCallbackPage(): React.ReactElement {
       try {
         const searchParams = new URLSearchParams(location.search);
 
-        // Wait a moment for the OAuth flow to complete
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Check if we came from OAuth flow
+        const from = searchParams.get('from');
+        if (from !== 'oauth') {
+          console.log('[AUTH-CALLBACK] Not an OAuth callback, redirecting...');
+          const redirectTo = searchParams.get('redirect') || '/docs/intro';
+          history.push(redirectTo);
+          return;
+        }
 
-        // Try to get session - the onSuccess handler in auth-client will capture the Bearer token
-        // from set-auth-token header automatically
-        let sessionResult;
+        // Wait longer for the OAuth flow to complete and session to be established
+        console.log('[AUTH-CALLBACK] Waiting for OAuth session to establish...');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Try to get token directly using the JWT plugin
+        let tokenResult;
         let retries = 0;
-        const maxRetries = 3;
+        const maxRetries = 5;
 
         while (retries < maxRetries) {
           try {
-            console.log(`[AUTH-CALLBACK] Checking session (attempt ${retries + 1}/${maxRetries})...`);
+            console.log(`[AUTH-CALLBACK] Attempt ${retries + 1}/${maxRetries}...`);
 
-            sessionResult = await authClient.getSession({
+            // First try to get the token directly
+            tokenResult = await authClient.token({
               fetchOptions: {
-                onSuccess: (ctx) => {
-                  // The global onSuccess handler already captures set-auth-token
-                  // But we can also capture it here for redundancy
-                  const token = ctx.response.headers.get('set-auth-token');
-                  if (token) {
-                    console.log('[AUTH-CALLBACK] Token captured from session check');
-                    setAuthToken(decodeURIComponent(token));
-                  }
-                }
+                credentials: 'include', // Include cookies
               }
             });
 
-            if (sessionResult.data) {
-              console.log('[AUTH-CALLBACK] Session established successfully');
-              break;
+            console.log('[AUTH-CALLBACK] Token response:', tokenResult);
+
+            if (tokenResult.data?.token) {
+              console.log('[AUTH-CALLBACK] Token received successfully');
+              setAuthToken(tokenResult.data.token);
+
+              // Verify we can get session with this token
+              const sessionResult = await authClient.getSession();
+              if (sessionResult.data) {
+                console.log('[AUTH-CALLBACK] Session verified with token');
+                const redirectTo = searchParams.get('redirect') || '/docs/intro';
+                console.log('[AUTH-CALLBACK] Authentication successful, redirecting to:', redirectTo);
+                history.push(redirectTo);
+                return;
+              }
             }
 
-            console.warn('[AUTH-CALLBACK] No session data, retrying...');
+            console.log('[AUTH-CALLBACK] No token in response, retrying...');
           } catch (err) {
-            console.error(`[AUTH-CALLBACK] Session check attempt ${retries + 1} failed:`, err);
-
-            if (retries < maxRetries - 1) {
-              await new Promise(resolve => setTimeout(resolve, 1000));
-            }
+            console.error(`[AUTH-CALLBACK] Attempt ${retries + 1} failed:`, err);
           }
 
+          if (retries < maxRetries - 1) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
           retries++;
         }
 
-        if (sessionResult?.data) {
-          const redirectTo = searchParams.get('redirect') || '/docs/intro';
-          console.log('[AUTH-CALLBACK] Authentication successful, redirecting to:', redirectTo);
-          history.push(redirectTo);
-        } else {
-          console.error('[AUTH-CALLBACK] Failed to establish session after all retries');
-          setError('Authentication completed but session could not be established. Please try signing in again.');
-        }
+        console.error('[AUTH-CALLBACK] Failed to get token after all retries');
+        setError('Authentication completed but token could not be retrieved. This may be due to cross-domain restrictions. Please try signing in again.');
       } catch (err) {
         console.error('[AUTH-CALLBACK] Unexpected error during callback:', err);
         setError(err instanceof Error ? err.message : 'Authentication failed unexpectedly');
