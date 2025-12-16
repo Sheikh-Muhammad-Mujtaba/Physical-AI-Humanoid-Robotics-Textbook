@@ -14,6 +14,8 @@ import { jwtClient } from "better-auth/client/plugins";
 
 // Default fallback URL for local development
 export const DEV_AUTH_URL = "http://localhost:3001";
+export const DEV_API_BASE_URL = "http://localhost:8000";
+export const DEV_FRONTEND_URL = "http://localhost:3000"; // Assuming frontend runs on 3000 locally
 
 // Cache for auth client instances by URL
 const clientCache = new Map<string, ReturnType<typeof createAuthClient>>();
@@ -22,10 +24,22 @@ const clientCache = new Map<string, ReturnType<typeof createAuthClient>>();
  * Create or get cached auth client for a specific URL
  * Use this inside React components with the URL from useDocusaurusContext
  */
-export const createClientForUrl = (baseURL: string) => {
-  if (!clientCache.has(baseURL)) {
-    clientCache.set(baseURL, createAuthClient({
+export const createClientForUrl = (
+  baseURL: string,
+  apiBaseUrl: string,
+  frontendUrl: string | string[]
+) => {
+  const cacheKey = `${baseURL}-${apiBaseUrl}-${JSON.stringify(frontendUrl)}`;
+  if (!clientCache.has(cacheKey)) {
+    const trustedOrigins = [
+      ...(Array.isArray(frontendUrl) ? frontendUrl : [frontendUrl]),
+      apiBaseUrl,
       baseURL,
+    ].filter((origin, index, self) => self.indexOf(origin) === index); // Remove duplicates
+
+    clientCache.set(cacheKey, createAuthClient({
+      baseURL,
+      trustedOrigins, // Pass trusted origins to the frontend client
       fetchOptions: {
         credentials: 'include', // Always include cookies for session management
         onSuccess: async (context) => {
@@ -81,7 +95,7 @@ export const createClientForUrl = (baseURL: string) => {
       ],
     }));
   }
-  return clientCache.get(baseURL)!;
+  return clientCache.get(cacheKey)!;
 };
 
 // Token storage key

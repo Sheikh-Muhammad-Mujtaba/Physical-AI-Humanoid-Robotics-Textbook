@@ -5,7 +5,7 @@
 
 import React, { createContext, useContext, useMemo, ReactNode } from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import { createClientForUrl } from '../lib/auth-client';
+import { createClientForUrl, DEV_AUTH_URL, DEV_API_BASE_URL, DEV_FRONTEND_URL } from '../lib/auth-client';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -19,11 +19,13 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { siteConfig } = useDocusaurusContext();
 
-  // Get auth URL from Docusaurus config (set via BETTER_AUTH_URL env var)
-  const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || 'http://localhost:3001';
+  // Get auth URL, API Base URL, and Frontend URL from Docusaurus config
+  const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || DEV_AUTH_URL;
+  const apiBaseUrl = (siteConfig.customFields?.apiBaseUrl as string) || DEV_API_BASE_URL;
+  const frontendUrl = siteConfig.url || DEV_FRONTEND_URL; // Use siteConfig.url for frontend URL
 
-  // Create auth client with the correct URL
-  const authClient = useMemo(() => createClientForUrl(authUrl), [authUrl]);
+  // Create auth client with the correct URLs
+  const authClient = useMemo(() => createClientForUrl(authUrl, apiBaseUrl, frontendUrl), [authUrl, apiBaseUrl, frontendUrl]);
 
   // Use the session hook from the auth client
   const { data: session, isPending } = authClient.useSession();
