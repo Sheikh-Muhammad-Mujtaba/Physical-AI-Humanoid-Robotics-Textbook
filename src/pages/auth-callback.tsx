@@ -23,11 +23,25 @@ export default function AuthCallbackPage(): React.ReactElement {
       console.log('[AUTH-CALLBACK] Processing OAuth callback...');
 
       try {
-        // Wait for cookies to be set (increased from 500ms to 1000ms)
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        const searchParams = new URLSearchParams(location.search);
 
-        // Try to get a JWT token with retry logic
-        console.log('[AUTH-CALLBACK] Requesting JWT token with retries...');
+        // Check if token is in URL (from token-relay endpoint)
+        const tokenFromUrl = searchParams.get('token');
+
+        if (tokenFromUrl) {
+          console.log('[AUTH-CALLBACK] Token found in URL, storing...');
+          setAuthToken(decodeURIComponent(tokenFromUrl));
+
+          // Redirect to the intended destination
+          const redirectTo = searchParams.get('redirect') || '/docs/intro';
+          console.log('[AUTH-CALLBACK] Redirecting to:', redirectTo);
+          history.push(redirectTo);
+          return;
+        }
+
+        // Fallback: Try to get token from session (for backwards compatibility)
+        console.log('[AUTH-CALLBACK] No token in URL, trying session-based approach...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         let tokenResult;
         let retries = 0;
@@ -47,7 +61,6 @@ export default function AuthCallbackPage(): React.ReactElement {
           } catch (err) {
             console.error(`[AUTH-CALLBACK] Token request attempt ${retries + 1} failed:`, err);
 
-            // Wait before retry (except on last attempt)
             if (retries < maxRetries - 1) {
               await new Promise(resolve => setTimeout(resolve, 500));
             }
@@ -60,14 +73,12 @@ export default function AuthCallbackPage(): React.ReactElement {
           console.log('[AUTH-CALLBACK] Token successfully obtained, storing...');
           setAuthToken(tokenResult.data.token);
 
-          // Redirect to the intended destination or home
-          const searchParams = new URLSearchParams(location.search);
           const redirectTo = searchParams.get('redirect') || '/docs/intro';
           console.log('[AUTH-CALLBACK] Redirecting to:', redirectTo);
           history.push(redirectTo);
         } else {
           console.error('[AUTH-CALLBACK] Failed to get token after all retries');
-          setError('Authentication completed but could not obtain access token. This may be a cross-origin cookie issue. Please try again or contact support.');
+          setError('Authentication completed but could not obtain access token. Third-party cookies may be blocked by your browser. Please try a different browser or enable third-party cookies.');
         }
       } catch (err) {
         console.error('[AUTH-CALLBACK] Unexpected error during callback:', err);

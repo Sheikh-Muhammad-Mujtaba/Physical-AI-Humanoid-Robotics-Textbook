@@ -75,11 +75,11 @@ export default function LoginPage(): React.ReactElement {
     setSocialLoading(provider);
 
     try {
-      // Social login redirects to OAuth provider, then back to our callback handler
-      // The callback handler will extract the token and redirect to the final destination
+      // Social login redirects to OAuth provider, then to auth service /callback
+      // Auth service redirects to /token-relay which extracts token and passes it via URL
       await authClient.signIn.social({
         provider,
-        callbackURL: `${frontendUrl}/auth-callback?redirect=/docs/intro`,
+        callbackURL: `${authUrl}/api/token-relay?redirect=/docs/intro`,
       });
       // Note: Code after this line won't execute because social login causes a redirect
     } catch (err) {

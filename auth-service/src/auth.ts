@@ -109,6 +109,7 @@ export const auth = betterAuth({
       secure: isProduction, // Must be secure when sameSite is "none"
       httpOnly: true,
       path: "/",
+      partitioned: isProduction, // CRITICAL: Required for Chrome to accept cross-site cookies
     },
   },
   plugins: [
