@@ -35,7 +35,19 @@ export const createClientForUrl = (
       baseURL,
       fetchOptions: {
         credentials: 'include', // Always include cookies for session management
+        onRequest: async (context) => {
+          console.log('[AUTH-CLIENT] Request:', {
+            url: context.request.url,
+            method: context.request.method,
+          });
+        },
         onSuccess: async (context) => {
+          console.log('[AUTH-CLIENT] Response Success:', {
+            url: context.request?.url,
+            status: context.response.status,
+            hasData: !!context.data,
+            data: context.data,
+          });
           // Check if the backend sent a JWT token in the set-auth-token header
           const token = context.response.headers.get('set-auth-token');
           if (token) {

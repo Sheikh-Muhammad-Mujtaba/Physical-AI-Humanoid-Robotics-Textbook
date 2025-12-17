@@ -33,18 +33,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Use the session hook from the auth client
   // CRITICAL: Disable cookie cache to force fresh session checks
-  const { data: session, isPending } = authClient.useSession({
+  const { data: session, isPending, error } = authClient.useSession({
     query: {
       disableCookieCache: true, // Force fresh session from database, not cached cookie
     },
   });
 
-  const value = useMemo(() => ({
-    isAuthenticated: !!session?.user,
-    isLoading: isPending,
+  // DETAILED LOGGING for debugging
+  console.log('[AUTH-PROVIDER] Session State:', {
+    hasSession: !!session,
+    hasUser: !!session?.user,
+    isPending,
+    error: error || null,
     user: session?.user || null,
-    authClient,
-  }), [session, isPending, authClient]);
+    sessionData: session || null,
+  });
+
+  const value = useMemo(() => {
+    const authState = {
+      isAuthenticated: !!session?.user,
+      isLoading: isPending,
+      user: session?.user || null,
+      authClient,
+    };
+    console.log('[AUTH-PROVIDER] Computed Auth State:', authState);
+    return authState;
+  }, [session, isPending, authClient]);
 
   return (
     <AuthContext.Provider value={value}>
