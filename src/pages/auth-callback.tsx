@@ -41,58 +41,58 @@ export default function AuthCallbackPage(): React.ReactElement {
           return;
         }
 
-        // Wait longer for the OAuth flow to complete and session to be established
-        console.log('[AUTH-CALLBACK] Waiting for OAuth session to establish...');
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // BetterAuth OAuth flow:
+        // 1. User clicks "Sign in with Google" on frontend
+        // 2. Frontend calls signIn.social() which redirects to auth service
+        // 3. Auth service redirects to Google OAuth
+        // 4. Google redirects back to auth service /callback/google with auth code
+        // 5. Auth service exchanges code for tokens, creates session, sets cookies
+        // 6. Auth service redirects here (frontend /auth-callback?from=oauth)
+        // 7. Session cookies should already be set by auth service
 
-        // Try to get token directly using the JWT plugin
-        let tokenResult;
-        let retries = 0;
-        const maxRetries = 5;
+        console.log('[AUTH-CALLBACK] Waiting briefly for cookies to propagate...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
-        while (retries < maxRetries) {
+        // Check if session exists (cookies should be set by auth service)
+        const sessionResult = await authClient.getSession({
+          fetchOptions: {
+            credentials: 'include',
+          }
+        });
+
+        console.log('[AUTH-CALLBACK] Session check result:', sessionResult);
+
+        if (sessionResult.data?.user) {
+          console.log('[AUTH-CALLBACK] Session established successfully');
+
+          // Try to get JWT token for backend API calls
           try {
-            console.log(`[AUTH-CALLBACK] Attempt ${retries + 1}/${maxRetries}...`);
-
-            // First try to get the token directly
-            tokenResult = await authClient.token({
+            const tokenResult = await authClient.token({
               fetchOptions: {
-                credentials: 'include', // Include cookies
+                credentials: 'include',
               }
             });
 
-            console.log('[AUTH-CALLBACK] Token response:', tokenResult);
-
             if (tokenResult.data?.token) {
-              console.log('[AUTH-CALLBACK] Token received successfully');
+              console.log('[AUTH-CALLBACK] JWT token obtained');
               setAuthToken(tokenResult.data.token);
-
-              // Verify we can get session with this token
-              const sessionResult = await authClient.getSession();
-              if (sessionResult.data) {
-                console.log('[AUTH-CALLBACK] Session verified with token');
-                const redirectTo = searchParams.get('redirect') || '/docs/intro';
-                console.log('[AUTH-CALLBACK] Authentication successful, redirecting to:', redirectTo);
-                history.push(redirectTo);
-                return;
-              }
             }
-
-            console.log('[AUTH-CALLBACK] No token in response, retrying...');
-          } catch (err) {
-            console.error(`[AUTH-CALLBACK] Attempt ${retries + 1} failed:`, err);
+          } catch (tokenErr) {
+            console.warn('[AUTH-CALLBACK] Could not get JWT token, but session exists:', tokenErr);
+            // Continue anyway - session cookies are enough for auth
           }
 
-          if (retries < maxRetries - 1) {
-            await new Promise(resolve => setTimeout(resolve, 2000));
-          }
-          retries++;
+          const redirectTo = searchParams.get('redirect') || '/docs/intro';
+          console.log('[AUTH-CALLBACK] Redirecting to:', redirectTo);
+          history.push(redirectTo);
+          return;
         }
 
-        console.error('[AUTH-CALLBACK] Failed to get token after all retries');
-        setError('Authentication completed but token could not be retrieved. This may be due to cross-domain restrictions. Please try signing in again.');
+        // No session found
+        console.error('[AUTH-CALLBACK] No session found after OAuth callback');
+        setError('OAuth authentication completed but session was not established. This may be a cookie issue. Please try again or use email/password login.');
       } catch (err) {
-        console.error('[AUTH-CALLBACK] Unexpected error during callback:', err);
+        console.error('[AUTH-CALLBACK] Error during callback:', err);
         setError(err instanceof Error ? err.message : 'Authentication failed unexpectedly');
       }
     };

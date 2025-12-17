@@ -112,18 +112,28 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      // CRITICAL: OAuth callback must point to the auth service, not frontend
+      // This is where Google/GitHub redirect after user authorizes
+      redirectURI: `${authServiceUrl}/api/auth/callback/google`,
     },
     github: {
       clientId: process.env.GITHUB_CLIENT_ID || "",
       clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
+      // CRITICAL: OAuth callback must point to the auth service, not frontend
+      redirectURI: `${authServiceUrl}/api/auth/callback/github`,
     },
   },
   // Account configuration to handle cross-origin OAuth
   account: {
-    // Skip state cookie check for cross-origin OAuth (state cookies are blocked by browsers)
-    // This is necessary when frontend and auth service are on different domains
-    // WARNING: This has security implications - only enable for cross-origin setups
+    // CRITICAL: Store OAuth state in database instead of cookies for cross-domain setups
+    // Cookies don't work reliably across domains due to browser security (SameSite, Partitioned)
+    // Database storage solves the "state mismatch" error in production
+    storeStateStrategy: "database",
+
+    // Skip state cookie check since we're storing state in database
+    // This prevents "state mismatch" errors when cookies are blocked by browsers
     skipStateCookieCheck: isProduction, // Only skip in production where domains differ
+
     accountLinking: {
       enabled: true,
     },
