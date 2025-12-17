@@ -45,10 +45,10 @@ export const createClientForUrl = (
         // CRITICAL: Disable ALL caching to ensure session state updates immediately
         cache: 'no-store',
         // CRITICAL: Add cache-busting headers to prevent browser from using cached responses
+        // NOTE: Only use request headers here (Cache-Control, Pragma), NOT response headers (Expires)
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           'Pragma': 'no-cache',
-          'Expires': '0',
         },
         // CRITICAL: Override fetch to add timestamp for cache busting
         customFetchImpl: async (url, init) => {
@@ -79,7 +79,6 @@ export const createClientForUrl = (
                   credentials: 'include', // Send cookies
                   cache: 'no-store',
                   headers: {
-                    'Content-Type': 'application/json',
                     'Cache-Control': 'no-cache, no-store, must-revalidate',
                     'Pragma': 'no-cache',
                   },
@@ -161,7 +160,6 @@ export async function getJWTToken(baseURL: string): Promise<string | null> {
       credentials: 'include', // Send cookies with session
       cache: 'no-store',
       headers: {
-        'Content-Type': 'application/json',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
       },
