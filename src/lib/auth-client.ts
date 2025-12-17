@@ -42,6 +42,8 @@ export const createClientForUrl = (
       trustedOrigins, // Pass trusted origins to the frontend client
       fetchOptions: {
         credentials: 'include', // Always include cookies for session management
+        // CRITICAL: Disable caching to ensure session state updates immediately
+        cache: 'no-store',
         onSuccess: async (context) => {
           // Check if the backend sent a JWT token in the set-auth-token header
           const token = context.response.headers.get('set-auth-token');

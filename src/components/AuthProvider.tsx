@@ -3,7 +3,7 @@
  * Uses Docusaurus context to get the correct auth URL from environment variables
  */
 
-import React, { createContext, useContext, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useMemo, useEffect, ReactNode } from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import { createClientForUrl, DEV_AUTH_URL, DEV_API_BASE_URL, DEV_FRONTEND_URL } from '../lib/auth-client';
 
@@ -32,7 +32,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const authClient = useMemo(() => createClientForUrl(authUrl, apiBaseUrl, frontendUrl), [authUrl, apiBaseUrl, frontendUrl]);
 
   // Use the session hook from the auth client
-  const { data: session, isPending } = authClient.useSession();
+  // CRITICAL: Set refetchOnMount to ensure session is always fresh
+  const { data: session, isPending, refetch } = authClient.useSession();
+
+  // Force refetch on mount to ensure we have the latest session state
+  useEffect(() => {
+    console.log('[AUTH-PROVIDER] Mounted, refetching session...');
+    refetch();
+  }, [refetch]);
 
   const value = useMemo(() => ({
     isAuthenticated: !!session?.user,
