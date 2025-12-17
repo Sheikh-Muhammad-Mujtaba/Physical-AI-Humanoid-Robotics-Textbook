@@ -32,14 +32,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const authClient = useMemo(() => createClientForUrl(authUrl, apiBaseUrl, frontendUrl), [authUrl, apiBaseUrl, frontendUrl]);
 
   // Use the session hook from the auth client
-  // CRITICAL: Set refetchOnMount to ensure session is always fresh
-  const { data: session, isPending, refetch } = authClient.useSession();
+  // CRITICAL: Configure to always refetch and never use stale cache
+  const { data: session, isPending, refetch } = authClient.useSession({
+    fetchOptions: {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    },
+  });
 
-  // Force refetch on mount to ensure we have the latest session state
+  // Force refetch on mount and when URL changes to ensure we have the latest session state
   useEffect(() => {
-    console.log('[AUTH-PROVIDER] Mounted, refetching session...');
+    console.log('[AUTH-PROVIDER] Mounted/Updated, refetching session...');
     refetch();
-  }, [refetch]);
+  }, [refetch, frontendUrl]);
 
   const value = useMemo(() => ({
     isAuthenticated: !!session?.user,

@@ -42,8 +42,20 @@ export const createClientForUrl = (
       trustedOrigins, // Pass trusted origins to the frontend client
       fetchOptions: {
         credentials: 'include', // Always include cookies for session management
-        // CRITICAL: Disable caching to ensure session state updates immediately
+        // CRITICAL: Disable ALL caching to ensure session state updates immediately
         cache: 'no-store',
+        // CRITICAL: Add cache-busting headers to prevent browser from using cached responses
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+        // CRITICAL: Override fetch to add timestamp for cache busting
+        customFetchImpl: async (url, init) => {
+          const urlObj = new URL(url);
+          urlObj.searchParams.set('_t', Date.now().toString());
+          return fetch(urlObj.toString(), init);
+        },
         onSuccess: async (context) => {
           // Check if the backend sent a JWT token in the set-auth-token header
           const token = context.response.headers.get('set-auth-token');
@@ -62,11 +74,14 @@ export const createClientForUrl = (
 
               // Get JWT token using the session (cookies)
               try {
-                const tokenResponse = await fetch(`${baseURL}/api/auth/token`, {
+                const tokenResponse = await fetch(`${baseURL}/api/auth/token?_t=${Date.now()}`, {
                   method: 'GET',
                   credentials: 'include', // Send cookies
+                  cache: 'no-store',
                   headers: {
                     'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
                   },
                 });
 
@@ -141,11 +156,14 @@ export function isAuthenticated(): boolean {
  */
 export async function getJWTToken(baseURL: string): Promise<string | null> {
   try {
-    const response = await fetch(`${baseURL}/api/auth/token`, {
+    const response = await fetch(`${baseURL}/api/auth/token?_t=${Date.now()}`, {
       method: 'GET',
       credentials: 'include', // Send cookies with session
+      cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
       },
     });
 
