@@ -49,6 +49,7 @@ logEnvironmentVariables();
 const pool = new Pool({
   connectionString: connectionString,
   idleTimeoutMillis: 5000, // Configure a low idle timeout (5 seconds)
+  ssl: isNeonDb && !isProduction ? { rejectUnauthorized: false } : (isNeonDb ? true : false), // Add conditional SSL config
 });
 
 // Attach the pool to ensure idle connections close before suspension
