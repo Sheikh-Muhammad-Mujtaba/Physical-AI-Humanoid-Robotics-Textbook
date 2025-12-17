@@ -1,31 +1,12 @@
-import { ensureJWTToken, clearAuthToken } from './auth-client';
-
 const API_BASE_URL = '/api'; // Proxied by Vercel to the Python backend
 
 /**
- * Get a valid JWT token - fetches a fresh one if needed
- * IMPORTANT: JWT tokens expire after 15 minutes, but sessions last 7 days
- * We must always fetch a fresh token from the auth service, not rely on stale localStorage
+ * Handle 401 responses by redirecting to login
  *
- * @param authServiceUrl - The auth service URL from environment variables
- */
-async function requireAuthToken(authServiceUrl: string): Promise<string> {
-  // ensureJWTToken checks localStorage first, then fetches fresh token if needed/expired
-  const token = await ensureJWTToken(authServiceUrl);
-
-  if (!token) {
-    // No session exists, user needs to log in
-    throw new Error("Not authenticated. Please sign in.");
-  }
-
-  return token;
-}
-
-/**
- * Handle 401 responses by clearing token and redirecting to login
+ * Session-based auth: BetterAuth cookies handle authentication automatically.
+ * No need for manual JWT token management.
  */
 function handleUnauthorized(): never {
-  clearAuthToken();
   window.location.href = '/login';
   throw new Error("Session expired. Please sign in again.");
 }
@@ -54,13 +35,13 @@ async function handleResponseError(response: Response, defaultMessage: string): 
   return new Error(errorDetail);
 }
 
-export async function getHistory(sessionId: string, authServiceUrl: string): Promise<any> {
-  const token = await requireAuthToken(authServiceUrl);
-
+/**
+ * Get chat history for a session
+ * Uses session cookies for authentication (no JWT token needed)
+ */
+export async function getHistory(sessionId: string): Promise<any> {
   const response = await fetch(`${API_BASE_URL}/history/${sessionId}`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
+    credentials: 'include', // Send session cookies
   });
 
   if (response.status === 401) {
@@ -74,15 +55,17 @@ export async function getHistory(sessionId: string, authServiceUrl: string): Pro
   return response.json();
 }
 
-export async function chatWithBackend(query: string, sessionId: string, authServiceUrl: string): Promise<any> {
-  const token = await requireAuthToken(authServiceUrl);
-
+/**
+ * Send a chat message to the backend
+ * Uses session cookies for authentication (no JWT token needed)
+ */
+export async function chatWithBackend(query: string, sessionId: string): Promise<any> {
   const response = await fetch(`${API_BASE_URL}/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
     },
+    credentials: 'include', // Send session cookies
     body: JSON.stringify({ query, session_id: sessionId }),
   });
 
@@ -97,15 +80,17 @@ export async function chatWithBackend(query: string, sessionId: string, authServ
   return response.json();
 }
 
-export async function askSelectionWithBackend(selection: string, question: string, sessionId: string, authServiceUrl: string): Promise<any> {
-  const token = await requireAuthToken(authServiceUrl);
-
+/**
+ * Ask a question about selected text
+ * Uses session cookies for authentication (no JWT token needed)
+ */
+export async function askSelectionWithBackend(selection: string, question: string, sessionId: string): Promise<any> {
   const response = await fetch(`${API_BASE_URL}/ask-selection`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
     },
+    credentials: 'include', // Send session cookies
     body: JSON.stringify({ selection, question, session_id: sessionId }),
   });
 
@@ -120,15 +105,17 @@ export async function askSelectionWithBackend(selection: string, question: strin
   return response.json();
 }
 
-export async function sendFeedback(messageId: string, rating: number, authServiceUrl: string): Promise<any> {
-  const token = await requireAuthToken(authServiceUrl);
-
+/**
+ * Send feedback for a message
+ * Uses session cookies for authentication (no JWT token needed)
+ */
+export async function sendFeedback(messageId: string, rating: number): Promise<any> {
   const response = await fetch(`${API_BASE_URL}/feedback`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
     },
+    credentials: 'include', // Send session cookies
     body: JSON.stringify({ message_id: messageId, rating }),
   });
 

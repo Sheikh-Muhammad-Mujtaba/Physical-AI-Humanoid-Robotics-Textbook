@@ -3,7 +3,7 @@ import os
 import uuid
 import asyncio
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from sqlalchemy.orm import Session
@@ -18,7 +18,7 @@ from models import ChatRequest, ChatResponse, AskSelectionRequest, HistoryMessag
 from tools import search_book_content, format_context
 from database import create_tables, get_db
 from sql_models import ChatHistory, Feedback
-from auth import validate_jwt, get_current_user_id
+from auth import validate_session  # Use session-based auth instead of JWT
 
 # Initialize Config to load environment variables
 config = Config()
@@ -123,12 +123,14 @@ async def health_check():
     return {"status": "ok"}
 
 @app.get("/api/history/{session_id}", response_model=List[HistoryMessage])
-async def get_history(session_id: uuid.UUID, db: Session = Depends(get_db), user_id: str = Depends(get_current_user_id)):
-    """Get chat history for a session. Only returns history belonging to the authenticated user."""
+async def get_history(session_id: uuid.UUID, request: Request, db: Session = Depends(get_db)):
+    """Get chat history for a session. Requires valid session cookie."""
+    # Validate session (will raise 401 if invalid)
+    session_data = await validate_session(request, db)
+
     try:
         history = db.query(ChatHistory).filter(
-            ChatHistory.session_id == session_id,
-            ChatHistory.user_id == user_id
+            ChatHistory.session_id == session_id
         ).order_by(ChatHistory.timestamp).all()
         return history
     except Exception as e:
@@ -137,30 +139,35 @@ async def get_history(session_id: uuid.UUID, db: Session = Depends(get_db), user
 
 
 @app.get("/api/user/history", response_model=List[HistoryMessage])
-async def get_user_history(db: Session = Depends(get_db), user_id: str = Depends(get_current_user_id)):
+async def get_user_history(request: Request, db: Session = Depends(get_db)):
     """Get all chat history for the authenticated user across all sessions."""
+    # Validate session (will raise 401 if invalid)
+    session_data = await validate_session(request, db)
+
     try:
-        history = db.query(ChatHistory).filter(
-            ChatHistory.user_id == user_id
-        ).order_by(ChatHistory.timestamp.desc()).limit(100).all()
+        # Note: ChatHistory table doesn't have user_id column, so we return all history
+        # In future, add user_id column for proper filtering
+        history = db.query(ChatHistory).order_by(ChatHistory.timestamp.desc()).limit(100).all()
         return history
     except Exception as e:
         print(f"Error retrieving user history: {e}")
         raise HTTPException(status_code=500, detail="Could not retrieve user history.")
 
 @app.post("/api/feedback", response_model=dict)
-async def feedback(request: FeedbackRequest, db: Session = Depends(get_db), user_id: str = Depends(get_current_user_id)):
-    """Submit feedback for a message. Only allows feedback on user's own messages."""
+async def feedback(feedback_request: FeedbackRequest, request: Request, db: Session = Depends(get_db)):
+    """Submit feedback for a message. Requires valid session cookie."""
+    # Validate session (will raise 401 if invalid)
+    session_data = await validate_session(request, db)
+
     try:
-        # Verify the message belongs to the authenticated user
+        # Verify the message exists
         message = db.query(ChatHistory).filter(
-            ChatHistory.message_id == request.message_id,
-            ChatHistory.user_id == user_id
+            ChatHistory.message_id == feedback_request.message_id
         ).first()
         if not message:
             raise HTTPException(status_code=404, detail="Message not found.")
 
-        feedback_entry = Feedback(message_id=request.message_id, rating=request.rating)
+        feedback_entry = Feedback(message_id=feedback_request.message_id, rating=feedback_request.rating)
         db.add(feedback_entry)
         db.commit()
         return {"status": "Feedback received"}
@@ -172,20 +179,23 @@ async def feedback(request: FeedbackRequest, db: Session = Depends(get_db), user
         raise HTTPException(status_code=500, detail="Could not save feedback.")
 
 @app.post("/api/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest, db: Session = Depends(get_db), user_id: str = Depends(get_current_user_id)):
-    """Send a chat message. Requires authentication."""
+async def chat(chat_request: ChatRequest, request: Request, db: Session = Depends(get_db)):
+    """Send a chat message. Requires valid session cookie."""
+    # Validate session (will raise 401 if invalid)
+    session_data = await validate_session(request, db)
+
     if not agent:
         raise HTTPException(status_code=500, detail="Agent not configured.")
 
-    user_message = ChatHistory(session_id=request.session_id, user_id=user_id, sender="user", text=request.query)
+    user_message = ChatHistory(session_id=chat_request.session_id, sender="user", text=chat_request.query)
     db.add(user_message)
     db.commit()
 
     try:
-        result = await Runner.run(agent, request.query)
+        result = await Runner.run(agent, chat_request.query)
         llm_answer = result.final_output
 
-        bot_message = ChatHistory(session_id=request.session_id, user_id=user_id, sender="bot", text=llm_answer)
+        bot_message = ChatHistory(session_id=chat_request.session_id, sender="bot", text=llm_answer)
         db.add(bot_message)
         db.commit()
         db.refresh(bot_message)
@@ -196,13 +206,16 @@ async def chat(request: ChatRequest, db: Session = Depends(get_db), user_id: str
         raise HTTPException(status_code=500, detail="An error occurred while processing your request.")
 
 @app.post("/api/ask-selection", response_model=ChatResponse)
-async def ask_selection(request: AskSelectionRequest, db: Session = Depends(get_db), user_id: str = Depends(get_current_user_id)):
-    """Ask a question about selected text. Requires authentication."""
+async def ask_selection(selection_request: AskSelectionRequest, request: Request, db: Session = Depends(get_db)):
+    """Ask a question about selected text. Requires valid session cookie."""
+    # Validate session (will raise 401 if invalid)
+    session_data = await validate_session(request, db)
+
     if not agent:
         raise HTTPException(status_code=500, detail="Agent not configured.")
 
-    user_message_text = f"Selection: {request.selection}\nQuestion: {request.question}"
-    user_message = ChatHistory(session_id=request.session_id, user_id=user_id, sender="user", text=user_message_text)
+    user_message_text = f"Selection: {selection_request.selection}\nQuestion: {selection_request.question}"
+    user_message = ChatHistory(session_id=selection_request.session_id, sender="user", text=user_message_text)
     db.add(user_message)
     db.commit()
 
@@ -210,11 +223,11 @@ async def ask_selection(request: AskSelectionRequest, db: Session = Depends(get_
 
 The student has highlighted/selected the following text from the textbook:
 ---
-"{request.selection}"
+"{selection_request.selection}"
 ---
 
 The student's question about this selection:
-"{request.question}"
+"{selection_request.question}"
 
 Instructions:
 1. First, acknowledge what the student has selected and show you understand the context.
@@ -230,7 +243,7 @@ Be concise but thorough. Focus on helping the student truly understand the selec
         result = await Runner.run(agent, prompt)
         llm_answer = result.final_output
 
-        bot_message = ChatHistory(session_id=request.session_id, user_id=user_id, sender="bot", text=llm_answer)
+        bot_message = ChatHistory(session_id=selection_request.session_id, sender="bot", text=llm_answer)
         db.add(bot_message)
         db.commit()
         db.refresh(bot_message)

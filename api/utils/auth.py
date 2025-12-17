@@ -1,12 +1,14 @@
 """
-JWT validation module for BetterAuth integration.
-Validates JWT tokens from BetterAuth service using JWKS endpoint.
+Authentication module for BetterAuth integration.
+Supports both JWT token validation and session-based authentication.
 """
 
 import os
 import logging
-from fastapi import Depends, HTTPException, status
+from datetime import datetime, timezone
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy.orm import Session
 import jwt
 from jwt import PyJWKClient
 
@@ -92,3 +94,101 @@ def get_current_user_id(payload: dict = Depends(validate_jwt)) -> str:
             headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
         )
     return user_id
+
+
+# ============================================================================
+# SESSION-BASED AUTHENTICATION (RECOMMENDED FOR CHATBOT)
+# ============================================================================
+
+async def validate_session(request: Request, db: Session) -> dict:
+    """
+    Validate BetterAuth session from cookie.
+
+    This is the RECOMMENDED authentication method for chatbot endpoints.
+    Uses session cookies instead of JWT tokens for simpler, more reliable auth.
+
+    Args:
+        request: FastAPI request object (to read cookies)
+        db: Database session (to query BetterAuth session table)
+
+    Returns:
+        dict with user_id and session_id
+
+    Raises:
+        HTTPException 401 if session is invalid or expired
+    """
+    from sql_models import BetterAuthSession
+
+    # Get session token from cookie
+    # BetterAuth stores session token in "better-auth.session_token" cookie
+    session_token = request.cookies.get("better-auth.session_token")
+
+    if not session_token:
+        logger.error("Session validation failed: No session token in cookies")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated. Please sign in.",
+        )
+
+    # Query BetterAuth session table
+    try:
+        session = db.query(BetterAuthSession).filter(
+            BetterAuthSession.token == session_token
+        ).first()
+    except Exception as e:
+        logger.error(f"Database error while validating session: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Authentication service error",
+        )
+
+    if not session:
+        logger.error(f"Session validation failed: Session not found for token: {session_token[:10]}...")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid session. Please sign in again.",
+        )
+
+    # Check if session is expired
+    now = datetime.now(timezone.utc)
+
+    # Make expiresAt timezone-aware if it isn't already
+    expires_at = session.expiresAt
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+    if expires_at < now:
+        logger.error(f"Session validation failed: Session expired at {expires_at}, current time: {now}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Session expired. Please sign in again.",
+        )
+
+    logger.info(f"Session validated successfully for user: {session.userId}")
+
+    return {
+        "user_id": session.userId,
+        "session_id": session.id,
+    }
+
+
+def get_current_user_from_session(
+    request: Request,
+    db: Session = Depends(lambda: None)  # Will be injected by FastAPI
+) -> str:
+    """
+    Dependency to get current user ID from session cookie.
+
+    Use this in chatbot endpoints instead of get_current_user_id.
+
+    Example:
+        @app.post("/api/chat")
+        async def chat(
+            user_id: str = Depends(get_current_user_from_session),
+            db: Session = Depends(get_db)
+        ):
+            # user_id is now available
+    """
+    import asyncio
+    session_data = asyncio.run(validate_session(request, db))
+    return session_data["user_id"]
