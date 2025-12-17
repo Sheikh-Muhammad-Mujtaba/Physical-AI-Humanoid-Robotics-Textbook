@@ -8,16 +8,20 @@ import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import { useHistory } from '@docusaurus/router';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import { createClientForUrl, DEV_AUTH_URL } from '../lib/auth-client';
+import { createClientForUrl, DEV_AUTH_URL, DEV_API_BASE_URL } from '../lib/auth-client';
 import styles from './auth.module.css';
 
 export default function RegisterPage(): React.ReactElement {
   const { siteConfig } = useDocusaurusContext();
   const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || DEV_AUTH_URL;
-  const authClient = useMemo(() => createClientForUrl(authUrl), [authUrl]);
 
   // Get frontend URL for OAuth callbacks (use current origin in browser, fallback to siteConfig.url)
   const frontendUrl = typeof window !== 'undefined' ? window.location.origin : siteConfig.url;
+
+  // Get API base URL from config
+  const apiBaseUrl = (siteConfig.customFields?.apiBaseUrl as string) || DEV_API_BASE_URL;
+
+  const authClient = useMemo(() => createClientForUrl(authUrl, apiBaseUrl, frontendUrl), [authUrl, apiBaseUrl, frontendUrl]);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

@@ -9,16 +9,22 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import { createClientForUrl, clearAuthToken } from '../lib/auth-client';
+import { createClientForUrl, clearAuthToken, DEV_AUTH_URL, DEV_API_BASE_URL, DEV_FRONTEND_URL } from '../lib/auth-client';
 
 export default function UserMenu() {
   const { siteConfig } = useDocusaurusContext();
 
   // Get auth URL from Docusaurus config (set via BETTER_AUTH_URL env var)
-  const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || 'http://localhost:3001';
+  const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || DEV_AUTH_URL;
+
+  // Get frontend URL (use current origin in browser, fallback to siteConfig.url)
+  const frontendUrl = typeof window !== 'undefined' ? window.location.origin : (siteConfig.url || DEV_FRONTEND_URL);
+
+  // Get API base URL from config
+  const apiBaseUrl = (siteConfig.customFields?.apiBaseUrl as string) || DEV_API_BASE_URL;
 
   // Create auth client with the correct URL
-  const authClient = useMemo(() => createClientForUrl(authUrl), [authUrl]);
+  const authClient = useMemo(() => createClientForUrl(authUrl, apiBaseUrl, frontendUrl), [authUrl, apiBaseUrl, frontendUrl]);
 
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;

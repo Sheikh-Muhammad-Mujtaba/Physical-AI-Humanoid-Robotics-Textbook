@@ -8,7 +8,7 @@ import React, { useState, useMemo } from 'react';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import { createClientForUrl, setAuthToken } from '../lib/auth-client';
+import { createClientForUrl, setAuthToken, DEV_AUTH_URL, DEV_API_BASE_URL, DEV_FRONTEND_URL } from '../lib/auth-client';
 
 export default function LoginOverlay() {
   const { siteConfig } = useDocusaurusContext();
@@ -19,10 +19,16 @@ export default function LoginOverlay() {
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
 
   // Get auth URL from Docusaurus config (set via BETTER_AUTH_URL env var)
-  const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || 'http://localhost:3001';
+  const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || DEV_AUTH_URL;
+
+  // Get frontend URL (use current origin in browser, fallback to siteConfig.url)
+  const frontendUrl = typeof window !== 'undefined' ? window.location.origin : (siteConfig.url || DEV_FRONTEND_URL);
+
+  // Get API base URL from config
+  const apiBaseUrl = (siteConfig.customFields?.apiBaseUrl as string) || DEV_API_BASE_URL;
 
   // Create auth client with the correct URL
-  const authClient = useMemo(() => createClientForUrl(authUrl), [authUrl]);
+  const authClient = useMemo(() => createClientForUrl(authUrl, apiBaseUrl, frontendUrl), [authUrl, apiBaseUrl, frontendUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

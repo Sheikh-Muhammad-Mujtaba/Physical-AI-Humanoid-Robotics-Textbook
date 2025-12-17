@@ -7,13 +7,20 @@ import React, { useEffect, useState } from 'react';
 import Layout from '@theme/Layout';
 import { useHistory, useLocation } from '@docusaurus/router';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import { createClientForUrl, setAuthToken, DEV_AUTH_URL } from '../lib/auth-client';
+import { createClientForUrl, setAuthToken, DEV_AUTH_URL, DEV_API_BASE_URL } from '../lib/auth-client';
 import styles from './auth.module.css';
 
 export default function AuthCallbackPage(): React.ReactElement {
   const { siteConfig } = useDocusaurusContext();
   const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || DEV_AUTH_URL;
-  const authClient = createClientForUrl(authUrl);
+
+  // Get frontend URL (use current origin in browser, fallback to siteConfig.url)
+  const frontendUrl = typeof window !== 'undefined' ? window.location.origin : siteConfig.url;
+
+  // Get API base URL from config
+  const apiBaseUrl = (siteConfig.customFields?.apiBaseUrl as string) || DEV_API_BASE_URL;
+
+  const authClient = createClientForUrl(authUrl, apiBaseUrl, frontendUrl);
   const history = useHistory();
   const location = useLocation();
   const [error, setError] = useState('');
