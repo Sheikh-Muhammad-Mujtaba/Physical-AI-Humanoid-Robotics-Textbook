@@ -152,9 +152,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    // Copy all other headers (excluding set-cookie)
+    // Copy all other headers (excluding set-cookie and caching headers)
+    // IMPORTANT: Remove ETag and Last-Modified to prevent 304 responses which ignore Set-Cookie headers
     response.headers.forEach((value: string, key: string) => {
-      if (key.toLowerCase() !== 'set-cookie') {
+      const lowerKey = key.toLowerCase();
+      if (lowerKey !== 'set-cookie' && lowerKey !== 'etag' && lowerKey !== 'last-modified') {
         res.setHeader(key, value);
       }
     });
@@ -168,6 +170,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         cookies: setCookieHeaders.map(c => c.substring(0, 50) + '...'),
       });
     }
+
+    // CRITICAL: Prevent 304 Not Modified responses which cause browsers to ignore Set-Cookie headers
+    // Authentication responses must NEVER be cached to ensure cookies are always set
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
 
     // For successful sign-in (email or OAuth), generate and send JWT token in response header
     // This allows the frontend to capture the token directly without relying on cookies
