@@ -51,10 +51,6 @@ export default function LoginPage(): React.ReactElement {
         },
         {
           onSuccess: async () => {
-            // The global onSuccess handler in auth-client will automatically fetch JWT token
-            // Wait a moment for the token to be stored
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
             // Refetch session to update UI
             await refetch();
 
