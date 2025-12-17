@@ -175,7 +175,10 @@ export const auth = betterAuth({
       jwt: {
         expirationTime: "15m",
         issuer: process.env.BETTER_AUTH_URL || "http://localhost:3001",
-        audience: process.env.API_BASE_URL || "http://localhost:8000",
+        // CRITICAL FIX: JWT audience must be the frontend URL (where chatbot validates tokens)
+        // NOT the backend API URL. The chatbot runs on the frontend and expects tokens
+        // issued for the frontend domain, not the backend /api/ endpoint
+        audience: frontendOrigins[0], // Use first frontend origin as primary audience
       },
     }),
   ],
