@@ -38,15 +38,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const redirectTo = (req.query.redirect as string) || '/docs/intro';
         const frontendUrl = process.env.FRONTEND_URL;
 
-        // Encode token for URL
-        const encodedToken = encodeURIComponent(tokenResponse as any);
+        // Ensure tokenResponse has a token property
+        if (typeof tokenResponse === 'object' && tokenResponse !== null && 'token' in tokenResponse) {
+          const jwtToken = (tokenResponse as { token: string }).token; // Type assert to ensure 'token' is present
+          const encodedToken = encodeURIComponent(jwtToken);
 
-        // Redirect to frontend with token
-        const redirectUrl = `${frontendUrl}/auth-callback?token=${encodedToken}&redirect=${encodeURIComponent(redirectTo)}`;
+          // Redirect to frontend with token
+          const redirectUrl = `${frontendUrl}/auth-callback?token=${encodedToken}&redirect=${encodeURIComponent(redirectTo)}`;
 
-        console.log('[TOKEN-RELAY] Redirecting to:', redirectUrl);
-        res.redirect(302, redirectUrl);
-        return;
+          console.log('[TOKEN-RELAY] Redirecting to:', redirectUrl);
+          res.redirect(302, redirectUrl);
+          return;
+        } else {
+          console.error('[TOKEN-RELAY] Token response missing "token" property:', tokenResponse);
+          // Fallback to error redirect if token not found in response
+          const frontendUrl = process.env.FRONTEND_URL;
+          res.redirect(302, `${frontendUrl}/login?error=token_missing_in_response`);
+          return;
+        }
       }
     }
 
