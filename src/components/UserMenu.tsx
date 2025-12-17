@@ -26,11 +26,7 @@ export default function UserMenu() {
   // Create auth client with the correct URL
   const authClient = useMemo(() => createClientForUrl(authUrl, apiBaseUrl, frontendUrl), [authUrl, apiBaseUrl, frontendUrl]);
 
-  const { data: session, isPending } = authClient.useSession({
-    query: {
-      disableCookieCache: true, // Force fresh session from database
-    },
-  });
+  const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
   const isAuthenticated = !!user;
   const isLoading = isPending;

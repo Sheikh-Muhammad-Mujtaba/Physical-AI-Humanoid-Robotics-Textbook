@@ -142,9 +142,13 @@ export const auth = betterAuth({
     enabled: false, // Disable rate limiting to avoid 401 errors during token fetching
   },
   session: {
+    // IMPORTANT: CookieCache disabled for cross-domain authentication
+    // When enabled, BetterAuth caches session data in a signed cookie for 5 minutes
+    // This causes stale session data on the frontend even after successful login
+    // For cross-domain setups, it's better to disable this and always fetch fresh from DB
+    // The slight performance cost is acceptable for correct authentication behavior
     cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60, // 5 minutes cache
+      enabled: false,
     },
   },
   advanced: {

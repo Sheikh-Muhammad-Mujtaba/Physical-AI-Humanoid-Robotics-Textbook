@@ -15,7 +15,7 @@ import { jwtClient } from "better-auth/client/plugins";
 // Default fallback URL for local development
 export const DEV_AUTH_URL = "http://localhost:3001";
 export const DEV_API_BASE_URL = "http://localhost:8000";
-export const DEV_FRONTEND_URL = "http://localhost:3000"; // Assuming frontend runs on 3000 locally
+export const DEV_FRONTEND_URL = "http://localhost:3000";
 
 // Cache for auth client instances by URL
 const clientCache = new Map<string, ReturnType<typeof createAuthClient>>();
@@ -23,6 +23,11 @@ const clientCache = new Map<string, ReturnType<typeof createAuthClient>>();
 /**
  * Create or get cached auth client for a specific URL
  * Use this inside React components with the URL from useDocusaurusContext
+ *
+ * IMPORTANT: Following Better Auth documentation for cross-domain authentication:
+ * - baseURL must point to auth service (not frontend)
+ * - credentials: 'include' is REQUIRED for cross-domain cookies
+ * - No custom fetch implementation that might interfere with Better Auth internals
  */
 export const createClientForUrl = (
   baseURL: string,
@@ -30,66 +35,48 @@ export const createClientForUrl = (
   frontendUrl: string | string[]
 ) => {
   const cacheKey = `${baseURL}-${apiBaseUrl}-${JSON.stringify(frontendUrl)}`;
+
   if (!clientCache.has(cacheKey)) {
     clientCache.set(cacheKey, createAuthClient({
       baseURL,
       fetchOptions: {
-        credentials: 'include', // Always include cookies for session management
+        // CRITICAL: credentials: 'include' is REQUIRED for cross-domain authentication
+        // This tells the browser to send cookies with cross-origin requests
+        credentials: 'include',
+
+        // Optional callbacks for debugging (safe with null checks)
         onRequest: async (context) => {
-          console.log('[AUTH-CLIENT] Request:', {
-            url: context.request?.url || 'unknown',
-            method: context.request?.method || 'unknown',
-          });
+          if (context?.request) {
+            console.log('[AUTH-CLIENT] Request:', {
+              url: context.request.url || 'unknown',
+              method: context.request.method || 'unknown',
+            });
+          }
         },
         onSuccess: async (context) => {
-          console.log('[AUTH-CLIENT] Response Success:', {
-            url: context.request?.url || 'unknown',
-            status: context.response?.status,
-            hasData: !!context.data,
-            data: context.data,
-          });
-          // Check if the backend sent a JWT token in the set-auth-token header
-          const token = context.response?.headers?.get('set-auth-token');
-          if (token) {
-            const decodedToken = decodeURIComponent(token);
-            console.log('[AUTH] JWT token received from server, storing...');
-            setAuthToken(decodedToken);
-          } else {
-            // Fallback: If no token in header and this was a sign-in, try fetching it
-            const url = context.request?.url || '';
-            if (url.includes('/sign-in/')) {
-              console.log('[AUTH] No token in header, attempting to fetch JWT token...');
+          if (context) {
+            console.log('[AUTH-CLIENT] Response Success:', {
+              url: context.request?.url || 'unknown',
+              status: context.response?.status || 'unknown',
+              hasData: !!context.data,
+            });
 
-              // Wait a moment for session to be established
-              await new Promise(resolve => setTimeout(resolve, 500));
-
-              // Get JWT token using the session (cookies)
-              try {
-                const tokenResponse = await fetch(`${baseURL}/api/auth/token`, {
-                  method: 'GET',
-                  credentials: 'include', // Send cookies
-                });
-
-                if (tokenResponse.ok) {
-                  const tokenData = await tokenResponse.json();
-                  if (tokenData?.token) {
-                    console.log('[AUTH] JWT token obtained successfully via fallback');
-                    setAuthToken(tokenData.token);
-                  }
-                } else {
-                  console.warn('[AUTH] Failed to get JWT token:', tokenResponse.status);
-                }
-              } catch (error) {
-                console.error('[AUTH] Error fetching JWT token:', error);
-              }
+            // Check if backend sent JWT token in custom header
+            const token = context.response?.headers?.get('set-auth-token');
+            if (token) {
+              const decodedToken = decodeURIComponent(token);
+              console.log('[AUTH] JWT token received from server, storing...');
+              setAuthToken(decodedToken);
             }
           }
         },
         onError: (context) => {
-          console.error('[AUTH] Request failed:', {
-            status: context.response?.status,
-            url: context.request?.url,
-          });
+          if (context) {
+            console.error('[AUTH] Request failed:', {
+              status: context.response?.status || 'unknown',
+              url: context.request?.url || 'unknown',
+            });
+          }
         },
       },
       plugins: [
@@ -97,6 +84,7 @@ export const createClientForUrl = (
       ],
     }));
   }
+
   return clientCache.get(cacheKey)!;
 };
 

@@ -32,12 +32,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const authClient = useMemo(() => createClientForUrl(authUrl, apiBaseUrl, frontendUrl), [authUrl, apiBaseUrl, frontendUrl]);
 
   // Use the session hook from the auth client
-  // CRITICAL: Disable cookie cache to force fresh session checks
-  const { data: session, isPending, error } = authClient.useSession({
-    query: {
-      disableCookieCache: true, // Force fresh session from database, not cached cookie
-    },
-  });
+  // Note: cookieCache is disabled on the backend, so we always get fresh data from database
+  const { data: session, isPending, error } = authClient.useSession();
 
   // DETAILED LOGGING for debugging
   console.log('[AUTH-PROVIDER] Session State:', {
