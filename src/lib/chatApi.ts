@@ -1,15 +1,23 @@
-import { getAuthToken, clearAuthToken } from './auth-client';
+import { ensureJWTToken, clearAuthToken } from './auth-client';
 
 const API_BASE_URL = '/api'; // Proxied by Vercel to the Python backend
 
 /**
- * Get the current auth token or throw if not authenticated
+ * Get a valid JWT token - fetches a fresh one if needed
+ * IMPORTANT: JWT tokens expire after 15 minutes, but sessions last 7 days
+ * We must always fetch a fresh token from the auth service, not rely on stale localStorage
+ *
+ * @param authServiceUrl - The auth service URL from environment variables
  */
-function requireAuthToken(): string {
-  const token = getAuthToken();
+async function requireAuthToken(authServiceUrl: string): Promise<string> {
+  // ensureJWTToken checks localStorage first, then fetches fresh token if needed/expired
+  const token = await ensureJWTToken(authServiceUrl);
+
   if (!token) {
+    // No session exists, user needs to log in
     throw new Error("Not authenticated. Please sign in.");
   }
+
   return token;
 }
 
@@ -46,8 +54,8 @@ async function handleResponseError(response: Response, defaultMessage: string): 
   return new Error(errorDetail);
 }
 
-export async function getHistory(sessionId: string): Promise<any> {
-  const token = requireAuthToken();
+export async function getHistory(sessionId: string, authServiceUrl: string): Promise<any> {
+  const token = await requireAuthToken(authServiceUrl);
 
   const response = await fetch(`${API_BASE_URL}/history/${sessionId}`, {
     headers: {
@@ -66,8 +74,8 @@ export async function getHistory(sessionId: string): Promise<any> {
   return response.json();
 }
 
-export async function chatWithBackend(query: string, sessionId: string): Promise<any> {
-  const token = requireAuthToken();
+export async function chatWithBackend(query: string, sessionId: string, authServiceUrl: string): Promise<any> {
+  const token = await requireAuthToken(authServiceUrl);
 
   const response = await fetch(`${API_BASE_URL}/chat`, {
     method: 'POST',
@@ -89,8 +97,8 @@ export async function chatWithBackend(query: string, sessionId: string): Promise
   return response.json();
 }
 
-export async function askSelectionWithBackend(selection: string, question: string, sessionId: string): Promise<any> {
-  const token = requireAuthToken();
+export async function askSelectionWithBackend(selection: string, question: string, sessionId: string, authServiceUrl: string): Promise<any> {
+  const token = await requireAuthToken(authServiceUrl);
 
   const response = await fetch(`${API_BASE_URL}/ask-selection`, {
     method: 'POST',
@@ -112,8 +120,8 @@ export async function askSelectionWithBackend(selection: string, question: strin
   return response.json();
 }
 
-export async function sendFeedback(messageId: string, rating: number): Promise<any> {
-  const token = requireAuthToken();
+export async function sendFeedback(messageId: string, rating: number, authServiceUrl: string): Promise<any> {
+  const token = await requireAuthToken(authServiceUrl);
 
   const response = await fetch(`${API_BASE_URL}/feedback`, {
     method: 'POST',
