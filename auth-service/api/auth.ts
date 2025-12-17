@@ -50,7 +50,8 @@ function setCorsHeaders(req: VercelRequest, res: VercelResponse) {
 
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Cookie');
+  // CRITICAL: Include cache-control headers that frontend sends for cache-busting
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Cookie, Cache-Control, Pragma');
   // IMPORTANT: Expose both Set-Cookie and set-auth-token headers for cross-origin requests
   res.setHeader('Access-Control-Expose-Headers', 'Set-Cookie, set-auth-token');
   res.setHeader('Access-Control-Max-Age', '86400'); // Cache preflight for 24 hours
