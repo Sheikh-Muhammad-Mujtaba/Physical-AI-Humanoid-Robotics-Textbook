@@ -30,7 +30,7 @@ if (isNeonDb && connectionString && !connectionString.includes('sslmode=require'
 function logEnvironmentVariables() {
   logger.info('--- Environment Variables Check (Auth Service) ---');
   logger.info(`DATABASE_URL is set: ${!!process.env.DATABASE_URL}`);
-  logger.info(`BETTER_AUTH_SECRET is set: ${!!process.env.BETTER_AUTH_SECRET}`);
+  logger.info(`BETTER_AUTH_SECRET is set: ${!!process.env.BETTER_AUTH_SECRET}, length: ${process.env.BETTER_AUTH_SECRET?.length || 0}`);
   logger.info(`BETTER_AUTH_URL: ${process.env.BETTER_AUTH_URL || 'Not set, using http://localhost:3001'}`);
   logger.info(`FRONTEND_URL: ${process.env.FRONTEND_URL || 'Not set, using http://localhost:3000 (default)'}`);
   logger.info(`API_BASE_URL: ${process.env.API_BASE_URL || 'Not set, using http://localhost:8000'}`);

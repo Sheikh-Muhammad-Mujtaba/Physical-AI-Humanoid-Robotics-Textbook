@@ -67,6 +67,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     origin: req.headers.origin,
     host: req.headers.host,
     tokenInfo: extractTokenInfo(req),
+    rawCookies: req.headers.cookie, // Log raw cookie value for debugging
     userAgent: req.headers['user-agent'],
   });
 
