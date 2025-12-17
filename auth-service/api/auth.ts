@@ -137,9 +137,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     // Copy response headers
+    // Special handling for Set-Cookie headers since there can be multiple
+    // Use getSetCookie() if available (modern Fetch API), otherwise fall back to manual parsing
+    let setCookieHeaders: string[] = [];
+
+    if (typeof (response.headers as any).getSetCookie === 'function') {
+      // Modern Fetch API - properly handles multiple Set-Cookie headers
+      setCookieHeaders = (response.headers as any).getSetCookie();
+    } else {
+      // Fallback for environments without getSetCookie()
+      const setCookieValue = response.headers.get('set-cookie');
+      if (setCookieValue) {
+        setCookieHeaders = [setCookieValue];
+      }
+    }
+
+    // Copy all other headers (excluding set-cookie)
     response.headers.forEach((value: string, key: string) => {
-      res.setHeader(key, value);
+      if (key.toLowerCase() !== 'set-cookie') {
+        res.setHeader(key, value);
+      }
     });
+
+    // Set all Set-Cookie headers (BetterAuth may set multiple: session_token, session_data, state, etc.)
+    if (setCookieHeaders.length > 0) {
+      res.setHeader('Set-Cookie', setCookieHeaders);
+      debugLog('SET_COOKIE_HEADERS', {
+        requestId,
+        count: setCookieHeaders.length,
+        cookies: setCookieHeaders.map(c => c.substring(0, 50) + '...'),
+      });
+    }
 
     // For successful sign-in (email or OAuth), generate and send JWT token in response header
     // This allows the frontend to capture the token directly without relying on cookies
