@@ -22,7 +22,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Get auth URL, API Base URL, and Frontend URL from Docusaurus config
   const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || DEV_AUTH_URL;
   const apiBaseUrl = (siteConfig.customFields?.apiBaseUrl as string) || DEV_API_BASE_URL;
-  const frontendUrl = siteConfig.url || DEV_FRONTEND_URL; // Use siteConfig.url for frontend URL
+
+  // Get frontend URL (use current origin in browser, fallback to siteConfig.url)
+  // IMPORTANT: Must match the frontendUrl used in other components (LoginOverlay, UserMenu, login.tsx, etc.)
+  // to ensure we're using the same cached auth client instance
+  const frontendUrl = typeof window !== 'undefined' ? window.location.origin : (siteConfig.url || DEV_FRONTEND_URL);
 
   // Create auth client with the correct URLs
   const authClient = useMemo(() => createClientForUrl(authUrl, apiBaseUrl, frontendUrl), [authUrl, apiBaseUrl, frontendUrl]);
