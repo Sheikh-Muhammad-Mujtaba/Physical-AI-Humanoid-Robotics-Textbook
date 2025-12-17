@@ -60,8 +60,12 @@ async function testPgConnection() {
     const client = await pool.connect();
     client.release();
     logger.info('PostgreSQL connection to DATABASE_URL successful.');
-  } catch (error) {
-    logger.error(`Failed to connect to PostgreSQL at DATABASE_URL: ${error.message}`);
+  } catch (error: unknown) { // Explicitly type error as unknown
+    if (error instanceof Error) {
+        logger.error(`Failed to connect to PostgreSQL at DATABASE_URL: ${error.message}`);
+    } else {
+        logger.error(`Failed to connect to PostgreSQL at DATABASE_URL: ${String(error)}`);
+    }
     // Optionally re-throw or exit process if DB connection is critical for startup
     // process.exit(1); 
   }
