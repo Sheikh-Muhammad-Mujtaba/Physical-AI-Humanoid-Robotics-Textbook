@@ -130,7 +130,8 @@ async def get_history(session_id: uuid.UUID, request: Request, db: Session = Dep
 
     try:
         history = db.query(ChatHistory).filter(
-            ChatHistory.session_id == session_id
+            ChatHistory.session_id == session_id,
+            ChatHistory.user_id == session_data['user_id']
         ).order_by(ChatHistory.timestamp).all()
         return history
     except Exception as e:
@@ -145,9 +146,7 @@ async def get_user_history(request: Request, db: Session = Depends(get_db)):
     session_data = await validate_session(request, db)
 
     try:
-        # Note: ChatHistory table doesn't have user_id column, so we return all history
-        # In future, add user_id column for proper filtering
-        history = db.query(ChatHistory).order_by(ChatHistory.timestamp.desc()).limit(100).all()
+        history = db.query(ChatHistory).filter(ChatHistory.user_id == session_data['user_id']).order_by(ChatHistory.timestamp.desc()).limit(100).all()
         return history
     except Exception as e:
         print(f"Error retrieving user history: {e}")
@@ -187,7 +186,7 @@ async def chat(chat_request: ChatRequest, request: Request, db: Session = Depend
     if not agent:
         raise HTTPException(status_code=500, detail="Agent not configured.")
 
-    user_message = ChatHistory(session_id=chat_request.session_id, sender="user", text=chat_request.query)
+    user_message = ChatHistory(session_id=chat_request.session_id, user_id=session_data['user_id'], sender="user", text=chat_request.query)
     db.add(user_message)
     db.commit()
 
@@ -195,7 +194,7 @@ async def chat(chat_request: ChatRequest, request: Request, db: Session = Depend
         result = await Runner.run(agent, chat_request.query)
         llm_answer = result.final_output
 
-        bot_message = ChatHistory(session_id=chat_request.session_id, sender="bot", text=llm_answer)
+        bot_message = ChatHistory(session_id=chat_request.session_id, user_id=session_data['user_id'], sender="bot", text=llm_answer)
         db.add(bot_message)
         db.commit()
         db.refresh(bot_message)
@@ -215,7 +214,7 @@ async def ask_selection(selection_request: AskSelectionRequest, request: Request
         raise HTTPException(status_code=500, detail="Agent not configured.")
 
     user_message_text = f"Selection: {selection_request.selection}\nQuestion: {selection_request.question}"
-    user_message = ChatHistory(session_id=selection_request.session_id, sender="user", text=user_message_text)
+    user_message = ChatHistory(session_id=selection_request.session_id, user_id=session_data['user_id'], sender="user", text=user_message_text)
     db.add(user_message)
     db.commit()
 
@@ -243,7 +242,7 @@ Be concise but thorough. Focus on helping the student truly understand the selec
         result = await Runner.run(agent, prompt)
         llm_answer = result.final_output
 
-        bot_message = ChatHistory(session_id=selection_request.session_id, sender="bot", text=llm_answer)
+        bot_message = ChatHistory(session_id=selection_request.session_id, user_id=session_data['user_id'], sender="bot", text=llm_answer)
         db.add(bot_message)
         db.commit()
         db.refresh(bot_message)
