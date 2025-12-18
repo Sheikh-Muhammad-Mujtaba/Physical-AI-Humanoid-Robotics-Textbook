@@ -51,7 +51,7 @@ Node.js >=20.0, TypeScript ~5.6.2: Follow standard conventions
 - 001-vercel-deployment: Added Docusaurus (TypeScript), Python 3.10+, TypeScript 5.x + Docusaurus, FastAPI, SQLAlchemy, Qdrant, PyJWT, Next.js (in `auth-service`)
 - 001-betterauth-integration: Added Python 3.11+ (Backend), TypeScript 5.x (Frontend) + FastAPI, uvicorn, pydantic (Backend); React, Docusaurus (Frontend)
 - 001-global-chatbot-integration: Added Python 3.10+ (for backend), TypeScript 5.x (for frontend) + FastAPI, React, Docusaurus, Tailwind CSS
-- 001-fix-session-auth: Refactored authentication to use session-based cookies instead of JWTs to fix login loop.
+- 001-fix-session-auth: Implemented session-based authentication in backend endpoints; refactored frontend to remove all JWT logic, fix login loop, and resolve build errors. Database migration performed to add user_id to chat_history.
 
 
 

@@ -219,4 +219,4 @@ See `.specify/memory/constitution.md` for code quality, testing, performance, se
 
 ## Recent Changes
 - 001-betterauth-integration: Added Python 3.11+ (Backend), TypeScript 5.x (Frontend) + FastAPI, uvicorn, pydantic (Backend); React, Docusaurus (Frontend)
-- 001-fix-session-auth: Refactored authentication to use session-based cookies instead of JWTs to fix login loop.
+- 001-fix-session-auth: Implemented session-based authentication in backend endpoints; refactored frontend to remove all JWT logic, fix login loop, and resolve build errors. Database migration performed to add user_id to chat_history.
