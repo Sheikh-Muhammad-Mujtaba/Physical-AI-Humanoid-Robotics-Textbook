@@ -3,12 +3,12 @@
  * Handles user authentication via email/password and social providers
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import { useHistory } from '@docusaurus/router';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import { createClientForUrl, setAuthToken, DEV_AUTH_URL, DEV_API_BASE_URL } from '../lib/auth-client';
+import { createClientForUrl, DEV_AUTH_URL, DEV_API_BASE_URL } from '../lib/auth-client';
 import styles from './auth.module.css';
 
 export default function LoginPage(): React.ReactElement {
@@ -28,17 +28,20 @@ export default function LoginPage(): React.ReactElement {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
-  const [redirectScheduled, setRedirectScheduled] = useState(false);
+  const hasRedirectedRef = useRef(false);
   const history = useHistory();
   const { data: session, isPending, refetch } = authClient.useSession();
 
-  // Redirect if already logged in (only once)
+  // Redirect if already logged in - use ref to ensure single redirect
   useEffect(() => {
-    if (!redirectScheduled && session?.user && !isPending) {
-      setRedirectScheduled(true);
+    // Only redirect if session is fully loaded (not pending) and user exists
+    // Use ref to guarantee only one redirect happens
+    if (!hasRedirectedRef.current && session?.user && !isPending) {
+      console.log('[LOGIN] User already authenticated, redirecting to /docs/intro');
+      hasRedirectedRef.current = true;
       history.push('/docs/intro');
     }
-  }, [session?.user, isPending, history, redirectScheduled]);
+  }, [session?.user, isPending, history]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

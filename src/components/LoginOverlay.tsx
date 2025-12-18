@@ -8,7 +8,7 @@ import React, { useState, useMemo } from 'react';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import { createClientForUrl, setAuthToken, DEV_AUTH_URL, DEV_API_BASE_URL, DEV_FRONTEND_URL } from '../lib/auth-client';
+import { createClientForUrl, DEV_AUTH_URL, DEV_API_BASE_URL, DEV_FRONTEND_URL } from '../lib/auth-client';
 
 export default function LoginOverlay() {
   const { siteConfig } = useDocusaurusContext();
@@ -40,14 +40,8 @@ export default function LoginOverlay() {
         { email, password },
         {
           onSuccess: async () => {
-            try {
-              const tokenResult = await authClient.token();
-              if (tokenResult.data?.token) {
-                setAuthToken(tokenResult.data.token);
-              }
-            } catch (tokenError) {
-              // Token fetch failed, but login succeeded
-            }
+            // Session is now established with BetterAuth cookies
+            // Refetch session to ensure AuthProvider is updated
             window.location.reload();
           },
           onError: (ctx) => {
