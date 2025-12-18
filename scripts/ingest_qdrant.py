@@ -43,9 +43,11 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams, PointStruct
 
 # Configure Google API
-GEMINI_API_KEY = os.getenv('GOOGLE_API_KEY')
+# Try GEMINI_API_KEY first (preferred), fall back to GOOGLE_API_KEY for compatibility
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
 if not GEMINI_API_KEY:
-    print("ERROR: GOOGLE_API_KEY environment variable not set")
+    print("ERROR: Neither GEMINI_API_KEY nor GOOGLE_API_KEY environment variable is set")
+    print("Please set GEMINI_API_KEY in your .env file")
     sys.exit(1)
 
 genai.configure(api_key=GEMINI_API_KEY)
@@ -347,15 +349,27 @@ def ingest_documents(resume: bool = True, reset: bool = False):
     print("Physical AI Textbook - Qdrant Data Ingestion (Optimized)")
     print("=" * 70)
 
+    # Verify configuration
+    print("\n🔍 Verifying configuration...")
+    if not GEMINI_API_KEY:
+        print("✗ GEMINI_API_KEY not set")
+        sys.exit(1)
+    print("✓ GEMINI_API_KEY configured")
+
+    if not QDRANT_URL:
+        print("✗ QDRANT_URL not set")
+        sys.exit(1)
+    print(f"✓ Qdrant URL: {QDRANT_URL[:50]}...")
+
     # Setup directories
     base_dir = Path(__file__).parent.parent
     docs_dir = base_dir / 'docs'
     blog_dir = base_dir / 'blog'
 
     if not docs_dir.exists() or not blog_dir.exists():
-        print(f"✗ Required directories not found")
-        print(f"  docs: {docs_dir.exists()}")
-        print(f"  blog: {blog_dir.exists()}")
+        print(f"\n✗ Required directories not found")
+        print(f"  docs ({docs_dir}): {docs_dir.exists()}")
+        print(f"  blog ({blog_dir}): {blog_dir.exists()}")
         sys.exit(1)
 
     print(f"\n📂 Docs directory: {docs_dir}")
@@ -379,8 +393,17 @@ def ingest_documents(resume: bool = True, reset: bool = False):
     print(f"✓ Total files to process: {len(md_files)}")
 
     # Initialize managers
-    qdrant = QdrantManager()
-    qdrant.create_collection()
+    print("\n📡 Initializing Qdrant connection...")
+    try:
+        qdrant = QdrantManager()
+        qdrant.create_collection()
+    except Exception as e:
+        print(f"✗ Failed to initialize Qdrant: {e}")
+        print("  Make sure:")
+        print("    1. Qdrant is running (docker or cloud instance)")
+        print("    2. QDRANT_URL is correct in .env")
+        print("    3. QDRANT_API_KEY is correct (if cloud hosted)")
+        sys.exit(1)
 
     # Process files sequentially
     print(f"\n📖 Starting ingestion (resume: {resume}, reset: {reset})...")
