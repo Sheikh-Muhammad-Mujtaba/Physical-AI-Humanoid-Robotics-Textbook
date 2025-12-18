@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../components/AuthProvider';
 import TextSelectionButton from '../components/TextSelectionButton';
 import ChatbotWidget from '../components/ChatbotWidget';
 
@@ -9,7 +8,6 @@ function isPublicPath(pathname: string): boolean {
 }
 
 export default function AppContent({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading: isPending } = useAuth();
   const [pathname, setPathname] = useState<string>('');
 
   // Get pathname on client side only
@@ -37,13 +35,14 @@ export default function AppContent({ children }: { children: React.ReactNode }) 
     }
   }, []);
 
-  const showChatFeatures = isAuthenticated && !isPending && pathname !== '' && !isPublicPath(pathname);
+  // Don't show chat features on public paths or when pathname is empty
+  const shouldShowChatFeatures = pathname !== '' && !isPublicPath(pathname);
 
   return (
     <>
       {children}
-      {showChatFeatures && <TextSelectionButton />}
-      {showChatFeatures && <ChatbotWidget />}
+      {shouldShowChatFeatures && <TextSelectionButton />}
+      {shouldShowChatFeatures && <ChatbotWidget />}
     </>
   );
 }

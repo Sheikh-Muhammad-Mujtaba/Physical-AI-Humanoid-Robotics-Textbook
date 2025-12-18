@@ -28,15 +28,17 @@ export default function LoginPage(): React.ReactElement {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
+  const [redirectScheduled, setRedirectScheduled] = useState(false);
   const history = useHistory();
   const { data: session, isPending, refetch } = authClient.useSession();
 
-  // Redirect if already logged in
+  // Redirect if already logged in (only once)
   useEffect(() => {
-    if (session?.user && !isPending) {
+    if (!redirectScheduled && session?.user && !isPending) {
+      setRedirectScheduled(true);
       history.push('/docs/intro');
     }
-  }, [session, isPending, history]);
+  }, [session?.user, isPending, history, redirectScheduled]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

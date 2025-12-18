@@ -5,13 +5,13 @@ import AppContent from './AppContent';
 
 export default function Root({ children }: { children: React.ReactNode }) {
   return (
-    <AuthProvider>
-      <ChatProvider>
+    <ChatProvider>
+      <AuthProvider>
         <AppContent>
           {children}
         </AppContent>
-      </ChatProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </ChatProvider>
   );
 }
 

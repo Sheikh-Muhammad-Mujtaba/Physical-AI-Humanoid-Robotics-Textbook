@@ -52,7 +52,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user: session?.user || null,
       authClient,
     };
-    console.log('[AUTH-PROVIDER] Computed Auth State:', authState);
+    console.log('[AUTH-PROVIDER][DEBUG] session:', session);
+    console.log('[AUTH-PROVIDER][DEBUG] isPending:', isPending);
+    console.log('[AUTH-PROVIDER][DEBUG] isAuthenticated:', !!session?.user);
+    console.log('[AUTH-PROVIDER][DEBUG] authState:', authState);
     return authState;
   }, [session, isPending, authClient]);
 
