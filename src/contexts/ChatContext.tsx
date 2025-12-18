@@ -88,27 +88,22 @@ const ChatProviderInner: React.FC<ChatProviderProps> = ({ children }) => {
     try {
       let botResponseContent: string;
 
-      // Get user ID from authenticated user
+      // Get user ID from authenticated user (middleware will validate)
       const userId = user?.id;
-      if (!userId) {
-        botResponseContent = "Error: Not authenticated. Please sign in.";
-        console.error("Error: No authenticated user");
-        throw new Error("User not authenticated");
-      }
 
       console.log("Attempting to fetch chat/ask-selection API with user:", userId);
 
       if (selectedText && sessionId) {
         // Use askSelectionWithBackend if text is selected
         console.log("Fetching /api/ask-selection with selected text and query:", selectedText, text);
-        const response = await askSelectionWithBackend(selectedText, text, sessionId, userId);
+        const response = await askSelectionWithBackend(selectedText, text, sessionId, userId || '');
         botResponseContent = response.answer;
         // Clear selection after sending
         setSelectedText(null);
       } else if (sessionId) {
         // Use chatWithBackend for general chat
         console.log("Fetching /api/chat with query:", text);
-        const response = await chatWithBackend(text, sessionId, userId);
+        const response = await chatWithBackend(text, sessionId, userId || '');
         botResponseContent = response.answer;
       } else {
         botResponseContent = "Error: Session not established.";
@@ -144,7 +139,7 @@ const ChatProviderInner: React.FC<ChatProviderProps> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedText, sessionId]);
+  }, [selectedText, sessionId, user?.id]);
 
   // --- Session management placeholder ---
   useEffect(() => {
@@ -201,7 +196,7 @@ const ChatProviderInner: React.FC<ChatProviderProps> = ({ children }) => {
       };
       loadHistory();
     }
-  }, [sessionId, user, historyLoaded]); // Rerun when sessionId, user, or auth state changes
+  }, [sessionId, user?.id, historyLoaded]); // Rerun when sessionId, user ID, or auth state changes
 
 
   // Value provided by the context
