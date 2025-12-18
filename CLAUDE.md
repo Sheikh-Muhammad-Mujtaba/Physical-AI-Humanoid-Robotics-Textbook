@@ -215,5 +215,8 @@ See `.specify/memory/constitution.md` for code quality, testing, performance, se
 - Docusaurus (TypeScript), Python 3.10+, TypeScript 5.x + Docusaurus, FastAPI, SQLAlchemy, Qdrant, PyJWT, Next.js (in `auth-service`) (001-vercel-deployment)
 - PostgreSQL (for user data), Qdrant (for vectors) (001-vercel-deployment)
 
+- TypeScript 5.x + better-auth/react (001-fix-session-auth)
+
 ## Recent Changes
 - 001-betterauth-integration: Added Python 3.11+ (Backend), TypeScript 5.x (Frontend) + FastAPI, uvicorn, pydantic (Backend); React, Docusaurus (Frontend)
+- 001-fix-session-auth: Refactored authentication to use session-based cookies instead of JWTs to fix login loop.

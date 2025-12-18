@@ -60,5 +60,20 @@ export const createClientForUrl = (
               status: context.response?.status || 'unknown',
               hasData: !!context.data,
             });
+          }
+        },
+        onError: (context) => {
+          if (context) {
+            console.error('[AUTH] Request failed:', {
+              status: context.response?.status || 'unknown',
+              url: context.request?.url || 'unknown',
+            });
+          }
+        },
+      },
+      plugins: [],
+    }));
+  }
 
-
+  return clientCache.get(cacheKey)!;
+};
