@@ -1,14 +1,26 @@
 const API_BASE_URL = '/api'; // Proxied by Vercel to the Python backend
 
+// Track if we've already initiated a redirect to prevent redirect loops
+let isRedirectingToLogin = false;
+
 /**
- * Handle 401 responses by redirecting to login
+ * Handle 401 responses by marking session as stale
  *
  * Session-based auth: BetterAuth cookies handle authentication automatically.
- * No need for manual JWT token management.
+ * When a 401 is received, it means the session has expired or is invalid.
+ * We return a stale session error instead of redirecting immediately to prevent loops.
  */
-function handleUnauthorized(): never {
-  window.location.href = '/login';
-  throw new Error("Session expired. Please sign in again.");
+function handleUnauthorized(): Error {
+  // Only redirect once, and not during SSR or if we're already redirecting
+  if (!isRedirectingToLogin && typeof window !== 'undefined') {
+    isRedirectingToLogin = true;
+    console.warn('[AUTH] Session expired or invalid. Marking as stale.');
+    // Redirect after a small delay to allow error handling to complete
+    setTimeout(() => {
+      window.location.href = '/login';
+    }, 100);
+  }
+  return new Error("Session expired or invalid. Please sign in again.");
 }
 
 async function handleResponseError(response: Response, defaultMessage: string): Promise<Error> {
@@ -45,7 +57,7 @@ export async function getHistory(sessionId: string): Promise<any> {
   });
 
   if (response.status === 401) {
-    handleUnauthorized();
+    throw handleUnauthorized();
   }
 
   if (!response.ok) {
@@ -70,7 +82,7 @@ export async function chatWithBackend(query: string, sessionId: string): Promise
   });
 
   if (response.status === 401) {
-    handleUnauthorized();
+    throw handleUnauthorized();
   }
 
   if (!response.ok) {

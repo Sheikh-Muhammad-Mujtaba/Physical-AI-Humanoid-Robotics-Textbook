@@ -144,8 +144,19 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   }, [sessionId]);
 
   // --- Load chat history when session ID is available ---
+  // Only attempt to load history on protected pages (not on login/register)
   useEffect(() => {
-    if (sessionId && !historyLoaded) {
+    if (sessionId && !historyLoaded && typeof window !== 'undefined') {
+      // Don't attempt to load history on public auth pages
+      const currentPath = window.location.pathname;
+      const isAuthPage = currentPath === '/login' || currentPath === '/register';
+
+      if (isAuthPage) {
+        console.log('[CHAT-CONTEXT] Skipping history load on auth page:', currentPath);
+        setHistoryLoaded(true);
+        return;
+      }
+
       const loadHistory = async () => {
         try {
           const history = await getHistory(sessionId);
@@ -153,10 +164,15 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
           setMessages(history);
           setHistoryLoaded(true);
         } catch (error) {
-          console.error("Error loading chat history:", error);
-          // Only show error if it's not an auth error (user might not be logged in yet)
           const errorMessage = error instanceof Error ? error.message : String(error);
-          if (!errorMessage.includes('Not authenticated')) {
+          console.warn("[CHAT-CONTEXT] Error loading chat history:", errorMessage);
+
+          // Silently handle auth errors - user might be on login/register page or session expired
+          // The redirect will be handled by the auth system
+          if (errorMessage.includes('Session expired') || errorMessage.includes('invalid')) {
+            console.log('[CHAT-CONTEXT] Session auth error - redirect will be handled by auth system');
+          } else {
+            // For non-auth errors, show error in chat
             setMessages((prev) => [
               ...prev,
               {
