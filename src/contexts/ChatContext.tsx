@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid'; // Import v4 as uuidv4
 import { chatWithBackend, askSelectionWithBackend, getHistory } from '../lib/chatApi';
-import { useAuth } from './AuthProvider';
+import { useAuth } from '../components/AuthProvider';
 
 
 // Interface for Chat Message
