@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import Layout from '@theme/Layout';
 import { useHistory, useLocation } from '@docusaurus/router';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import { createClientForUrl, setAuthToken, DEV_AUTH_URL, DEV_API_BASE_URL } from '../lib/auth-client';
+import { createClientForUrl, DEV_AUTH_URL, DEV_API_BASE_URL } from '../lib/auth-client';
 import styles from './auth.module.css';
 
 export default function AuthCallbackPage(): React.ReactElement {
@@ -64,23 +64,6 @@ export default function AuthCallbackPage(): React.ReactElement {
 
         if (sessionResult.data?.user) {
           console.log('[AUTH-CALLBACK] Session established successfully');
-
-          // Try to get JWT token for backend API calls
-          try {
-            const tokenResult = await authClient.token({
-              fetchOptions: {
-                credentials: 'include',
-              }
-            });
-
-            if (tokenResult.data?.token) {
-              console.log('[AUTH-CALLBACK] JWT token obtained');
-              setAuthToken(tokenResult.data.token);
-            }
-          } catch (tokenErr) {
-            console.warn('[AUTH-CALLBACK] Could not get JWT token, but session exists:', tokenErr);
-            // Continue anyway - session cookies are enough for auth
-          }
 
           const redirectTo = searchParams.get('redirect') || '/docs/intro';
           console.log('[AUTH-CALLBACK] Redirecting to:', redirectTo);

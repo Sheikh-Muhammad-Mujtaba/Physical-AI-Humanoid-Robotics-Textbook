@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid'; // Import v4 as uuidv4
 import { chatWithBackend, askSelectionWithBackend, getHistory } from '../lib/chatApi';
-import { isAuthenticated as checkIsAuthenticated } from '../lib/auth-client';
+
 
 // Interface for Chat Message
 export interface ChatMessage {
@@ -47,8 +47,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [selectedText, setSelectedText] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false); // Add isLoading state
-  const [isUserAuthenticated, setIsUserAuthenticated] = useState<boolean>(checkIsAuthenticated());
   const [historyLoaded, setHistoryLoaded] = useState<boolean>(false);
 
   // --- Functions exposed by the context ---
@@ -144,35 +142,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     }
   }, [sessionId]);
 
-  // --- Check authentication on mount and listen for changes ---
+  // --- Load chat history when session ID is available ---
   useEffect(() => {
-    // Check auth on mount
-    const currentAuthState = checkIsAuthenticated();
-    setIsUserAuthenticated(currentAuthState);
-    if (currentAuthState) {
-      setHistoryLoaded(false);
-    }
-
-    // Listen for storage events (token changes from other tabs or login flow)
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === 'auth_token') {
-        const newAuthState = checkIsAuthenticated();
-        setIsUserAuthenticated(newAuthState);
-        if (newAuthState) {
-          setHistoryLoaded(false);
-        }
-      }
-    };
-    window.addEventListener('storage', handleStorage);
-
-    return () => {
-      window.removeEventListener('storage', handleStorage);
-    };
-  }, []); // Empty deps - only run on mount, storage event handles changes
-
-  // --- Load chat history when session ID is available AND user is authenticated ---
-  useEffect(() => {
-    if (sessionId && isUserAuthenticated && !historyLoaded) {
+    if (sessionId && !historyLoaded) {
       const loadHistory = async () => {
         try {
           const history = await getHistory(sessionId);
@@ -200,7 +172,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       };
       loadHistory();
     }
-  }, [sessionId, isUserAuthenticated, historyLoaded]); // Rerun when sessionId or auth state changes
+  }, [sessionId, historyLoaded]); // Rerun when sessionId or auth state changes
 
 
   // Value provided by the context

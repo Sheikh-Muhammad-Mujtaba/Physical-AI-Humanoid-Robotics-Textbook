@@ -9,7 +9,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import { createClientForUrl, clearAuthToken, DEV_AUTH_URL, DEV_API_BASE_URL, DEV_FRONTEND_URL } from '../lib/auth-client';
+import { createClientForUrl, DEV_AUTH_URL, DEV_API_BASE_URL, DEV_FRONTEND_URL } from '../lib/auth-client';
 
 export default function UserMenu() {
   const { siteConfig } = useDocusaurusContext();
@@ -55,8 +55,7 @@ export default function UserMenu() {
       // Sign out from server failed, continue with local cleanup
     }
 
-    // Clear our custom auth token from localStorage
-    clearAuthToken();
+
 
     // Clear all localStorage items related to auth
     if (typeof window !== 'undefined') {
