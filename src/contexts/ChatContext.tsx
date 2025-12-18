@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid'; // Import v4 as uuidv4
 import { chatWithBackend, askSelectionWithBackend, getHistory } from '../lib/chatApi';
+import { useAuth } from './AuthProvider';
 
 
 // Interface for Chat Message
@@ -41,7 +42,8 @@ interface ChatProviderProps {
 
 // Implement the ChatProvider component
 export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
-  // Session-based auth: No need for auth URL, BetterAuth cookies handle everything
+  // Get authenticated user from BetterAuth
+  const { user, isLoading: authLoading } = useAuth();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -85,19 +87,28 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
     try {
       let botResponseContent: string;
-      console.log("Attempting to fetch chat/ask-selection API.");
+
+      // Get user ID from authenticated user
+      const userId = user?.id;
+      if (!userId) {
+        botResponseContent = "Error: Not authenticated. Please sign in.";
+        console.error("Error: No authenticated user");
+        throw new Error("User not authenticated");
+      }
+
+      console.log("Attempting to fetch chat/ask-selection API with user:", userId);
 
       if (selectedText && sessionId) {
         // Use askSelectionWithBackend if text is selected
         console.log("Fetching /api/ask-selection with selected text and query:", selectedText, text);
-        const response = await askSelectionWithBackend(selectedText, text, sessionId);
+        const response = await askSelectionWithBackend(selectedText, text, sessionId, userId);
         botResponseContent = response.answer;
         // Clear selection after sending
         setSelectedText(null);
       } else if (sessionId) {
         // Use chatWithBackend for general chat
         console.log("Fetching /api/chat with query:", text);
-        const response = await chatWithBackend(text, sessionId);
+        const response = await chatWithBackend(text, sessionId, userId);
         botResponseContent = response.answer;
       } else {
         botResponseContent = "Error: Session not established.";
@@ -143,10 +154,11 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     }
   }, [sessionId]);
 
-  // --- Load chat history when session ID is available ---
+  // --- Load chat history when session ID and user are available ---
   // Only attempt to load history on protected pages (not on login/register)
   useEffect(() => {
-    if (sessionId && !historyLoaded && typeof window !== 'undefined') {
+    const userId = user?.id;
+    if (sessionId && userId && !historyLoaded && typeof window !== 'undefined') {
       // Don't attempt to load history on public auth pages
       const currentPath = window.location.pathname;
       const isAuthPage = currentPath === '/login' || currentPath === '/register';
@@ -159,7 +171,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
       const loadHistory = async () => {
         try {
-          const history = await getHistory(sessionId);
+          const history = await getHistory(sessionId, userId);
           // Assuming history is an array of messages compatible with ChatMessage[]
           setMessages(history);
           setHistoryLoaded(true);
@@ -189,7 +201,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       };
       loadHistory();
     }
-  }, [sessionId, historyLoaded]); // Rerun when sessionId or auth state changes
+  }, [sessionId, user, historyLoaded]); // Rerun when sessionId, user, or auth state changes
 
 
   // Value provided by the context

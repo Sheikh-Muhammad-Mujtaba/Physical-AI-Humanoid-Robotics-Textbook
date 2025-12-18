@@ -101,94 +101,57 @@ def get_current_user_id(payload: dict = Depends(validate_jwt)) -> str:
 # SESSION-BASED AUTHENTICATION (RECOMMENDED FOR CHATBOT)
 # ============================================================================
 
-def validate_session_sync(request: Request, db: Session) -> dict:
+def get_user_id_from_header(request: Request) -> str:
     """
-    Validate BetterAuth session from cookie (synchronous version).
+    Extract user ID from X-User-ID header.
 
-    This is the RECOMMENDED authentication method for chatbot endpoints.
-    Uses session cookies instead of JWT tokens for simpler, more reliable auth.
+    This is sent by the frontend after BetterAuth authentication.
+    The frontend obtains the user ID from BetterAuth and includes it in all API requests.
 
     Args:
-        request: FastAPI request object (to read cookies)
-        db: Database session (to query BetterAuth session table)
+        request: FastAPI request object
 
     Returns:
-        dict with user_id and session_id
+        str: The authenticated user ID
 
     Raises:
-        HTTPException 401 if session is invalid or expired
+        HTTPException 401 if user ID header is missing or invalid
     """
-    from sql_models import BetterAuthSession
+    user_id = request.headers.get("X-User-ID")
 
-    # Get session token from cookie
-    # BetterAuth stores session token in "better-auth.session_token" cookie
-    session_token = request.cookies.get("better-auth.session_token")
-
-    if not session_token:
-        logger.error("Session validation failed: No session token in cookies")
+    if not user_id:
+        logger.error("Authentication failed: X-User-ID header missing")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated. Please sign in.",
         )
 
-    # Query BetterAuth session table
-    try:
-        session = db.query(BetterAuthSession).filter(
-            BetterAuthSession.token == session_token
-        ).first()
-    except Exception as e:
-        logger.error(f"Database error while validating session: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Authentication service error",
-        )
-
-    if not session:
-        logger.error(f"Session validation failed: Session not found for token: {session_token[:10]}...")
+    # Basic validation - user_id should not be empty
+    if not user_id.strip():
+        logger.error("Authentication failed: X-User-ID header is empty")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid session. Please sign in again.",
+            detail="Invalid user ID.",
         )
 
-    # Check if session is expired
-    now = datetime.now(timezone.utc)
-
-    # Make expiresAt timezone-aware if it isn't already
-    expires_at = session.expiresAt
-    if expires_at.tzinfo is None:
-        expires_at = expires_at.replace(tzinfo=timezone.utc)
-
-    if expires_at < now:
-        logger.error(f"Session validation failed: Session expired at {expires_at}, current time: {now}")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Session expired. Please sign in again.",
-        )
-
-    logger.info(f"Session validated successfully for user: {session.userId}")
-
-    return {
-        "user_id": session.userId,
-        "session_id": session.id,
-    }
+    logger.info(f"User authenticated: {user_id}")
+    return user_id
 
 
-def get_current_user_from_session(
-    request: Request,
-    db: Session = Depends(get_db)
-) -> str:
+def get_current_user_from_session(request: Request) -> str:
     """
-    Dependency to get current user ID from session cookie.
+    Dependency to get current user ID from authentication header.
 
-    Use this in chatbot endpoints instead of get_current_user_id.
+    The frontend sends the user ID in the X-User-ID header after authenticating with BetterAuth.
+    This avoids cross-domain session cookie issues.
 
-    Example:
+    Use this in API endpoints:
         @app.post("/api/chat")
         async def chat(
+            chat_request: ChatRequest,
             user_id: str = Depends(get_current_user_from_session),
             db: Session = Depends(get_db)
         ):
             # user_id is now available
     """
-    session_data = validate_session_sync(request, db)
-    return session_data["user_id"]
+    return get_user_id_from_header(request)

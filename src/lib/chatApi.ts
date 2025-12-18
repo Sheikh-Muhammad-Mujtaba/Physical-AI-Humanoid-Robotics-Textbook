@@ -4,9 +4,23 @@ const API_BASE_URL = '/api'; // Proxied by Vercel to the Python backend
 let isRedirectingToLogin = false;
 
 /**
+ * Get the current user ID from the auth system
+ * This function retrieves the user ID from BetterAuth session
+ */
+export function getUserId(): string | null {
+  // Try to get user ID from auth session (set by AuthProvider)
+  // This is accessed from the global auth context
+  if (typeof window !== 'undefined') {
+    // Check if there's a way to access the current auth state
+    // For now, we'll need to pass it as a parameter to API calls
+    return null;
+  }
+  return null;
+}
+
+/**
  * Handle 401 responses by marking session as stale
  *
- * Session-based auth: BetterAuth cookies handle authentication automatically.
  * When a 401 is received, it means the session has expired or is invalid.
  * We return a stale session error instead of redirecting immediately to prevent loops.
  */
@@ -49,11 +63,13 @@ async function handleResponseError(response: Response, defaultMessage: string): 
 
 /**
  * Get chat history for a session
- * Uses session cookies for authentication (no JWT token needed)
+ * Sends user ID via X-User-ID header for authentication
  */
-export async function getHistory(sessionId: string): Promise<any> {
+export async function getHistory(sessionId: string, userId: string): Promise<any> {
   const response = await fetch(`${API_BASE_URL}/history/${sessionId}`, {
-    credentials: 'include', // Send session cookies
+    headers: {
+      'X-User-ID': userId,
+    },
   });
 
   if (response.status === 401) {
@@ -69,15 +85,15 @@ export async function getHistory(sessionId: string): Promise<any> {
 
 /**
  * Send a chat message to the backend
- * Uses session cookies for authentication (no JWT token needed)
+ * Sends user ID via X-User-ID header for authentication
  */
-export async function chatWithBackend(query: string, sessionId: string): Promise<any> {
+export async function chatWithBackend(query: string, sessionId: string, userId: string): Promise<any> {
   const response = await fetch(`${API_BASE_URL}/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'X-User-ID': userId,
     },
-    credentials: 'include', // Send session cookies
     body: JSON.stringify({ query, session_id: sessionId }),
   });
 
@@ -94,20 +110,20 @@ export async function chatWithBackend(query: string, sessionId: string): Promise
 
 /**
  * Ask a question about selected text
- * Uses session cookies for authentication (no JWT token needed)
+ * Sends user ID via X-User-ID header for authentication
  */
-export async function askSelectionWithBackend(selection: string, question: string, sessionId: string): Promise<any> {
+export async function askSelectionWithBackend(selection: string, question: string, sessionId: string, userId: string): Promise<any> {
   const response = await fetch(`${API_BASE_URL}/ask-selection`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'X-User-ID': userId,
     },
-    credentials: 'include', // Send session cookies
     body: JSON.stringify({ selection, question, session_id: sessionId }),
   });
 
   if (response.status === 401) {
-    handleUnauthorized();
+    throw handleUnauthorized();
   }
 
   if (!response.ok) {
@@ -119,20 +135,20 @@ export async function askSelectionWithBackend(selection: string, question: strin
 
 /**
  * Send feedback for a message
- * Uses session cookies for authentication (no JWT token needed)
+ * Sends user ID via X-User-ID header for authentication
  */
-export async function sendFeedback(messageId: string, rating: number): Promise<any> {
+export async function sendFeedback(messageId: string, rating: number, userId: string): Promise<any> {
   const response = await fetch(`${API_BASE_URL}/feedback`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'X-User-ID': userId,
     },
-    credentials: 'include', // Send session cookies
     body: JSON.stringify({ message_id: messageId, rating }),
   });
 
   if (response.status === 401) {
-    handleUnauthorized();
+    throw handleUnauthorized();
   }
 
   if (!response.ok) {
