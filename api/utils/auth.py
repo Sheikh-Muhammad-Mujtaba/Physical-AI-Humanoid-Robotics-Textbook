@@ -101,9 +101,9 @@ def get_current_user_id(payload: dict = Depends(validate_jwt)) -> str:
 # SESSION-BASED AUTHENTICATION (RECOMMENDED FOR CHATBOT)
 # ============================================================================
 
-async def validate_session(request: Request, db: Session) -> dict:
+def validate_session_sync(request: Request, db: Session) -> dict:
     """
-    Validate BetterAuth session from cookie.
+    Validate BetterAuth session from cookie (synchronous version).
 
     This is the RECOMMENDED authentication method for chatbot endpoints.
     Uses session cookies instead of JWT tokens for simpler, more reliable auth.
@@ -175,7 +175,7 @@ async def validate_session(request: Request, db: Session) -> dict:
 
 def get_current_user_from_session(
     request: Request,
-    db: Session = Depends(lambda: None)  # Will be injected by FastAPI
+    db: Session = Depends(get_db)
 ) -> str:
     """
     Dependency to get current user ID from session cookie.
@@ -190,6 +190,5 @@ def get_current_user_from_session(
         ):
             # user_id is now available
     """
-    import asyncio
-    session_data = asyncio.run(validate_session(request, db))
+    session_data = validate_session_sync(request, db)
     return session_data["user_id"]
