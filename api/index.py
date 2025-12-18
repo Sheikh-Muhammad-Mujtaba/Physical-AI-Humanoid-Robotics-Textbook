@@ -150,7 +150,7 @@ async def get_user_history(user_id: str = Depends(get_current_user_from_session)
 async def feedback(feedback_request: FeedbackRequest, user_id: str = Depends(get_current_user_from_session), db: Session = Depends(get_db)):
     """Submit feedback for a message. Requires valid session cookie."""
     try:
-        # Verify the message exists
+        # Verify the message exists and belongs to the user
         message = db.query(ChatHistory).filter(
             ChatHistory.message_id == feedback_request.message_id,
             ChatHistory.user_id == user_id

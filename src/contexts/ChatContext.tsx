@@ -47,7 +47,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [selectedText, setSelectedText] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [historyLoaded, setHistoryLoaded] = useState<boolean>(false);
 
   // --- Functions exposed by the context ---

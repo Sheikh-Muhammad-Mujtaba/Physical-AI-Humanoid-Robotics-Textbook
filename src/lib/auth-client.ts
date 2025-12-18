@@ -10,7 +10,6 @@
  */
 
 import { createAuthClient } from "better-auth/react";
-import { jwtClient } from "better-auth/client/plugins";
 
 // Default fallback URL for local development
 export const DEV_AUTH_URL = "http://localhost:3001";

@@ -34,7 +34,8 @@ class ChatHistory(Base):
 
     message_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     session_id = Column(UUID(as_uuid=True), nullable=False, index=True)
-    user_id = Column(String, nullable=False, index=True)
+    # Note: user_id column doesn't exist in current schema (see prompt.txt lines 106-145)
+    # user_id = Column(String, nullable=False, index=True)  # Commented out - not in DB
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
     sender = Column(String, nullable=False)
     text = Column(Text, nullable=False)

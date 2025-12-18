@@ -173,9 +173,9 @@ async def validate_session(request: Request, db: Session) -> dict:
     }
 
 
-async def get_current_user_from_session(
+def get_current_user_from_session(
     request: Request,
-    db: Session = Depends(get_db)
+    db: Session = Depends(lambda: None)  # Will be injected by FastAPI
 ) -> str:
     """
     Dependency to get current user ID from session cookie.
@@ -186,8 +186,10 @@ async def get_current_user_from_session(
         @app.post("/api/chat")
         async def chat(
             user_id: str = Depends(get_current_user_from_session),
+            db: Session = Depends(get_db)
         ):
             # user_id is now available
     """
-    session_data = await validate_session(request, db)
+    import asyncio
+    session_data = asyncio.run(validate_session(request, db))
     return session_data["user_id"]
