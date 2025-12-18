@@ -40,8 +40,8 @@ interface ChatProviderProps {
   children: ReactNode;
 }
 
-// Implement the ChatProvider component
-export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
+// Inner ChatProvider component that requires AuthProvider
+const ChatProviderInner: React.FC<ChatProviderProps> = ({ children }) => {
   // Get authenticated user from BetterAuth
   const { user, isLoading: authLoading } = useAuth();
 
@@ -221,6 +221,33 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     <ChatContext.Provider value={contextValue}>
       {children}
     </ChatContext.Provider>
+  );
+};
+
+// Wrapper ChatProvider that handles SSG gracefully
+// This component wraps the inner provider to handle cases where AuthProvider is not available
+export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
+  // During SSG, AuthProvider might not be available yet
+  // In that case, just render children without ChatContext
+  if (typeof window === 'undefined') {
+    // Server-side rendering: check if we're in a context that has AuthProvider
+    try {
+      return (
+        <ChatProviderInner>
+          {children}
+        </ChatProviderInner>
+      );
+    } catch {
+      // If AuthProvider is not available during SSG, just render children
+      return <>{children}</>;
+    }
+  }
+
+  // Client-side: always use ChatProviderInner
+  return (
+    <ChatProviderInner>
+      {children}
+    </ChatProviderInner>
   );
 };
 
