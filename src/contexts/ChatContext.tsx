@@ -224,32 +224,9 @@ const ChatProviderInner: React.FC<ChatProviderProps> = ({ children }) => {
   );
 };
 
-// Wrapper ChatProvider that handles SSG gracefully
-// This component wraps the inner provider to handle cases where AuthProvider is not available
-export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
-  // During SSG, AuthProvider might not be available yet
-  // In that case, just render children without ChatContext
-  if (typeof window === 'undefined') {
-    // Server-side rendering: check if we're in a context that has AuthProvider
-    try {
-      return (
-        <ChatProviderInner>
-          {children}
-        </ChatProviderInner>
-      );
-    } catch {
-      // If AuthProvider is not available during SSG, just render children
-      return <>{children}</>;
-    }
-  }
-
-  // Client-side: always use ChatProviderInner
-  return (
-    <ChatProviderInner>
-      {children}
-    </ChatProviderInner>
-  );
-};
+// Export ChatProviderInner as the main ChatProvider
+// Note: Root.tsx ensures AuthProvider wraps ChatProvider, so useAuth() is always available
+export const ChatProvider = ChatProviderInner;
 
 // Custom hook to use the ChatContext
 export const useChat = () => {
