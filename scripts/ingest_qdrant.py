@@ -17,6 +17,7 @@ Usage:
     python scripts/ingest_qdrant.py --help       # Show help
 """
 
+# Standard library imports
 import sys
 import os
 import json
@@ -24,41 +25,98 @@ import re
 import time
 import random
 import argparse
+import logging
 from pathlib import Path
 from typing import List, Dict, Any, Tuple
 import uuid
 from datetime import datetime
 
-# Add parent directory to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
+# Third-party imports
 try:
     from dotenv import load_dotenv
-    load_dotenv(".env")
 except ImportError:
-    pass
+    load_dotenv = None
 
 import google.generativeai as genai
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams, PointStruct
 
+# Add parent directory to path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Load environment variables
+if load_dotenv:
+    load_dotenv(".env")
+
+# Configure logging
+def setup_logging():
+    """Setup comprehensive logging to file and console."""
+    log_dir = Path(__file__).parent.parent / 'logs'
+    log_dir.mkdir(exist_ok=True)
+
+    log_file = log_dir / f'qdrant_ingestion_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'
+
+    # Create logger
+    logger = logging.getLogger('qdrant_ingest')
+    logger.setLevel(logging.DEBUG)
+
+    # File handler (DEBUG level - log everything)
+    fh = logging.FileHandler(log_file)
+    fh.setLevel(logging.DEBUG)
+
+    # Console handler (INFO level - show important info)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+
+    # Formatter with detailed information
+    file_formatter = logging.Formatter(
+        '%(asctime)s - [%(levelname)-8s] - %(name)s:%(funcName)s:%(lineno)d - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    console_formatter = logging.Formatter(
+        '%(asctime)s - [%(levelname)-8s] - %(message)s',
+        datefmt='%H:%M:%S'
+    )
+
+    fh.setFormatter(file_formatter)
+    ch.setFormatter(console_formatter)
+
+    # Add handlers
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+
+    logger.info(f"Logging initialized. Log file: {log_file}")
+    return logger, log_file
+
+# Setup logging first
+logger, log_file = setup_logging()
+logger.debug("Loaded environment variables from .env file")
+
 # Configure Google API
 # Try GEMINI_API_KEY first (preferred), fall back to GOOGLE_API_KEY for compatibility
+logger.debug("Attempting to load API keys from environment")
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
 if not GEMINI_API_KEY:
-    print("ERROR: Neither GEMINI_API_KEY nor GOOGLE_API_KEY environment variable is set")
-    print("Please set GEMINI_API_KEY in your .env file")
+    logger.error("Neither GEMINI_API_KEY nor GOOGLE_API_KEY environment variable is set")
+    logger.error("Please set GEMINI_API_KEY in your .env file")
     sys.exit(1)
 
-genai.configure(api_key=GEMINI_API_KEY)
+logger.info("GEMINI_API_KEY loaded successfully")
+try:
+    genai.configure(api_key=GEMINI_API_KEY)
+    logger.info("Google API configured successfully")
+except Exception as e:
+    logger.error(f"Failed to configure Google API: {e}", exc_info=True)
+    sys.exit(1)
 
 # Qdrant configuration
 QDRANT_URL = os.getenv('QDRANT_URL', 'http://localhost:6333')
 QDRANT_API_KEY = os.getenv('QDRANT_API_KEY', None)
 COLLECTION_NAME = os.getenv('QDRANT_COLLECTION_NAME', 'textbook_chunks')
+logger.debug(f"Qdrant configuration: URL={QDRANT_URL[:50]}..., Collection={COLLECTION_NAME}")
 
 # Embedding model
-EMBEDDING_MODEL = 'models/embedding-001'
+EMBEDDING_MODEL = 'model/text-embedding-004' #'models/embedding-001'
 VECTOR_SIZE = 768  # Google Embedding API returns 768-dimensional vectors
 
 # Chunk configuration
@@ -85,11 +143,14 @@ class ProgressTracker:
             try:
                 with open(self.state_file, 'r') as f:
                     state = json.load(f)
-                print(f"📊 Loaded progress state from {self.state_file.name}")
+                logger.info(f"Loaded progress state from {self.state_file.name}")
+                logger.debug(f"Loaded state: {state}")
                 return state
             except Exception as e:
-                print(f"⚠️  Error loading progress state: {e}. Starting fresh.")
+                logger.error(f"Error loading progress state: {e}", exc_info=True)
+                logger.info("Starting fresh with new progress state")
                 return self._create_new_state()
+        logger.debug(f"Progress state file not found: {self.state_file}")
         return self._create_new_state()
 
     @staticmethod
@@ -108,10 +169,12 @@ class ProgressTracker:
 
     def mark_completed(self, file_path: Path, chunk_count: int):
         """Mark file as successfully processed."""
+        logger.debug(f"Marking file as completed: {file_path.name} with {chunk_count} chunks")
         self.state['completed_files'].append(str(file_path.resolve()))
         self.state['total_chunks'] += chunk_count
         self.state['total_points'] += chunk_count
         self.state['last_updated'] = datetime.now().isoformat()
+        logger.info(f"File completed: {file_path.name} | Total: {len(self.state['completed_files'])} files, {self.state['total_chunks']} chunks")
         self._save_state()
 
     def _save_state(self):
@@ -119,22 +182,26 @@ class ProgressTracker:
         try:
             with open(self.state_file, 'w') as f:
                 json.dump(self.state, f, indent=2)
+            logger.debug(f"Progress state saved to {self.state_file}")
         except Exception as e:
-            print(f"⚠️  Error saving progress state: {e}")
+            logger.error(f"Error saving progress state: {e}", exc_info=True)
 
     def reset(self):
         """Clear all progress (for --reset flag)."""
+        logger.warning("Resetting progress state - all progress will be cleared")
         self.state = self._create_new_state()
         self._save_state()
-        print("🔄 Progress state reset")
+        logger.info("Progress state reset successfully")
 
     def get_summary(self) -> str:
         """Get human-readable progress summary."""
-        return (
+        summary = (
             f"Completed: {len(self.state['completed_files'])} files, "
             f"{self.state['total_chunks']} chunks, "
             f"{self.state['total_points']} points"
         )
+        logger.debug(f"Progress summary: {summary}")
+        return summary
 
     def get_completed_count(self) -> int:
         """Get count of completed files."""
@@ -293,16 +360,22 @@ class EmbeddingManager:
         """
         try:
             # Truncate text to reasonable length for embedding
+            text_len = len(text)
             text = text[:2000]  # Google's limit is typically 2048 tokens
+            logger.debug(f"Embedding text: length={text_len} chars, truncated={len(text)} chars")
 
             response = genai.embed_content(
                 model=EMBEDDING_MODEL,
                 content=text
             )
 
+            embedding_dim = len(response['embedding'])
+            logger.debug(f"Embedding created successfully: {embedding_dim}-dimensional vector")
+
             # Sleep after embedding to respect rate limits
             if sleep_duration > 0:
                 time.sleep(sleep_duration)
+                logger.debug(f"Rate limit sleep: {sleep_duration}s")
 
             return response['embedding']
         except Exception as e:
@@ -310,13 +383,14 @@ class EmbeddingManager:
             if '429' in str(e) or 'quota' in error_str or 'rate limit' in error_str:
                 # Rate limit hit, wait and retry
                 wait_time = 90 + random.randint(0, 30)
-                print(f"      ⏳ Rate limited! Waiting {wait_time}s before retry...")
+                logger.warning(f"Rate limit encountered: {e}")
+                logger.warning(f"Retrying after {wait_time}s wait")
                 time.sleep(wait_time)
                 # Retry once with longer sleep
                 return EmbeddingManager.embed_text(text, sleep_duration=1.0)
             else:
-                print(f"✗ Error embedding text: {e}")
-                return None
+                logger.error(f"Error embedding text: {e}", exc_info=True)
+                return []
 
 
 def get_markdown_files(base_dir: Path, source: str = 'docs') -> List[Tuple[Path, str]]:
@@ -345,20 +419,29 @@ def ingest_documents(resume: bool = True, reset: bool = False):
         resume: Whether to resume from checkpoint
         reset: Whether to reset progress and start fresh
     """
+    logger.info("="*70)
+    logger.info("Physical AI Textbook - Qdrant Data Ingestion (Optimized)")
+    logger.info("="*70)
+
+    # Verify configuration
+    logger.info("Verifying configuration...")
+    if not GEMINI_API_KEY:
+        logger.error("GEMINI_API_KEY not set")
+        sys.exit(1)
+    logger.info("✓ GEMINI_API_KEY configured")
+
+    if not QDRANT_URL:
+        logger.error("QDRANT_URL not set")
+        sys.exit(1)
+    logger.info(f"✓ Qdrant URL: {QDRANT_URL[:50]}...")
+
     print("=" * 70)
     print("Physical AI Textbook - Qdrant Data Ingestion (Optimized)")
     print("=" * 70)
-
-    # Verify configuration
-    print("\n🔍 Verifying configuration...")
-    if not GEMINI_API_KEY:
-        print("✗ GEMINI_API_KEY not set")
-        sys.exit(1)
+    print(f"Log file: {log_file}")
+    print()
+    # Print config (visually for console)
     print("✓ GEMINI_API_KEY configured")
-
-    if not QDRANT_URL:
-        print("✗ QDRANT_URL not set")
-        sys.exit(1)
     print(f"✓ Qdrant URL: {QDRANT_URL[:50]}...")
 
     # Setup directories
@@ -414,73 +497,86 @@ def ingest_documents(resume: bool = True, reset: bool = False):
     for file_idx, (file_path, source) in enumerate(md_files, 1):
         # Skip if already processed
         if resume and progress.is_completed(file_path):
+            logger.debug(f"File already processed: {file_path.name}")
             print(f"⊘ [{file_idx:2d}/{len(md_files)}] {file_path.name} (already ingested)")
             continue
 
         base = docs_dir if source == 'docs' else blog_dir
         rel_path = file_path.relative_to(base)
+        logger.info(f"[{file_idx:2d}/{len(md_files)}] Processing {source}: {rel_path}")
         print(f"📄 [{file_idx:2d}/{len(md_files)}] Processing {source}: {rel_path}")
 
         try:
             # Parse file
+            logger.debug(f"Parsing file: {file_path}")
             parsed = MarkdownParser.parse_file(file_path)
             content = parsed['content']
 
             if not content.strip():
+                logger.warning(f"File has no content: {rel_path}")
                 print(f"   ⚠️  No content, skipping")
                 progress.mark_completed(file_path, 0)
                 continue
 
             # Chunk content
             chunks = MarkdownParser.chunk_text(content)
+            logger.info(f"Parsed: {len(content)} chars, {len(chunks)} chunks | File: {rel_path}")
             print(f"   ✓ Parsed: {len(content)} chars, {len(chunks)} chunks")
 
             # Extract metadata
             frontmatter = parsed['frontmatter']
             document_id = frontmatter.get('id', str(rel_path))
             title = frontmatter.get('title', str(rel_path))
+            logger.debug(f"Document ID: {document_id}, Title: {title}")
 
             # Embed and insert each chunk
             chunk_success = 0
             for chunk_idx, chunk in enumerate(chunks, 1):
+                logger.debug(f"Embedding chunk {chunk_idx}/{len(chunks)} for {rel_path}")
                 # Embed with rate limiting
                 embedding = EmbeddingManager.embed_text(chunk, sleep_duration=CHUNK_SLEEP_DURATION)
 
                 if not embedding:
+                    logger.error(f"Failed to embed chunk {chunk_idx}/{len(chunks)} for {rel_path}")
                     print(f"   ✗ Failed to embed chunk {chunk_idx}/{len(chunks)}")
                     continue
 
                 # Create and insert point
-                point = PointStruct(
-                    id=uuid.uuid4().int % (2**31),  # Qdrant-compatible ID
-                    vector=embedding,
-                    payload={
-                        'text': chunk,
-                        'document_id': document_id,
-                        'title': title,
-                        'file_path': str(rel_path),
-                        'source': source,
-                        'file_name': file_path.name,
-                        'chunk_index': chunk_idx - 1,
-                        'ingested_at': datetime.now().isoformat(),
-                    }
-                )
-
                 try:
+                    point = PointStruct(
+                        id=uuid.uuid4().int % (2**31),  # Qdrant-compatible ID
+                        vector=embedding,
+                        payload={
+                            'text': chunk,
+                            'document_id': document_id,
+                            'title': title,
+                            'file_path': str(rel_path),
+                            'source': source,
+                            'file_name': file_path.name,
+                            'chunk_index': chunk_idx - 1,
+                            'ingested_at': datetime.now().isoformat(),
+                        }
+                    )
+
                     qdrant.insert_points([point])
                     chunk_success += 1
+                    logger.debug(f"Chunk {chunk_idx} inserted successfully | File: {rel_path}")
                 except Exception as e:
+                    logger.error(f"Failed to insert chunk {chunk_idx}: {e}", exc_info=True)
                     print(f"   ✗ Failed to insert chunk {chunk_idx}: {e}")
                     continue
 
                 # Show progress for large files
                 if chunk_idx % 5 == 0:
+                    logger.debug(f"Progress: Embedded {chunk_idx}/{len(chunks)} chunks")
                     print(f"   → Embedded {chunk_idx}/{len(chunks)} chunks")
 
             if chunk_success > 0:
+                logger.info(f"File completed: {chunk_success}/{len(chunks)} chunks inserted | File: {rel_path}")
                 print(f"   ✓ Embedded {chunk_success}/{len(chunks)} chunks, inserted into Qdrant")
                 total_inserted += chunk_success
             else:
+                logger.error(f"No chunks successfully embedded for file: {rel_path}")
                 print(f"   ✗ No chunks successfully embedded")
                 continue
 
@@ -488,12 +584,14 @@ def ingest_documents(resume: bool = True, reset: bool = False):
             progress.mark_completed(file_path, chunk_success)
 
         except Exception as e:
+            logger.error(f"Error processing file {rel_path}: {e}", exc_info=True)
             print(f"   ✗ Error processing file: {e}")
             continue
 
         # Sleep between files (except last file)
         if file_idx < len(md_files):
             sleep_time = random.randint(FILE_SLEEP_DURATION_MIN, FILE_SLEEP_DURATION_MAX)
+            logger.info(f"Rate limit: Sleeping {sleep_time}s before next file")
             print(f"   ⏳ Sleeping {sleep_time}s before next file...")
             print()
             time.sleep(sleep_time)
