@@ -52,42 +52,78 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Hero Banner Enhancements */
 .heroBanner {
-  padding: 10rem 0;
-  background: linear-gradient(135deg, var(--ifm-color-primary-darkest), var(--ifm-color-primary));
+  padding: 8rem 0;
   color: white;
   text-shadow: 0 2px 8px rgba(0,0,0,0.6);
   margin-bottom: 5rem;
 }
 
 [data-theme='dark'] .heroBanner {
-    background: linear-gradient(135deg, #000000, var(--ifm-color-primary-darkest));
+    background: none; /* Remove dark theme gradient to let the image show */
 }
 
 .hero__title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 5rem;
+    font-size: 4rem;
     text-transform: uppercase;
     letter-spacing: 3px;
     text-shadow: 0 4px 12px rgba(0,0,0,0.8);
+    color: white; /* Ensure title is white */
 }
 
 .hero__subtitle {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+    color: white; /* Ensure subtitle is white */
 }
 
-
-.buttons a.button {
-  transition: all 0.3s ease-in-out;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  border-radius: 50px;
-  padding: 1.2rem 2.5rem;
-  font-weight: bold;
-  background: linear-gradient(135deg, var(--ifm-color-primary-light), var(--ifm-color-primary-dark));
-  border: none;
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 6rem 1rem;
+  }
+  .hero__title {
+    font-size: 2.5rem;
+  }
+  .hero__subtitle {
+    font-size: 1.1rem;
+  }
 }
-.buttons a.button:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+
+@media screen and (max-width: 375px) {
+  .heroBanner {
+    padding: 4rem 1rem;
+  }
+  .hero__title {
+    font-size: 2rem;
+  }
+  .hero__subtitle {
+    font-size: 1rem;
+  }
+}
+
+@media screen and (max-width: 996px) {
+  .theme-layout-navbar-sidebar {
+    height: 100vh; /* Make it full height of the viewport */
+    position: fixed; /* Fix its position */
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000; /* Ensure it's above other content */
+  }
+
+  .navbar__items--right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align items to the right */
+    gap: 0.5rem; /* Use gap for consistent spacing */
+  }
+
+  .header-search-bar {
+    order: 2; /* Move search bar to the right of other items */
+  }
+
+  .navbar__items--right > .navbar__item:last-child {
+    order: 1; /* Ensure signin button comes before search */
+  }
 }
 
 
@@ -96,8 +132,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .feature-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 2.5rem;
 }
 
@@ -106,9 +143,12 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 15px;
   border: none;
   transition: all 0.3s ease;
-  height: 100%;
+  /* height: 100%; Removed to fix layout issues */
   background: linear-gradient(135deg, var(--ifm-background-color), var(--ifm-color-primary-lightest));
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  display: flex; /* Added for better button alignment */
+  flex-direction: column; /* Arrange content vertically */
+  justify-content: space-between; /* Push button to the bottom */
 }
 
 [data-theme='dark'] .module-card {
@@ -128,6 +168,25 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
   color: var(--ifm-color-primary);
   font-size: 1.5rem;
+}
+
+
+/* Header styles */
+.navbar {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 999; /* Ensure navbar is always on top */
+}
+
+[data-theme='dark'] .navbar {
+  background: rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar__title, .navbar__link {
+    font-family: 'Orbitron', sans-serif;
 }
 
 .quick-links-section {
@@ -167,29 +226,12 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 5px 15px rgba(216, 180, 254, 0.4);
 }
 
-
 .footer {
-    background: linear-gradient(135deg, var(--ifm-color-primary-darkest), var(--ifm-color-primary-dark));
+    background: var(--ifm-color-primary); /* Red in light mode */
     color: white;
 }
 
 [data-theme='dark'] .footer {
-    background: linear-gradient(135deg, #000000, #1a1a1a);
-}
-
-/* Header styles */
-.navbar {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-[data-theme='dark'] .navbar {
-  background: rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.navbar__title, .navbar__link {
-    font-family: 'Orbitron', sans-serif;
+    background: #1a1a1a; /* Dark grayish in dark mode */
+    color: white;
 }

@@ -14,6 +14,7 @@ Auto-generated from all feature plans. Last updated: 2025-12-07
 - N/A (Authentication feature) (001-betterauth-integration)
 - Docusaurus (TypeScript), Python 3.10+, TypeScript 5.x + Docusaurus, FastAPI, SQLAlchemy, Qdrant, PyJWT, Next.js (in `auth-service`) (001-vercel-deployment)
 - PostgreSQL (for user data), Qdrant (for vectors) (001-vercel-deployment)
+- Python 3.10+ (Backend), TypeScript 5.x (Frontend) + FastAPI, React, Docusaurus, Tailwind CSS, BetterAuth, Gemini SDK, Qdrant client (001-fix-auth-and-l10n)
 
 - TypeScript 5.x + jose, pg library, @vercel/functions (001-fix-betterauth-session)
 
@@ -48,10 +49,9 @@ npm test && npm run lint
 Node.js >=20.0, TypeScript ~5.6.2: Follow standard conventions
 
 ## Recent Changes
+- 001-fix-auth-and-l10n: Added Python 3.10+ (Backend), TypeScript 5.x (Frontend) + FastAPI, React, Docusaurus, Tailwind CSS, BetterAuth, Gemini SDK, Qdrant client
 - 001-vercel-deployment: Added Docusaurus (TypeScript), Python 3.10+, TypeScript 5.x + Docusaurus, FastAPI, SQLAlchemy, Qdrant, PyJWT, Next.js (in `auth-service`)
 - 001-betterauth-integration: Added Python 3.11+ (Backend), TypeScript 5.x (Frontend) + FastAPI, uvicorn, pydantic (Backend); React, Docusaurus (Frontend)
-- 001-global-chatbot-integration: Added Python 3.10+ (for backend), TypeScript 5.x (for frontend) + FastAPI, React, Docusaurus, Tailwind CSS
-- 001-fix-session-auth: Implemented session-based authentication in backend endpoints; refactored frontend to remove all JWT logic, fix login loop, and resolve build errors. Database migration performed to add user_id to chat_history.
 
 
 

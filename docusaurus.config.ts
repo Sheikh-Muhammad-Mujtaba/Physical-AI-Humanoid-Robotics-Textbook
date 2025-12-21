@@ -50,6 +50,7 @@ const config: Config = {
       ur: {
         direction: 'rtl',
         label: 'اردو',
+        path: 'ur',
       },
     },
   },

@@ -29,10 +29,14 @@
   },
   "link.item.label.GitHub": {
     "message": "گٹ ہب",
-    "description": "The label of footer link with label=GitHub linking to https://github.com/Sheikh-Muhammad-Mujtaba"
+    "description": "The label of footer link with label=GitHub linking to https://github.com/Sheikh-Muhammad-Mujtaba/Physical-AI-Humanoid-Robotics-Textbook"
   },
   "copyright": {
     "message": "کاپی رائٹ © 2025 فزیکل اے آئی اور ہیومنائڈ روبوٹکس۔ ڈوکوسارس کے ساتھ بنایا گیا۔",
     "description": "The footer copyright"
+  },
+  "link.item.label.Introduction": {
+    "message": "تعارف",
+    "description": "The label of footer link with label=Introduction linking to /docs/intro"
   }
 }

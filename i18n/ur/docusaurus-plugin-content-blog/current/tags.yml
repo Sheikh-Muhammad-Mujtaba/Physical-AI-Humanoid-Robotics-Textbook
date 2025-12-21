@@ -1,0 +1,26 @@
+```yml
+AI:
+  label: AI
+  permalink: /tags/ai
+  description: مصنوعی ذہانت سے متعلق پوسٹس
+
+Robotics:
+  label: Robotics
+  permalink: /tags/robotics
+  description: روبوٹکس سے متعلق پوسٹس
+
+Docusaurus:
+  label: Docusaurus
+  permalink: /tags/docusaurus
+  description: ڈاکوسارس فریم ورک سے متعلق پوسٹس
+
+Book:
+  label: Book
+  permalink: /tags/book
+  description: فزیکل اے آئی اور ہیومنائیڈ روبوٹکس ٹیکسٹ بک سے متعلق پوسٹس
+
+AI-Native:
+  label: AI-Native
+  permalink: /tags/ai-native
+  description: اے آئی-نیٹو سسٹمز اور ڈیویلپمنٹ سے متعلق پوسٹس
+```
