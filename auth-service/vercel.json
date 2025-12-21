@@ -13,6 +13,10 @@
     {
       "source": "/health",
       "destination": "/api/health"
+    },
+    {
+      "source": "/auth-callback",
+      "destination": "/api/auth-callback"
     }
   ],
   "headers": [
