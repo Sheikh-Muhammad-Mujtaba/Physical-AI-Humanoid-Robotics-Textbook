@@ -63,15 +63,25 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
   useEffect(() => {
     document.addEventListener('mouseup', handleMouseUp);
     const handleScroll = () => {
-        setButtonPosition(null);
-        setCurrentSelection(null);
+        // Only clear if there's no active selection
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+            setButtonPosition(null);
+            setCurrentSelection(null);
+        } else if (buttonPosition && currentSelection) {
+            // Update button position while keeping selection active during scroll
+            const coords = getSelectionCoords();
+            if (coords) {
+                setButtonPosition(coords);
+            }
+        }
     };
     window.addEventListener('scroll', handleScroll);
     return () => {
       document.removeEventListener('mouseup', handleMouseUp);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [handleMouseUp]);
+  }, [handleMouseUp, buttonPosition, currentSelection, getSelectionCoords]);
 
   if (!buttonPosition || !currentSelection) {
     return null;
