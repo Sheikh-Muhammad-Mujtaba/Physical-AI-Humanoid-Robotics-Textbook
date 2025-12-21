@@ -29,17 +29,33 @@ export default function AuthCallbackPage(): React.ReactElement {
 
   useEffect(() => {
     const handleCallback = async () => {
-      console.log('[AUTH-CALLBACK] Processing OAuth callback with session-based auth...');
+      console.log('[AUTH-CALLBACK] Processing OAuth callback with frontend-owned callback pattern...');
 
       try {
         const searchParams = new URLSearchParams(location.search);
         const redirectTo = searchParams.get('redirect') || '/docs/intro';
+        const code = searchParams.get('code');
+        const state = searchParams.get('state');
+        const error = searchParams.get('error');
+        const errorDescription = searchParams.get('error_description');
 
-        // For session-based auth, OAuth provider automatically sets session cookies
-        // We need to wait for the cookies to be set and then verify the session
-        console.log('[AUTH-CALLBACK] Waiting for session cookies to be established...');
+        // Check for OAuth errors from provider
+        if (error) {
+          console.error('[AUTH-CALLBACK] OAuth provider error:', error, errorDescription);
+          setError(`OAuth authentication failed: ${error}${errorDescription ? ' - ' + errorDescription : ''}`);
+          return;
+        }
 
-        // Wait longer for cookies to propagate through the network
+        // For the frontend-owned callback pattern, we just need to verify the session
+        // The frontend OAuth callback endpoint (/api/oauth/callback) has already:
+        // 1. Received the code and state from OAuth provider
+        // 2. Validated them
+        // 3. Redirected us here
+
+        console.log('[AUTH-CALLBACK] Frontend-owned callback received. Code:', code ? 'present' : 'missing');
+        console.log('[AUTH-CALLBACK] Waiting for session to be established...');
+
+        // Wait for session cookies to be set by the browser
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         // Attempt to get session multiple times (retry logic)

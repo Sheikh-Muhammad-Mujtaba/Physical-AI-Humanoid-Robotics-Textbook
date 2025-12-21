@@ -79,20 +79,22 @@ export default function LoginPage(): React.ReactElement {
     setSocialLoading(provider);
 
     try {
-      // Social login flow for cross-domain auth setup:
-      // 1. Frontend calls signIn.social() with auth service callback URL
-      // 2. OAuth provider redirects to auth service /callback/[provider]
-      // 3. Auth service processes OAuth, sets session cookie on auth service domain
-      // 4. Auth service redirects to this callbackURL with session established
-      // 5. Frontend then validates the session
+      // Social login flow using "frontend-owned callback" pattern:
+      // 1. Frontend calls signIn.social() with FRONTEND callback URL
+      // 2. OAuth provider redirects to frontend /api/oauth/callback (same domain as app)
+      // 3. Frontend endpoint validates code/state and redirects to auth-callback page
+      // 4. Auth-callback page exchanges code with auth service
+      // 5. Session cookie is set on FRONTEND domain (first-party cookie, not blocked)
+      // 6. Frontend can now read the session cookie
 
-      // CRITICAL: callbackURL must be on the AUTH SERVICE domain to receive the session cookie
-      // The auth service will handle the redirect back to the frontend
-      const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || 'http://localhost:3001';
+      // CRITICAL: callbackURL MUST be on the FRONTEND domain so the session cookie
+      // is set as a first-party cookie and can be read by the frontend.
+      // Using the auth service domain for the callback causes cross-domain cookie issues
+      // because cookies set on one domain cannot be read by a different domain.
 
       await authClient.signIn.social({
         provider,
-        callbackURL: `${authUrl}/auth-callback`,
+        callbackURL: `${frontendUrl}/api/oauth/callback`,
       });
       // Note: Code after this line won't execute because social login causes a redirect
     } catch (err) {
