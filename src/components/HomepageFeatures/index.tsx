@@ -1,68 +1,69 @@
 import Translate from '@docusaurus/Translate';
-import type {ReactNode} from 'react';
+import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import Heading from '@theme/Heading';
 import styles from './styles.module.css';
 import Link from '@docusaurus/Link';
 
 type FeatureItem = {
-  title: string;
-  description: ReactNode;
-  link: string;
+    title: string;
+    description: ReactNode;
+    link: string;
 };
 
 const FeatureList: FeatureItem[] = [
-  {
-    title: <Translate id="homepage.features.module1.title">Module 1: Introduction to Physical AI</Translate>,
-    description: (
-      <Translate id="homepage.features.module1.description">
-        Explore the foundational concepts of Physical AI, its components, and the sense-plan-act cycle.
-      </Translate>
-    ),
-    link: '/docs/module1-introduction-to-physical-ai/what-is-physical-ai',
-  },
-  {
-    title: <Translate id="homepage.features.module2.title">Module 2: Hardware Requirements</Translate>,
-    description: (
-      <Translate id="homepage.features.module2.description">
-        Understand the hardware necessary to build and run your own Physical AI projects.
-      </Translate>
-    ),
-    link: '/docs/module2-hardware-requirements/workstation-requirements',
-  },
-  {
-    title: <Translate id="homepage.features.module3.title">Module 3: Cloud-Native Lab</Translate>,
-    description: (
-      <Translate id="homepage.features.module3.description">
-        Learn how to set up a cloud-native lab for Physical AI development.
-      </Translate>
-    ),
-    link: '/docs/module3-cloud-native-lab/cloud-workstations',
-  },
-  {
-    title: <Translate id="homepage.features.module4.title">Module 4: Economy Jetson Student Kit</Translate>,
-    description: (
-      <Translate id="homepage.features.module4.description">
-        Get a detailed breakdown of an affordable and powerful hardware kit for students.
-      </Translate>
-    ),
-    link: '/docs/module4-economy-jetson-student-kit/jetson-student-kit',
-  },
+    {
+        title: <Translate id="homepage.features.module1.title">Module 1: Introduction to Physical AI</Translate>,
+        description: (
+            <Translate id="homepage.features.module1.description">
+                Explore the foundational concepts of Physical AI, its components, and the sense-plan-act cycle.
+            </Translate>
+        ),
+        link: '/docs/module1-introduction-to-physical-ai/what-is-physical-ai',
+    },
+    {
+        title: <Translate id="homepage.features.module2.title">Module 2: Hardware Requirements</Translate>,
+        description: (
+            <Translate id="homepage.features.module2.description">
+                Understand the hardware necessary to build and run your own Physical AI projects.
+            </Translate>
+        ),
+        link: '/docs/module2-hardware-requirements/workstation-requirements',
+    },
+    {
+        title: <Translate id="homepage.features.module3.title">Module 3: Cloud-Native Lab</Translate>,
+        description: (
+            <Translate id="homepage.features.module3.description">
+                Learn how to set up a cloud-native lab for Physical AI development.
+            </Translate>
+        ),
+        link: '/docs/module3-cloud-native-lab/cloud-workstations',
+    },
+    {
+        title: <Translate id="homepage.features.module4.title">Module 4: Economy Jetson Student Kit</Translate>,
+        description: (
+            <Translate id="homepage.features.module4.description">
+                Get a detailed breakdown of an affordable and powerful hardware kit for students.
+            </Translate>
+        ),
+        link: '/docs/module4-economy-jetson-student-kit/jetson-student-kit',
+    },
 ];
 
-function Feature({title, description, link}: FeatureItem) {
-  return (
-    <div className="module-card">
-      <div className="text--center padding-horiz--md">
-        <Heading as="h3">{title}</Heading>
-        <p>{description}</p>
-                  <Link
+function Feature({ title, description, link }: FeatureItem) {
+    return (
+        <div className="module-card">
+            <div className="text--center padding-horiz--md">
+                <Heading as="h3">{title}</Heading>
+                <p>{description}</p>
+                <Link
                     className="button button--primary button--md"
                     to={link}>
                     <Translate id="homepage.features.exploreModule">Explore Module</Translate>
-                  </Link>      </div>
-    </div>
-  );
+                </Link>
+            </div>
+        </div>
+    );
 }
 
 function WhyThisBook(): ReactNode {
@@ -187,20 +188,20 @@ function QuickLinks(): ReactNode {
 
 
 export default function HomepageFeatures(): ReactNode {
-  return (
-    <>
-        <QuickLinks />
-        <section className={styles.features}>
-          <div className="container">
-            <div className="feature-list">
-              {FeatureList.map((props, idx) => (
-                <Feature key={idx} {...props} />
-              ))}
-            </div>
-          </div>
-        </section>
-        <WhyThisBook />
-        <Testimonials />
-    </>
-  );
+    return (
+        <>
+            <QuickLinks />
+            <section className={styles.features}>
+                <div className="container">
+                    <div className="feature-list">
+                        {FeatureList.map((props, idx) => (
+                            <Feature key={idx} {...props} />
+                        ))}
+                    </div>
+                </div>
+            </section>
+            <WhyThisBook />
+            <Testimonials />
+        </>
+    );
 }

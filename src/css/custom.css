@@ -127,7 +127,49 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
-/* ... existing styles ... */
+.features {
+    padding: 5rem 0;
+}
+
+.feature-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2.5rem;
+}
+
+.module-card {
+  padding: 2rem;
+  border-radius: 15px;
+  border: none;
+  transition: all 0.3s ease;
+  /* height: 100%; Removed to fix layout issues */
+  background: linear-gradient(135deg, var(--ifm-background-color), var(--ifm-color-primary-lightest));
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  display: flex; /* Added for better button alignment */
+  flex-direction: column; /* Arrange content vertically */
+  justify-content: space-between; /* Push button to the bottom */
+}
+
+[data-theme='dark'] .module-card {
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+}
+
+.module-card:hover {
+  box-shadow: 0 12px 35px rgba(216, 180, 254, 0.6);
+  transform: translateY(-8px);
+}
+
+[data-theme='dark'] .module-card:hover {
+    box-shadow: 0 12px 35px rgba(255, 0, 0, 0.6);
+}
+
+.module-card h3 {
+  margin-top: 0;
+  color: var(--ifm-color-primary);
+  font-size: 1.5rem;
+}
+
 
 /* Header styles */
 .navbar {
@@ -145,6 +187,43 @@ h1, h2, h3, h4, h5, h6 {
 
 .navbar__title, .navbar__link {
     font-family: 'Orbitron', sans-serif;
+}
+
+.quick-links-section {
+    padding: 3rem 0;
+    background-color: var(--ifm-background-color);
+}
+
+[data-theme='dark'] .quick-links-section {
+    background-color: #0d0d0d;
+}
+
+.quick-links-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.quick-links-container a {
+  text-decoration: none;
+  color: var(--ifm-link-color);
+  font-weight: 500;
+  transition: all 0.3s ease-in-out;
+  padding: 0.8rem 1.5rem;
+  border: 2px solid var(--ifm-color-primary);
+  border-radius: 50px;
+}
+
+.quick-links-container a:hover {
+  text-decoration: none;
+  background-color: var(--ifm-color-primary);
+  color: white;
+  box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+}
+
+[data-theme='dark'] .quick-links-container a:hover {
+    box-shadow: 0 5px 15px rgba(216, 180, 254, 0.4);
 }
 
 .footer {
