@@ -62,8 +62,14 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
 
   useEffect(() => {
     document.addEventListener('mouseup', handleMouseUp);
+    const handleScroll = () => {
+        setButtonPosition(null);
+        setCurrentSelection(null);
+    };
+    window.addEventListener('scroll', handleScroll);
     return () => {
       document.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, [handleMouseUp]);
 
