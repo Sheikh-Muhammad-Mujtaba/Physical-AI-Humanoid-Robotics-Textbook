@@ -146,3 +146,13 @@ h1, h2, h3, h4, h5, h6 {
 .navbar__title, .navbar__link {
     font-family: 'Orbitron', sans-serif;
 }
+
+.footer {
+    background: var(--ifm-color-primary); /* Red in light mode */
+    color: white;
+}
+
+[data-theme='dark'] .footer {
+    background: #1a1a1a; /* Dark grayish in dark mode */
+    color: white;
+}
