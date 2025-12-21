@@ -1,6 +1,7 @@
 /**
- * OAuth Callback Handler
- * Handles the OAuth callback, extracts token from URL params or makes a token request
+ * OAuth Callback Handler - Session-Based Auth
+ * Handles the OAuth callback and waits for session cookies to be set
+ * Better Auth automatically sets secure httpOnly cookies on OAuth success
  */
 
 import React, { useEffect, useState, useMemo } from 'react';
@@ -28,54 +29,62 @@ export default function AuthCallbackPage(): React.ReactElement {
 
   useEffect(() => {
     const handleCallback = async () => {
-      console.log('[AUTH-CALLBACK] Processing OAuth callback...');
+      console.log('[AUTH-CALLBACK] Processing OAuth callback with session-based auth...');
 
       try {
         const searchParams = new URLSearchParams(location.search);
-        const token = searchParams.get('token');
         const redirectTo = searchParams.get('redirect') || '/docs/intro';
 
-        if (token) {
-          console.log('[AUTH-CALLBACK] Found token in URL, verifying with oneTimeToken...');
-          const { error: verifyError } = await authClient.oneTimeToken.verify({ token });
+        // For session-based auth, OAuth provider automatically sets session cookies
+        // We need to wait for the cookies to be set and then verify the session
+        console.log('[AUTH-CALLBACK] Waiting for session cookies to be established...');
 
-          if (verifyError) {
-            console.error('[AUTH-CALLBACK] One-time token verification failed:', verifyError);
-            setError('Session verification failed. The link may have expired.');
-            return;
+        // Wait longer for cookies to propagate through the network
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Attempt to get session multiple times (retry logic)
+        let sessionResult = null;
+        let attempts = 0;
+        const maxAttempts = 5;
+
+        while (attempts < maxAttempts) {
+          console.log(`[AUTH-CALLBACK] Session check attempt ${attempts + 1}/${maxAttempts}...`);
+
+          try {
+            sessionResult = await authClient.getSession({
+              fetchOptions: {
+                credentials: 'include',
+              }
+            });
+
+            console.log('[AUTH-CALLBACK] Session check result:', sessionResult);
+
+            if (sessionResult.data?.user) {
+              console.log('[AUTH-CALLBACK] ✓ Session established successfully via OAuth.');
+              console.log('[AUTH-CALLBACK] User:', sessionResult.data.user.email);
+              console.log('[AUTH-CALLBACK] Refetching session in provider...');
+
+              // Refetch session to update AuthProvider state
+              await refetch();
+
+              console.log('[AUTH-CALLBACK] Redirecting to:', redirectTo);
+              history.push(redirectTo);
+              return;
+            }
+          } catch (checkErr) {
+            console.warn(`[AUTH-CALLBACK] Session check attempt ${attempts + 1} failed:`, checkErr);
           }
 
-          console.log('[AUTH-CALLBACK] One-time token verified successfully. Refetching session...');
-          // Refetch session to update AuthProvider state
-          await refetch();
-          console.log('[AUTH-CALLBACK] Session refetched. Redirecting to:', redirectTo);
-          history.push(redirectTo);
-          return;
-        }
-        
-        // Fallback for cookie-based flow if no token is present
-        console.log('[AUTH-CALLBACK] No token in URL, attempting cookie-based session check...');
-        console.log('[AUTH-CALLBACK] Waiting briefly for cookies to propagate...');
-        await new Promise(resolve => setTimeout(resolve, 500)); // Shorter wait
-
-        const sessionResult = await authClient.getSession({
-          fetchOptions: {
-            credentials: 'include',
+          attempts++;
+          if (attempts < maxAttempts) {
+            // Wait before retrying
+            await new Promise(resolve => setTimeout(resolve, 500));
           }
-        });
-
-        console.log('[AUTH-CALLBACK] Session check result:', sessionResult);
-
-        if (sessionResult.data?.user) {
-          console.log('[AUTH-CALLBACK] Session established successfully via cookie.');
-          console.log('[AUTH-CALLBACK] Redirecting to:', redirectTo);
-          history.push(redirectTo);
-          return;
         }
 
-        // No session found
-        console.error('[AUTH-CALLBACK] No session found after OAuth callback (neither token nor cookie).');
-        setError('OAuth authentication completed but session was not established. Please try again.');
+        // No session found after retries
+        console.error('[AUTH-CALLBACK] Failed to establish session after OAuth callback.');
+        setError('OAuth authentication completed but session was not established. The auth server may be having issues. Please try again.');
       } catch (err) {
         console.error('[AUTH-CALLBACK] Error during callback:', err);
         setError(err instanceof Error ? err.message : 'Authentication failed unexpectedly');
