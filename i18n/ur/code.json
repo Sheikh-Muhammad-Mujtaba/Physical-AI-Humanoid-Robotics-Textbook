@@ -63,19 +63,19 @@
     "message": "ہمارے قارئین کیا کہتے ہیں"
   },
   "homepage.testimonials.testimonial1.quote": {
-    "message": \"\"یہ فزیکل اے آئی پر میری پڑھی ہوئی بہترین کتاب ہے۔ یہ جامع، عملی اور پیروی کرنے میں آسان ہے۔\""
+    "message": "یہ فزیکل اے آئی پر میری پڑھی ہوئی بہترین کتاب ہے۔ یہ جامع، عملی اور پیروی کرنے میں آسان ہے۔"
   },
   "homepage.testimonials.testimonial1.author": {
     "message": "- جان ڈو، روبوٹکس انجینئر"
   },
   "homepage.testimonials.testimonial2.quote": {
-    "message": \"\"اس کتاب کو پڑھنے کے بعد میں اپنا پہلا روبوٹ بنانے میں کامیاب رہا۔ انتہائی سفارش کی جاتی ہے!\""
+    "message": "اس کتاب کو پڑھنے کے بعد میں اپنا پہلا روبوٹ بنانے میں کامیاب رہا۔ انتہائی سفارش کی جاتی ہے!"
   },
   "homepage.testimonials.testimonial2.author": {
     "message": "- جین اسمتھ، اے آئی کے شوقین"
   },
   "homepage.testimonials.testimonial3.quote": {
-    "message": \"\"روبوٹکس کے دلچسپ میدان میں داخل ہونے کے خواہشمند ہر شخص کے لیے یہ ایک لازمی کتاب ہے۔\""
+    "message": "روبوٹکس کے دلچسپ میدان میں داخل ہونے کے خواہشمند ہر شخص کے لیے یہ ایک لازمی کتاب ہے۔"
   },
   "homepage.testimonials.testimonial3.author": {
     "message": "- سیم ولسن، محقق"
@@ -180,7 +180,7 @@
     "description": "Pluralized label for \"{count} docs tagged\". Use as much plural forms (separated by \"|\") as your language support (see https://www.unicode.org/cldr/cldr-aux/charts/34/supplemental/language_plural_rules.html)"
   },
   "theme.docs.tagDocListPageTitle": {
-    "message": \"\"{tagName}\" کے ساتھ {nDocsTagged}\",
+    "message": "{tagName}' کے ساتھ {nDocsTagged}",
     "description": "The title of the page for a docs tag"
   },
   "theme.docs.versions.unreleasedVersionLabel": {
@@ -371,7 +371,7 @@
     "description": "The ARIA label and title attribute for expand button of doc sidebar"
   },
   "theme.SearchPage.existingResultsTitle": {
-    "message": \"\"{query}\" کے لیے تلاش کے نتائج\",
+    "message": "'{query}' کے لیے تلاش کے نتائج",
     "description": "The search page title for non-empty query"
   },
   "theme.SearchPage.emptyResultsTitle": {
@@ -393,10 +393,10 @@
     "message": "کوئی نتیجہ نہیں"
   },
   "theme.SearchBar.seeAllOutsideContext": {
-    "message": \"\"{context}\" سے باہر تمام نتائج دیکھیں"
+    "message": "'{context}' سے باہر تمام نتائج دیکھیں"
   },
   "theme.SearchBar.searchInContext": {
-    "message": \"\"{context}\" کے اندر تمام نتائج دیکھیں"
+    "message": "'{context}' کے اندر تمام نتائج دیکھیں"
   },
   "theme.SearchBar.seeAll": {
     "message": "تمام نتائج دیکھیں"
@@ -410,7 +410,7 @@
     "description": "Pluralized label for \"{count} posts\". Use as much plural forms (separated by \"|\") as your language support (see https://www.unicode.org/cldr/cldr-aux/charts/34/supplemental/language_plural_rules.html)"
   },
   "theme.blog.tagTitle": {
-    "message": \"\"{tagName}\" کے ساتھ {nPosts} ٹیگ شدہ\",
+    "message": "{tagName}' کے ساتھ {nPosts} ٹیگ شدہ",
     "description": "The title of the page for a blog tag"
   },
   "theme.blog.author.pageTitle": {
