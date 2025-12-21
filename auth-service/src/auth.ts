@@ -137,6 +137,11 @@ export const auth = betterAuth({
     accountLinking: {
       enabled: true,
     },
+
+    // Default callback URL for OAuth after successful authentication
+    // This is where Better Auth redirects after the OAuth callback is processed
+    // The frontend /auth-callback page will handle the redirect and session verification
+    callbackURL: frontendOrigins[0] + "/auth-callback",
   },
   rateLimit: {
     enabled: false, // Disable rate limiting to avoid 401 errors during token fetching
