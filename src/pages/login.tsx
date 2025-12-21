@@ -79,12 +79,20 @@ export default function LoginPage(): React.ReactElement {
     setSocialLoading(provider);
 
     try {
-      // Social login: OAuth provider redirects to auth service /callback/[provider]
-      // Auth service processes OAuth and redirects to this callbackURL
-      // We use token-relay to extract token server-side and pass via URL
+      // Social login flow for cross-domain auth setup:
+      // 1. Frontend calls signIn.social() with auth service callback URL
+      // 2. OAuth provider redirects to auth service /callback/[provider]
+      // 3. Auth service processes OAuth, sets session cookie on auth service domain
+      // 4. Auth service redirects to this callbackURL with session established
+      // 5. Frontend then validates the session
+
+      // CRITICAL: callbackURL must be on the AUTH SERVICE domain to receive the session cookie
+      // The auth service will handle the redirect back to the frontend
+      const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || 'http://localhost:3001';
+
       await authClient.signIn.social({
         provider,
-        callbackURL: `${frontendUrl}/auth-callback`,
+        callbackURL: `${authUrl}/auth-callback`,
       });
       // Note: Code after this line won't execute because social login causes a redirect
     } catch (err) {

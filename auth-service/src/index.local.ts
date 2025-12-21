@@ -69,6 +69,35 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", service: "auth-service" });
 });
 
+// OAuth Callback redirect endpoint
+// This endpoint receives the OAuth callback on the auth service domain (where session cookie is set)
+// and redirects to the frontend's auth callback page with the session cookie preserved
+app.get("/auth-callback", (req, res) => {
+  try {
+    // Get the frontend URL from environment or request origin
+    const frontendUrl = process.env.FRONTEND_URL
+      ? process.env.FRONTEND_URL.split(",")[0].trim()
+      : "http://localhost:3000";
+
+    // Get redirect target from query params or default to /auth-callback on frontend
+    const redirectPath = req.query.redirect || "/auth-callback";
+    const targetUrl = `${frontendUrl}${redirectPath}`;
+
+    console.log(`[AUTH-CALLBACK] Redirecting from auth service to frontend: ${targetUrl}`);
+    console.log(`[AUTH-CALLBACK] Session cookie should be preserved in subsequent requests`);
+
+    // Redirect to frontend - the session cookie will be automatically included in subsequent requests
+    // because it was set by Better Auth on the auth service domain
+    res.redirect(targetUrl);
+  } catch (error) {
+    console.error("[AUTH-CALLBACK] Error:", error);
+    res.status(500).json({
+      error: "Redirect failed",
+      message: error instanceof Error ? error.message : "Unknown error"
+    });
+  }
+});
+
 const server = app.listen(PORT, () => {
   console.log(`Auth service running on port ${PORT}`);
   console.log(`JWKS endpoint: http://localhost:${PORT}/api/auth/jwks`);
