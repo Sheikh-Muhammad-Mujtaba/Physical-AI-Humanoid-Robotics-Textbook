@@ -10,6 +10,7 @@
  */
 
 import { createAuthClient } from "better-auth/react";
+import { oneTimeTokenClient } from "better-auth/client/plugins";
 
 // Default fallback URL for local development
 export const DEV_AUTH_URL = "http://localhost:3001";
@@ -70,7 +71,7 @@ export const createClientForUrl = (
           }
         },
       },
-      plugins: [],
+      plugins: [oneTimeTokenClient()],
     }));
   }
 

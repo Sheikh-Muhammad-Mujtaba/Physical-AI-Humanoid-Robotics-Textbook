@@ -3,7 +3,7 @@
  * Handles the OAuth callback, extracts token from URL params or makes a token request
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Layout from '@theme/Layout';
 import { useHistory, useLocation } from '@docusaurus/router';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
@@ -20,10 +20,11 @@ export default function AuthCallbackPage(): React.ReactElement {
   // Get API base URL from config
   const apiBaseUrl = (siteConfig.customFields?.apiBaseUrl as string) || DEV_API_BASE_URL;
 
-  const authClient = createClientForUrl(authUrl, apiBaseUrl, frontendUrl);
+  const authClient = useMemo(() => createClientForUrl(authUrl, apiBaseUrl, frontendUrl), [authUrl, apiBaseUrl, frontendUrl]);
   const history = useHistory();
   const location = useLocation();
   const [error, setError] = useState('');
+  const { refetch } = authClient.useSession();
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -31,29 +32,32 @@ export default function AuthCallbackPage(): React.ReactElement {
 
       try {
         const searchParams = new URLSearchParams(location.search);
+        const token = searchParams.get('token');
+        const redirectTo = searchParams.get('redirect') || '/docs/intro';
 
-        // Check if we came from OAuth flow
-        const from = searchParams.get('from');
-        if (from !== 'oauth') {
-          console.log('[AUTH-CALLBACK] Not an OAuth callback, redirecting...');
-          const redirectTo = searchParams.get('redirect') || '/docs/intro';
+        if (token) {
+          console.log('[AUTH-CALLBACK] Found token in URL, verifying with oneTimeToken...');
+          const { error: verifyError } = await authClient.oneTimeToken.verify({ token });
+
+          if (verifyError) {
+            console.error('[AUTH-CALLBACK] One-time token verification failed:', verifyError);
+            setError('Session verification failed. The link may have expired.');
+            return;
+          }
+
+          console.log('[AUTH-CALLBACK] One-time token verified successfully. Refetching session...');
+          // Refetch session to update AuthProvider state
+          await refetch();
+          console.log('[AUTH-CALLBACK] Session refetched. Redirecting to:', redirectTo);
           history.push(redirectTo);
           return;
         }
-
-        // BetterAuth OAuth flow:
-        // 1. User clicks "Sign in with Google" on frontend
-        // 2. Frontend calls signIn.social() which redirects to auth service
-        // 3. Auth service redirects to Google OAuth
-        // 4. Google redirects back to auth service /callback/google with auth code
-        // 5. Auth service exchanges code for tokens, creates session, sets cookies
-        // 6. Auth service redirects here (frontend /auth-callback?from=oauth)
-        // 7. Session cookies should already be set by auth service
-
+        
+        // Fallback for cookie-based flow if no token is present
+        console.log('[AUTH-CALLBACK] No token in URL, attempting cookie-based session check...');
         console.log('[AUTH-CALLBACK] Waiting briefly for cookies to propagate...');
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 500)); // Shorter wait
 
-        // Check if session exists (cookies should be set by auth service)
         const sessionResult = await authClient.getSession({
           fetchOptions: {
             credentials: 'include',
@@ -63,17 +67,15 @@ export default function AuthCallbackPage(): React.ReactElement {
         console.log('[AUTH-CALLBACK] Session check result:', sessionResult);
 
         if (sessionResult.data?.user) {
-          console.log('[AUTH-CALLBACK] Session established successfully');
-
-          const redirectTo = searchParams.get('redirect') || '/docs/intro';
+          console.log('[AUTH-CALLBACK] Session established successfully via cookie.');
           console.log('[AUTH-CALLBACK] Redirecting to:', redirectTo);
           history.push(redirectTo);
           return;
         }
 
         // No session found
-        console.error('[AUTH-CALLBACK] No session found after OAuth callback');
-        setError('OAuth authentication completed but session was not established. This may be a cookie issue. Please try again or use email/password login.');
+        console.error('[AUTH-CALLBACK] No session found after OAuth callback (neither token nor cookie).');
+        setError('OAuth authentication completed but session was not established. Please try again.');
       } catch (err) {
         console.error('[AUTH-CALLBACK] Error during callback:', err);
         setError(err instanceof Error ? err.message : 'Authentication failed unexpectedly');
@@ -81,7 +83,7 @@ export default function AuthCallbackPage(): React.ReactElement {
     };
 
     handleCallback();
-  }, [authClient, history, location]);
+  }, [authClient, history, location, refetch]);
 
   if (error) {
     return (

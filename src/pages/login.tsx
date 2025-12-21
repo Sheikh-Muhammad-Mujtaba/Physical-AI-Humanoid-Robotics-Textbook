@@ -84,7 +84,7 @@ export default function LoginPage(): React.ReactElement {
       // We use token-relay to extract token server-side and pass via URL
       await authClient.signIn.social({
         provider,
-        callbackURL: `${frontendUrl}/auth-callback?from=oauth`,
+        callbackURL: `${frontendUrl}/auth-callback`,
       });
       // Note: Code after this line won't execute because social login causes a redirect
     } catch (err) {

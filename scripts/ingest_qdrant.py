@@ -116,7 +116,7 @@ COLLECTION_NAME = os.getenv('QDRANT_COLLECTION_NAME', 'textbook_chunks')
 logger.debug(f"Qdrant configuration: URL={QDRANT_URL[:50]}..., Collection={COLLECTION_NAME}")
 
 # Embedding model
-EMBEDDING_MODEL = 'model/text-embedding-004' #'models/embedding-001'
+EMBEDDING_MODEL = 'models/text-embedding-004' #'models/embedding-001'
 VECTOR_SIZE = 768  # Google Embedding API returns 768-dimensional vectors
 
 # Chunk configuration
@@ -450,7 +450,7 @@ def ingest_documents(resume: bool = True, reset: bool = False):
     blog_dir = base_dir / 'blog'
 
     if not docs_dir.exists() or not blog_dir.exists():
-        print(f"\n✗ Required directories not found")
+        print("\n✗ Required directories not found")
         print(f"  docs ({docs_dir}): {docs_dir.exists()}")
         print(f"  blog ({blog_dir}): {blog_dir.exists()}")
         sys.exit(1)
@@ -514,7 +514,7 @@ def ingest_documents(resume: bool = True, reset: bool = False):
 
             if not content.strip():
                 logger.warning(f"File has no content: {rel_path}")
-                print(f"   ⚠️  No content, skipping")
+                print("   ⚠️  No content, skipping")
                 progress.mark_completed(file_path, 0)
                 continue
 
@@ -577,7 +577,7 @@ def ingest_documents(resume: bool = True, reset: bool = False):
                 total_inserted += chunk_success
             else:
                 logger.error(f"No chunks successfully embedded for file: {rel_path}")
-                print(f"   ✗ No chunks successfully embedded")
+                print("   ✗ No chunks successfully embedded")
                 continue
 
             # Mark completed and save progress

@@ -7,20 +7,26 @@ import Heading from '@theme/Heading';
 
 import styles from './index.module.css';
 
+import Translate from '@docusaurus/Translate';
+
+// ...
+
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
-      <div className="container">
+      <div className={styles.heroContent}>
         <Heading as="h1" className="hero__title">
-          {siteConfig.title}
+          <Translate id="homepage.hero.title">{siteConfig.title}</Translate>
         </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
+        <p className="hero__subtitle">
+          <Translate id="homepage.hero.tagline">{siteConfig.tagline}</Translate>
+        </p>
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
             to="/docs/intro">
-            Start Learning
+            <Translate id="homepage.hero.startLearning">Start Learning</Translate>
           </Link>
         </div>
       </div>

@@ -1,0 +1,234 @@
+openapi: 3.0.0
+info:
+  title: Authentication and Localization API
+  version: 1.0.0
+  description: API for managing user authentication (email/password and OAuth) and supporting localization within the application.
+
+servers:
+  - url: /api
+    description: Base URL for authentication APIs
+
+tags:
+  - name: Authentication
+    description: User authentication operations
+  - name: Localization
+    description: Localization related operations
+
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user with email and password
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: myStrongPassword123
+      responses:
+        '201':
+          description: User registered successfully and logged in. Returns a session token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User registered successfully
+                  session_token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: Invalid input or email already registered
+        '500':
+          description: Internal server error
+
+  /auth/login:
+    post:
+      summary: Log in an existing user with email and password
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: myStrongPassword123
+      responses:
+        '200':
+          description: User logged in successfully. Returns a session token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User logged in successfully
+                  session_token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Invalid credentials
+        '500':
+          description: Internal server error
+
+  /auth/logout:
+    post:
+      summary: Log out the current user
+      tags:
+        - Authentication
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User logged out successfully. Session invalidated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User logged out successfully
+        '401':
+          description: Unauthorized
+
+  /auth/google:
+    get:
+      summary: Initiate Google OAuth flow
+      tags:
+        - Authentication
+      responses:
+        '302':
+          description: Redirects to Google's authentication page
+        '500':
+          description: Internal server error
+
+  /auth/google/callback:
+    get:
+      summary: Google OAuth callback handler
+      tags:
+        - Authentication
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string
+          required: true
+          description: Authorization code from Google
+        - in: query
+          name: state
+          schema:
+            type: string
+          required: false
+          description: State parameter for CSRF protection
+      responses:
+        '302':
+          description: Redirects to frontend with session token or error
+        '500':
+          description: Internal server error
+
+  /auth/github:
+    get:
+      summary: Initiate GitHub OAuth flow
+      tags:
+        - Authentication
+      responses:
+        '302':
+          description: Redirects to GitHub's authentication page
+        '500':
+          description: Internal server error
+
+  /auth/github/callback:
+    get:
+      summary: GitHub OAuth callback handler
+      tags:
+        - Authentication
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string
+          required: true
+          description: Authorization code from GitHub
+        - in: query
+          name: state
+          schema:
+            type: string
+          required: false
+          description: State parameter for CSRF protection
+      responses:
+        '302':
+          description: Redirects to frontend with session token or error
+        '500':
+          description: Internal server error
+
+  /localization/{lang}:
+    get:
+      summary: Retrieve localized content for a given language
+      tags:
+        - Localization
+      parameters:
+        - in: path
+          name: lang
+          schema:
+            type: string
+            enum: [en, ur]
+          required: true
+          description: The language code (e.g., 'en', 'ur')
+      responses:
+        '200':
+          description: Returns localized content (e.g., JSON object of translations)
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+                example:
+                  greeting: "Hello"
+                  welcome: "Welcome to our application"
+        '404':
+          description: Language not supported or content not found
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT # Assuming JWT or similar token format
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Something went wrong

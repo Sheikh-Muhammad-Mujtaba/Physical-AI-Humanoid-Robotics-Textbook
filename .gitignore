@@ -58,7 +58,7 @@ auth-service/node_modules/
 auth-service/dist/
 auth-service/.env
 auth-service/*.db
-
+logs/
 # Dependencies
 /node_modules
 

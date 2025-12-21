@@ -1,44 +1,48 @@
-# Implementation Plan: [FEATURE]
+# Implementation Plan: Fix Auth and L10n
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/sp.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Branch**: `001-fix-auth-and-l10n` | **Date**: 2025-12-21 | **Spec**: [specs/001-fix-auth-and-l10n/spec.md](./spec.md)
+**Input**: Feature specification from `/specs/001-fix-auth-and-l10n/spec.md`
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Address unreliability in BetterAuth session-based login and signup, fix social OAuth login/signup, and complete Urdu localization. This involves aligning the authentication implementation strictly with the latest BetterAuth documentation, using Context7 MCP and BetterAuth MCP for reference, and utilizing Gemini AI for high-quality Urdu translations within Docusaurus i18n.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: Python 3.10+ (Backend), TypeScript 5.x (Frontend)
+**Primary Dependencies**: FastAPI, React, Docusaurus, Tailwind CSS, BetterAuth, Gemini SDK, Qdrant client
+**Storage**: PostgreSQL (for user data), Qdrant (for vectors)
+**Testing**: npm test && npm run lint (Frontend), pytest (Backend)
+**Target Platform**: Vercel
+**Project Type**: Web application (Frontend & Backend)
+**Performance Goals**: NEEDS CLARIFICATION (not explicitly defined in spec, will target standard web application responsiveness for authentication flows and localization loading times).
+**Constraints**:
+- Align implementation strictly with the latest BetterAuth documentation.
+- Use Gemini AI for high-quality Urdu translations.
+- No UI redesign unless required for auth correctness.
+- No custom auth logic outside BetterAuth unless explicitly required by docs.
+**Scale/Scope**: Existing Docusaurus application with authentication and localization requiring fixes and completeness.
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+### Secure API Access (Bearer Token)
+- **Principle 1.1 (Method)**: All requests from the chatbot frontend to protected backend endpoints (`/api/chat`, `/api/ask-selection`, `/api/feedback`) MUST include an `Authorization: Bearer <TOKEN>` header.
+  - **Compliance**: The authentication fix must ensure that the generated sessions and tokens (if any are still used internally by BetterAuth) adhere to this principle for protected endpoints. The fix should specifically focus on how the frontend obtains and uses this token.
+- **Principle 1.2 (Backend Enforcement)**: The FastAPI server (`api/index.py`) MUST implement a dependency injection (`fastapi.security.HTTPBearer`) to validate the token against an environment variable (`BETTER_AUTH_SECRET_KEY`). Invalid or missing tokens must return a 401 Unauthorized response.
+  - **Compliance**: The backend authentication logic, especially related to session validation and any token exchange, must strictly follow this enforcement mechanism. The fix will need to ensure `api/index.py` correctly handles `BETTER_AUTH_SECRET_KEY` and token validation.
+
+### Model Context Protocol (MCP)
+- **Principle 2.1 (Tooling)**: Use Context7 MCP to get updated BetterAuth `https://www.better-auth.com/` documentation for the implementation.
+  - **Compliance**: The planning and implementation phases will actively leverage Context7 MCP and BetterAuth MCP as specified in the feature goals to ensure alignment with the latest BetterAuth docs. This will be a key part of the research phase (Phase 0).
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/[###-feature]/
+specs/001-fix-auth-and-l10n/
 ├── plan.md              # This file (/sp.plan command output)
 ├── research.md          # Phase 0 output (/sp.plan command)
 ├── data-model.md        # Phase 1 output (/sp.plan command)
@@ -48,51 +52,31 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+backend/ (or api/ - using existing `api/` folder for backend)
+├── api/
+│   ├── index.py
+│   └── utils/
+│       ├── auth.py # Expected to be modified for BetterAuth integration
+│       └── ...
+└── tests/ # (assuming tests exist or will be added for backend)
 
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
+frontend/ (Docusaurus/React related files)
 ├── src/
 │   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+│   ├── contexts/
+│   ├── pages/ # Likely affected by auth and i18n
+│   ├── lib/
+│   ├── plugins/
+│   └── theme/
+├── i18n/ # Affected by localization
+│   ├── en/
+│   └── ur/ # Affected by localization
+└── tests/ # (assuming tests exist or will be added for frontend)
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: The project uses a hybrid structure with a dedicated `api/` directory for the Python backend and Docusaurus/React files in the root and `src/` for the frontend. We will continue to use this existing structure. The `auth.py` in `api/utils/` will be a key area for backend auth changes, and `i18n/ur/` for localization.
 
 ## Complexity Tracking
 
@@ -100,5 +84,4 @@ directories captured above]
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+| | | |
