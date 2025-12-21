@@ -1,4 +1,3 @@
-```
 ---
 title: Local "Bridge" Hardware
 sidebar_position: 2
@@ -17,4 +16,3 @@ sidebar_position: 2
 
 -   **ضروری:** آپ کو حتمی ڈیمو کے لیے اب بھی ایک فزیکل روبوٹ کی ضرورت ہے۔
 -   **لاگت:** تقریباً $3,000 (Unitree Go2 Standard)
-```

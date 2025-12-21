@@ -30,7 +30,7 @@ Humanoid Robots ہماری دنیا میں انقلاب لانے کے دہانے
 
 -   Physical AI اور Embodied Intelligence کے بنیادی اصولوں کو سمجھنا۔
 -   روبوٹک کنٹرول کے لیے Robot Operating System (ROS 2) میں مہارت حاصل کرنا۔
--   Gazebo اور Unity میں روبوٹس کو Simulate کرنا۔
--   NVIDIA Isaac AI روبوٹ پلیٹ فارم کے ساتھ Develop کرنا۔
+-   Gazebo اور Unity میں روبوٹس کو نقل کرنا (Simulate)۔
+-   NVIDIA Isaac AI روبوٹ پلیٹ فارم کے ساتھ تطویر کرنا (Develop)۔
 -   فطری اور بدیہی تعاملات کے لیے Humanoid Robots کو ڈیزائن کرنا۔
 -   Conversational Robotics کے لیے GPT ماڈلز کو Integrate کرنا۔

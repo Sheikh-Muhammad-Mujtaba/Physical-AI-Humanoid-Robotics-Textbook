@@ -1,6 +1,5 @@
-```
 ---
-title: Summary of Architecture
+title: فن تعمیر کا خلاصہ
 sidebar_position: 4
 ---
 
@@ -14,4 +13,3 @@ sidebar_position: 4
 | **ایڈج برین** | Jetson Orin Nano | "Inference" اسٹیک چلاتا ہے۔ طلباء اپنا کوڈ یہاں deploy کرتے ہیں۔ |
 | **سینسرز** | RealSense کیمرہ + Lidar | Jetson سے منسلک ہوتے ہیں تاکہ حقیقی دنیا کا ڈیٹا AI کو فراہم کریں۔ |
 | **ایکچوئیٹر** | Unitree Go2 یا G1 (مشترکہ) | Jetson سے موٹر کمانڈز وصول کرتا ہے۔ |
-```

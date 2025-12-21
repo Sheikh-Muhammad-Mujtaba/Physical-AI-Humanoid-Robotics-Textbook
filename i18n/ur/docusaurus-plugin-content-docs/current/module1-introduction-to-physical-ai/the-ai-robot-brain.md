@@ -1,5 +1,5 @@
 ---
-title: اے آئی-روبوٹ برین (NVIDIA Isaac™)
+title: روبوٹ کا ذہن (The AI Robot Brain)
 sidebar_position: 4
 ---
 

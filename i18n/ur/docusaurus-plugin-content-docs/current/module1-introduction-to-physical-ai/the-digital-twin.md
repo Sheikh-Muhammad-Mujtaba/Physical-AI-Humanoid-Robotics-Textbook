@@ -1,6 +1,5 @@
-```
 ---
-title: ڈیجیٹل ٹوئن (Gazebo اور Unity)
+title: ڈیجیٹل جڑواں (The Digital Twin)
 sidebar_position: 3
 ---
 
@@ -29,4 +28,3 @@ sidebar_position: 3
 -   **Robot Descriptions:** اپنے روبوٹ کی وضاحت کے لیے URDF (Unified Robot Description Format) اور SDF (Simulation Description Format) کو سمجھیں۔
 -   **Physics and Sensor Simulation:** Gazebo میں فزکس اور سینسرز کو سمولیٹ کرنے کی تفصیلات میں گہرائی سے جائیں۔
 -   **Unity for Visualization:** اعلیٰ معیار کی روبوٹ ویژولائزیشن کے لیے Unity کے استعمال کا تعارف حاصل کریں۔
-```

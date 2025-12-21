@@ -1,7 +1,6 @@
-```markdown
 ---
 slug: book-creation-summary
-title: "A New Book Unveiled: Physical AI & Humanoid Robotics"
+title: کتاب کی تخلیق کا خلاصہ
 authors: [sheikh_mujtaba]
 tags: [AI, Robotics, Docusaurus, Book, AI-Native]
 ---
@@ -35,4 +34,3 @@ tags: [AI, Robotics, Docusaurus, Book, AI-Native]
 **تالیف کردہ: شیخ مجتبیٰ**
 _AI/روبوٹکس کے پرجوش اور ڈویلپر_
 _6 دسمبر، 2025_
-```

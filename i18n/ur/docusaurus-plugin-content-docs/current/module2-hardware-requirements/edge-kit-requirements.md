@@ -1,5 +1,5 @@
 ---
-title: ایج کِٹ کے تقاضے
+title: Edge Kit کی ضروریات
 sidebar_position: 2
 ---
 
