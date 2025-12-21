@@ -79,22 +79,15 @@ export default function LoginPage(): React.ReactElement {
     setSocialLoading(provider);
 
     try {
-      // Social login flow using "frontend-owned callback" pattern:
-      // 1. Frontend calls signIn.social() with FRONTEND callback URL
-      // 2. OAuth provider redirects to frontend /api/oauth/callback (same domain as app)
-      // 3. Frontend endpoint validates code/state and redirects to auth-callback page
-      // 4. Auth-callback page exchanges code with auth service
-      // 5. Session cookie is set on FRONTEND domain (first-party cookie, not blocked)
-      // 6. Frontend can now read the session cookie
-
-      // CRITICAL: callbackURL MUST be on the FRONTEND domain so the session cookie
-      // is set as a first-party cookie and can be read by the frontend.
-      // Using the auth service domain for the callback causes cross-domain cookie issues
-      // because cookies set on one domain cannot be read by a different domain.
+      // Better Auth OAuth flow:
+      // 1. signIn.social() initiates OAuth with the auth service
+      // 2. Better Auth handles the full OAuth flow server-side
+      // 3. Session cookie is set on auth service domain by Better Auth
+      // 4. Browser automatically includes cookies in cross-origin requests (credentials: include)
+      // 5. Frontend can read the session via getSession()
 
       await authClient.signIn.social({
         provider,
-        callbackURL: `${frontendUrl}/api/oauth/callback`,
       });
       // Note: Code after this line won't execute because social login causes a redirect
     } catch (err) {

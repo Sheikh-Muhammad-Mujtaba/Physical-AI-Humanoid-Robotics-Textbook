@@ -29,36 +29,17 @@ export default function AuthCallbackPage(): React.ReactElement {
 
   useEffect(() => {
     const handleCallback = async () => {
-      console.log('[AUTH-CALLBACK] Processing OAuth callback with frontend-owned callback pattern...');
+      console.log('[AUTH-CALLBACK] Processing OAuth callback...');
 
       try {
         const searchParams = new URLSearchParams(location.search);
         const redirectTo = searchParams.get('redirect') || '/docs/intro';
-        const code = searchParams.get('code');
-        const state = searchParams.get('state');
-        const error = searchParams.get('error');
-        const errorDescription = searchParams.get('error_description');
 
-        // Check for OAuth errors from provider
-        if (error) {
-          console.error('[AUTH-CALLBACK] OAuth provider error:', error, errorDescription);
-          setError(`OAuth authentication failed: ${error}${errorDescription ? ' - ' + errorDescription : ''}`);
-          return;
-        }
-
-        // For the frontend-owned callback pattern, we just need to verify the session
-        // The frontend OAuth callback endpoint (/api/oauth/callback) has already:
-        // 1. Received the code and state from OAuth provider
-        // 2. Validated them
-        // 3. Redirected us here
-
-        console.log('[AUTH-CALLBACK] Frontend-owned callback received. Code:', code ? 'present' : 'missing');
+        // Wait for session to be established after OAuth redirect
         console.log('[AUTH-CALLBACK] Waiting for session to be established...');
-
-        // Wait for session cookies to be set by the browser
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // Attempt to get session multiple times (retry logic)
+        // Check session with retry logic
         let sessionResult = null;
         let attempts = 0;
         const maxAttempts = 5;
@@ -76,9 +57,8 @@ export default function AuthCallbackPage(): React.ReactElement {
             console.log('[AUTH-CALLBACK] Session check result:', sessionResult);
 
             if (sessionResult.data?.user) {
-              console.log('[AUTH-CALLBACK] ✓ Session established successfully via OAuth.');
+              console.log('[AUTH-CALLBACK] ✓ Session established successfully.');
               console.log('[AUTH-CALLBACK] User:', sessionResult.data.user.email);
-              console.log('[AUTH-CALLBACK] Refetching session in provider...');
 
               // Refetch session to update AuthProvider state
               await refetch();
@@ -93,14 +73,12 @@ export default function AuthCallbackPage(): React.ReactElement {
 
           attempts++;
           if (attempts < maxAttempts) {
-            // Wait before retrying
             await new Promise(resolve => setTimeout(resolve, 500));
           }
         }
 
-        // No session found after retries
         console.error('[AUTH-CALLBACK] Failed to establish session after OAuth callback.');
-        setError('OAuth authentication completed but session was not established. The auth server may be having issues. Please try again.');
+        setError('OAuth authentication completed but session was not established. Please try again.');
       } catch (err) {
         console.error('[AUTH-CALLBACK] Error during callback:', err);
         setError(err instanceof Error ? err.message : 'Authentication failed unexpectedly');
