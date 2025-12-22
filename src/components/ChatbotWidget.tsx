@@ -96,21 +96,31 @@ const ChatbotWidget: React.FC = () => {
 
           {/* Input Area */}
           <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-            {/* WhatsApp-style Selection Tag */}
+            {/* WhatsApp-style Selection Banner - Non-editable Context */}
             {selectedText && (
-              <div className="mb-2 p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg border-l-4 border-primary">
+              <div className="mb-3 p-2.5 bg-gradient-to-r from-blue-50 to-blue-50/50 dark:from-blue-900/40 dark:to-blue-900/20 rounded-lg border-l-4 border-primary shadow-sm transition-all duration-200">
                 <div className="flex justify-between items-start gap-2">
                   <div className="flex-1 min-w-0">
-                    <span className="text-xs font-medium text-primary dark:text-blue-400 block mb-1">
-                      Selected from book:
-                    </span>
-                    <p className="text-xs text-gray-600 dark:text-gray-300 italic line-clamp-2">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <svg className="w-3.5 h-3.5 text-primary dark:text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M4 4a2 2 0 012-2h6a2 2 0 012 2v2h2a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h2V4z" />
+                      </svg>
+                      <span className="text-xs font-semibold text-primary dark:text-blue-400 truncate">
+                        📖 Selected from book
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 italic line-clamp-2 bg-white/50 dark:bg-gray-800/50 p-1.5 rounded border border-gray-200/50 dark:border-gray-700/50">
                       "{truncateText(selectedText, 120)}"
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      This context will be included with your message.
                     </p>
                   </div>
                   <button
                     onClick={clearSelection}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 flex-shrink-0"
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 flex-shrink-0 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 p-1 rounded transition-colors"
+                    title="Clear selection"
+                    aria-label="Clear selection"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

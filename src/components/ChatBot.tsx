@@ -263,22 +263,27 @@ export default function ChatBot({ selectedText }: ChatBotProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Selected Text Banner */}
+      {/* Selected Text Banner - WhatsApp-style context */}
       {capturedText && (
-        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border-t-2 border-blue-200 px-4 py-3 flex items-center gap-3">
+        <div className="bg-gradient-to-r from-blue-50 to-blue-50/50 border-t-2 border-l-4 border-[#1cd98e] px-4 py-3.5 flex items-start gap-3 shadow-sm">
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Selected Text</p>
-            <p className="text-sm text-gray-700 truncate line-clamp-2">
-              {capturedText.substring(0, 80)}{capturedText.length > 80 ? '...' : ''}
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="inline-flex items-center justify-center w-5 h-5 text-sm">📖</span>
+              <p className="text-xs font-bold text-[#1cd98e] uppercase tracking-wider">Selected from book</p>
+            </div>
+            <p className="text-sm text-gray-700 italic bg-white/70 p-2 rounded border border-gray-200 line-clamp-2">
+              "{capturedText.substring(0, 80)}{capturedText.length > 80 ? '...' : ''}"
             </p>
+            <p className="text-xs text-gray-500 mt-1.5">This context will be included with your message.</p>
           </div>
           <button
-            onClick={handleAskAboutSelection}
+            onClick={() => setCapturedText("")}
             disabled={isLoading}
-            className="flex-shrink-0 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white text-xs font-bold rounded-lg transition-all duration-200 flex items-center gap-1 whitespace-nowrap"
+            className="flex-shrink-0 mt-0.5 text-gray-400 hover:text-gray-600 transition-colors"
+            title="Clear selection"
+            aria-label="Clear selection"
           >
-            <Sparkles className="w-4 h-4" />
-            Ask
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}

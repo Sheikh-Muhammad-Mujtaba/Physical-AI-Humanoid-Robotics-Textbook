@@ -25,23 +25,59 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
     const scrollY = window.scrollY || window.pageYOffset;
 
     // Position the button above the selected text, centered horizontally
-    return {
-      x: rect.left + scrollX + rect.width / 2,
-      y: rect.top + scrollY - 30, // 30px above selection
-    };
+    let x = rect.left + scrollX + rect.width / 2;
+    let y = rect.top + scrollY - 40; // 40px above selection
+
+    // Ensure button stays within viewport bounds
+    const buttonWidth = 80;
+    const buttonHeight = 32;
+    const padding = 10;
+
+    // Constrain horizontal position
+    x = Math.max(padding + buttonWidth / 2, Math.min(x, window.innerWidth - padding - buttonWidth / 2));
+
+    // Ensure button doesn't go above viewport
+    y = Math.max(padding, y);
+
+    // If button would go off-screen vertically, position below selection instead
+    if (y + buttonHeight > window.innerHeight) {
+      y = rect.bottom + scrollY + 10; // Position below text instead
+    }
+
+    console.log('[TextSelection] Button position calculated:', {
+      hasSelection: true,
+      text: selection.toString().substring(0, 50),
+      selectionRect: { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
+      scrollPos: { x: scrollX, y: scrollY },
+      finalPosition: { x, y },
+      viewportSize: { width: window.innerWidth, height: window.innerHeight },
+    });
+
+    return { x, y };
   }, []);
 
   const handleMouseUp = useCallback(() => {
     const selection = window.getSelection();
     const selectedText = selection?.toString().trim() || '';
 
+    console.log('[TextSelection] mouseUp detected:', {
+      hasSelection: !!selection && selection.rangeCount > 0,
+      isCollapsed: selection?.isCollapsed,
+      textLength: selectedText.length,
+      text: selectedText.substring(0, 100),
+    });
+
     if (selectedText.length > 0) {
       const coords = getSelectionCoords();
       if (coords) {
+        console.log('[TextSelection] Button will be shown at:', coords);
         setButtonPosition(coords);
         setCurrentSelection(selectedText);
+      } else {
+        console.log('[TextSelection] No valid coords returned');
       }
     } else {
+      console.log('[TextSelection] No text selected, hiding button');
       setButtonPosition(null);
       setCurrentSelection(null);
     }
@@ -62,24 +98,32 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
 
   useEffect(() => {
     document.addEventListener('mouseup', handleMouseUp);
+    let scrollTimeout: NodeJS.Timeout;
     const handleScroll = () => {
-        // Only clear if there's no active selection
-        const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
-            setButtonPosition(null);
-            setCurrentSelection(null);
-        } else if (buttonPosition && currentSelection) {
-            // Update button position while keeping selection active during scroll
-            const coords = getSelectionCoords();
-            if (coords) {
-                setButtonPosition(coords);
+        // Debounce scroll handler for performance
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            // Only clear if there's no active selection
+            const selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+                console.log('[TextSelection] Scroll: no selection, hiding button');
+                setButtonPosition(null);
+                setCurrentSelection(null);
+            } else if (buttonPosition && currentSelection) {
+                // Update button position while keeping selection active during scroll
+                console.log('[TextSelection] Scroll: updating button position');
+                const coords = getSelectionCoords();
+                if (coords) {
+                    setButtonPosition(coords);
+                }
             }
-        }
+        }, 50); // Debounce by 50ms
     };
     window.addEventListener('scroll', handleScroll);
     return () => {
       document.removeEventListener('mouseup', handleMouseUp);
       window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
     };
   }, [handleMouseUp, buttonPosition, currentSelection, getSelectionCoords]);
 
