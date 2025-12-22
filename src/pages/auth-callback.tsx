@@ -1,12 +1,19 @@
 /**
- * OAuth Callback Handler - One-Time Token Verification
- * Handles the OAuth callback and verifies the one-time token for cross-domain auth
- * Flow:
- * 1. OAuth provider redirects back to auth service's /api/auth/callback/{provider}
- * 2. Better Auth validates the OAuth code and creates a session
- * 3. Our custom /api/oauth-callback endpoint generates a one-time token
- * 4. Auth service redirects to frontend /auth-callback with token as URL param
- * 5. This page verifies the token to establish the session on the frontend domain
+ * OAuth Callback Handler - OAuth Proxy Session-Based Auth
+ * Handles the OAuth callback using Better Auth's OAuth Proxy plugin
+ *
+ * Flow with OAuth Proxy:
+ * 1. Frontend initiates OAuth on auth service via /api/auth/oauth-proxy endpoint
+ * 2. OAuth Proxy redirects user to OAuth provider (with proxy URL)
+ * 3. OAuth provider redirects back to OAuth Proxy endpoint on auth service
+ * 4. OAuth Proxy validates OAuth response and creates session
+ * 5. OAuth Proxy encrypts session cookies in URL and redirects to frontend /auth-callback
+ * 6. This page decrypts the URL-based session and establishes authentication
+ *
+ * The OAuth Proxy plugin solves cross-domain authentication by:
+ * - Proxying OAuth requests between different Vercel domains
+ * - Encrypting cookies in URL parameters (secure, only decrypt on receiving server)
+ * - Allowing session to be transferred across domains without direct cookie sharing
  */
 
 import React, { useEffect, useState, useMemo } from 'react';
@@ -34,57 +41,47 @@ export default function AuthCallbackPage(): React.ReactElement {
 
   useEffect(() => {
     const handleCallback = async () => {
-      console.log('[AUTH-CALLBACK] Processing OAuth callback with one-time token...');
+      console.log('[AUTH-CALLBACK] Processing OAuth callback via OAuth Proxy...');
 
       try {
         const searchParams = new URLSearchParams(location.search);
-        const token = searchParams.get('token');
         const redirectTo = searchParams.get('redirect') || '/docs/intro';
 
-        if (!token) {
-          console.error('[AUTH-CALLBACK] No one-time token found in URL parameters');
-          setError('Invalid callback: Missing authentication token. Please try logging in again.');
-          return;
-        }
+        // Wait briefly for session to be established by OAuth Proxy
+        // OAuth Proxy transfers cookies in URL parameters, which are automatically processed
+        console.log('[AUTH-CALLBACK] Waiting for session to be established by OAuth Proxy...');
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-        console.log('[AUTH-CALLBACK] One-time token found:', `${token.substring(0, 20)}...`);
-        console.log('[AUTH-CALLBACK] Verifying token with auth service...');
-
-        // Verify the one-time token
-        // This exchanges the token for a verified session
-        const verifyResult = await authClient.oneTimeToken.verify({
-          token,
-        });
-
-        console.log('[AUTH-CALLBACK] Token verification result:', {
-          hasError: !!verifyResult.error,
-          error: verifyResult.error,
-          hasSession: !!verifyResult.data,
-        });
-
-        if (verifyResult.error) {
-          console.error('[AUTH-CALLBACK] Token verification failed:', verifyResult.error);
-          setError(`Token verification failed: ${verifyResult.error}. Please try logging in again.`);
-          return;
-        }
-
-        if (!verifyResult.data?.user) {
-          console.error('[AUTH-CALLBACK] Token verified but no user session found');
-          setError('Token verified but user session could not be established. Please try logging in again.');
-          return;
-        }
-
-        console.log('[AUTH-CALLBACK] ✓ Token verified successfully');
-        console.log('[AUTH-CALLBACK] User authenticated:', verifyResult.data.user.email);
-
-        // Refetch session to update AuthProvider state
-        console.log('[AUTH-CALLBACK] Refreshing session state...');
+        // Refetch session to get the authenticated state transferred by OAuth Proxy
+        console.log('[AUTH-CALLBACK] Refetching session after OAuth Proxy...');
         await refetch();
+
+        // Check if we have an authenticated session
+        const sessionResult = await authClient.getSession({
+          fetchOptions: {
+            credentials: 'include',
+          }
+        });
+
+        console.log('[AUTH-CALLBACK] Session fetch result:', {
+          hasSession: !!sessionResult.data,
+          hasUser: !!sessionResult.data?.user,
+          userEmail: sessionResult.data?.user?.email,
+        });
+
+        if (!sessionResult.data?.user) {
+          console.error('[AUTH-CALLBACK] No session found after OAuth Proxy redirect');
+          setError('OAuth authentication completed but session was not established. Please try again.');
+          return;
+        }
+
+        console.log('[AUTH-CALLBACK] ✓ Session established successfully via OAuth Proxy');
+        console.log('[AUTH-CALLBACK] User authenticated:', sessionResult.data.user.email);
 
         console.log('[AUTH-CALLBACK] Redirecting to:', redirectTo);
         history.push(redirectTo);
       } catch (err) {
-        console.error('[AUTH-CALLBACK] Error during callback:', err);
+        console.error('[AUTH-CALLBACK] Error during OAuth callback:', err);
         setError(err instanceof Error ? err.message : 'Authentication failed unexpectedly');
       }
     };

@@ -2,7 +2,7 @@ import logger from './logging.js';
 import { betterAuth } from "better-auth";
 import { bearer } from "better-auth/plugins";
 import { jwt } from "better-auth/plugins";
-import { oneTimeToken } from "better-auth/plugins";
+import { oAuthProxy } from "better-auth/plugins";
 import { Pool } from "pg";
 import { attachDatabasePool } from "@vercel/functions"; // Import attachDatabasePool
 
@@ -179,12 +179,13 @@ export const auth = betterAuth({
   },
   plugins: [
     bearer(),
-    // One-Time Token plugin for cross-domain OAuth authentication
-    // Used to bridge the gap between auth service and frontend across different Vercel domains
-    // When OAuth callback completes on backend, we generate a one-time token and include it in redirect URL
-    // Frontend verifies the token to establish a session without relying on cross-domain cookies
-    oneTimeToken({
-      expiresIn: 10, // Token valid for 10 minutes
+    // OAuth Proxy plugin for cross-domain authentication on Vercel
+    // Solves the issue where OAuth redirects fail across different .vercel.app subdomains
+    // The plugin proxies OAuth requests and encrypts cookies in URL parameters
+    // This allows the frontend and auth service to communicate OAuth state securely
+    // even when they're on different Vercel domains (which treat subdomains as public suffixes)
+    oAuthProxy({
+      productionURL: primaryFrontendOrigin, // Frontend URL in production
     }),
     // NOTE: JWT plugin disabled for session-based authentication
     // The application uses Better Auth's secure session cookies instead of JWTs
