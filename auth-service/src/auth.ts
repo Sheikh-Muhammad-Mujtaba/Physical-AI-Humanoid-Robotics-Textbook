@@ -130,9 +130,12 @@ export const auth = betterAuth({
     // Database storage solves the "state mismatch" error in production
     storeStateStrategy: "database",
 
-    // Skip state cookie check since we're storing state in database
-    // This prevents "state mismatch" errors when cookies are blocked by browsers
-    skipStateCookieCheck: isProduction, // Only skip in production where domains differ
+    // CRITICAL: Always skip state cookie check for cross-domain OAuth
+    // When frontend (domain A) initiates OAuth, it redirects to OAuth provider
+    // OAuth provider redirects back to backend (domain B) callback
+    // The state cookie from domain A won't be readable by domain B
+    // Database-stored state handles this correctly without cookies
+    skipStateCookieCheck: true, // Always skip - use database state instead
 
     accountLinking: {
       enabled: true,

@@ -82,15 +82,23 @@ export default function LoginPage(): React.ReactElement {
       // Better Auth OAuth flow:
       // 1. signIn.social() initiates OAuth with the auth service
       // 2. Better Auth handles the full OAuth flow server-side
-      // 3. Session cookie is set on auth service domain by Better Auth
-      // 4. Browser automatically includes cookies in cross-origin requests (credentials: include)
-      // 5. Frontend can read the session via getSession()
+      // 3. Redirects to Google/GitHub for user authentication
+      // 4. Google/GitHub redirects back to /api/auth/callback/{provider}
+      // 5. Backend validates OAuth code and creates session
+      // 6. Backend redirects to /auth-callback page
+      // 7. Frontend verifies session and redirects to /docs/intro
 
-      await authClient.signIn.social({
+      console.log(`[LOGIN] Starting ${provider} OAuth flow...`);
+      console.log(`[LOGIN] Auth service URL: ${authUrl}`);
+
+      const result = await authClient.signIn.social({
         provider,
       });
-      // Note: Code after this line won't execute because social login causes a redirect
+
+      console.log(`[LOGIN] OAuth response:`, result);
+      // Note: Code after this line usually won't execute because social login causes a redirect
     } catch (err) {
+      console.error(`[LOGIN] Social login error:`, err);
       setError(err instanceof Error ? err.message : `Failed to sign in with ${provider}`);
       setSocialLoading(null);
     }
