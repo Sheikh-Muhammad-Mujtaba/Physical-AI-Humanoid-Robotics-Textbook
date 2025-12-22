@@ -11,6 +11,16 @@ const ChatbotWidget: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
+  // Auto-insert selected text into input when chat opens with selection
+  useEffect(() => {
+    if (isOpen && selectedText && !inputMessage) {
+      // Auto-insert selected text as a mention at the start of input
+      const mentionText = `📌 "${selectedText.substring(0, 100)}${selectedText.length > 100 ? '...' : ''}"\n`;
+      setInputMessage(mentionText);
+      console.log('[ChatbotWidget] Auto-inserted selected text into input:', mentionText.substring(0, 50));
+    }
+  }, [isOpen, selectedText]);
+
   // Handle sending message with selection context
   const handleSendMessage = () => {
     if (inputMessage.trim()) {

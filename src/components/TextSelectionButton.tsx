@@ -31,20 +31,30 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
     let y = rect.top + scrollY - 40; // 40px above selection
 
     // Ensure button stays within viewport bounds
-    const buttonWidth = 80;
-    const buttonHeight = 32;
+    const buttonWidth = 100;
+    const buttonHeight = 40;
     const padding = 10;
 
     // Constrain horizontal position
     x = Math.max(padding + buttonWidth / 2, Math.min(x, window.innerWidth - padding - buttonWidth / 2));
 
-    // Ensure button doesn't go above viewport
-    y = Math.max(padding, y);
+    // Calculate positions for above and below text
+    let positionAbove = rect.top + scrollY - 50; // 50px above selection
+    let positionBelow = rect.bottom + scrollY + 10; // 10px below selection
 
-    // If button would go off-screen vertically, position below selection instead
-    if (y + buttonHeight > window.innerHeight) {
-      y = rect.bottom + scrollY + 10; // Position below text instead
+    // Use position above selection, but if it goes off screen, use position below
+    if (positionAbove < padding) {
+      y = positionBelow;
+    } else if (positionAbove + buttonHeight > window.innerHeight + scrollY) {
+      // If both would go off screen, use position below
+      y = positionBelow;
+    } else {
+      y = positionAbove;
     }
+
+    // Final safety check - ensure y is not below the bottom of viewport minus padding
+    // This allows button to stay visible even at the very bottom
+    y = Math.max(padding, y);
 
     console.log('[TextSelection] Button position calculated:', {
       hasSelection: true,
