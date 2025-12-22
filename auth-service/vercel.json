@@ -11,6 +11,10 @@
       "destination": "/api/auth"
     },
     {
+      "source": "/api/oauth-callback",
+      "destination": "/api/oauth-callback"
+    },
+    {
       "source": "/health",
       "destination": "/api/health"
     },

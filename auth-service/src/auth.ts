@@ -2,6 +2,7 @@ import logger from './logging.js';
 import { betterAuth } from "better-auth";
 import { bearer } from "better-auth/plugins";
 import { jwt } from "better-auth/plugins";
+import { oneTimeToken } from "better-auth/plugins";
 import { Pool } from "pg";
 import { attachDatabasePool } from "@vercel/functions"; // Import attachDatabasePool
 
@@ -146,10 +147,10 @@ export const auth = betterAuth({
       enabled: true,
     },
 
-    // Default callback URL for OAuth after successful authentication
-    // This is where Better Auth redirects after the OAuth callback is processed
-    // The frontend /auth-callback page will handle the redirect and session verification
-    callbackURL: primaryFrontendOrigin + "/auth-callback",
+    // Callback URL for OAuth after successful authentication
+    // Points to /oauth-callback endpoint which generates a one-time token
+    // This solves the cross-domain cookie issue by using a token instead
+    callbackURL: authServiceUrl + "/api/oauth-callback",
   },
   rateLimit: {
     enabled: false, // Disable rate limiting to avoid 401 errors during token fetching
@@ -178,6 +179,13 @@ export const auth = betterAuth({
   },
   plugins: [
     bearer(),
+    // One-Time Token plugin for cross-domain OAuth authentication
+    // Used to bridge the gap between auth service and frontend across different Vercel domains
+    // When OAuth callback completes on backend, we generate a one-time token and include it in redirect URL
+    // Frontend verifies the token to establish a session without relying on cross-domain cookies
+    oneTimeToken({
+      expiresIn: 10, // Token valid for 10 minutes
+    }),
     // NOTE: JWT plugin disabled for session-based authentication
     // The application uses Better Auth's secure session cookies instead of JWTs
     // Session cookies are automatically managed by Better Auth and sent with credentials: 'include'

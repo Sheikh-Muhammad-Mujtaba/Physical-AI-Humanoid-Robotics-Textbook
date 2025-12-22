@@ -1,18 +1,23 @@
 /**
- * OAuth Callback Handler - Session-Based Auth
- * Handles the OAuth callback and waits for session cookies to be set
- * Better Auth automatically sets secure httpOnly cookies on OAuth success
+ * OAuth Callback Handler - One-Time Token Verification
+ * Handles the OAuth callback and verifies the one-time token for cross-domain auth
+ * Flow:
+ * 1. OAuth provider redirects back to auth service's /api/auth/callback/{provider}
+ * 2. Better Auth validates the OAuth code and creates a session
+ * 3. Our custom /api/oauth-callback endpoint generates a one-time token
+ * 4. Auth service redirects to frontend /auth-callback with token as URL param
+ * 5. This page verifies the token to establish the session on the frontend domain
  */
 
 import React, { useEffect, useState, useMemo } from 'react';
 import Layout from '@theme/Layout';
 import { useHistory, useLocation } from '@docusaurus/router';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import useDocausaurusContext from '@docusaurus/useDocausaurusContext';
 import { createClientForUrl, DEV_AUTH_URL, DEV_API_BASE_URL } from '../lib/auth-client';
 import styles from './auth.module.css';
 
 export default function AuthCallbackPage(): React.ReactElement {
-  const { siteConfig } = useDocusaurusContext();
+  const { siteConfig } = useDocausaurusContext();
   const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || DEV_AUTH_URL;
 
   // Get frontend URL (use current origin in browser, fallback to siteConfig.url)
@@ -29,65 +34,55 @@ export default function AuthCallbackPage(): React.ReactElement {
 
   useEffect(() => {
     const handleCallback = async () => {
-      console.log('[AUTH-CALLBACK] Processing OAuth callback...');
+      console.log('[AUTH-CALLBACK] Processing OAuth callback with one-time token...');
 
       try {
         const searchParams = new URLSearchParams(location.search);
+        const token = searchParams.get('token');
         const redirectTo = searchParams.get('redirect') || '/docs/intro';
 
-        // Wait for session to be established after OAuth redirect
-        console.log('[AUTH-CALLBACK] Waiting for session to be established...');
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Check session with retry logic
-        let sessionResult = null;
-        let attempts = 0;
-        const maxAttempts = 5;
-
-        while (attempts < maxAttempts) {
-          console.log(`[AUTH-CALLBACK] Session check attempt ${attempts + 1}/${maxAttempts}...`);
-          console.log('[AUTH-CALLBACK] Auth URL:', authUrl);
-          console.log('[AUTH-CALLBACK] Frontend URL:', frontendUrl);
-
-          try {
-            // Log cookies before requesting session
-            console.log('[AUTH-CALLBACK] Current cookies:', document.cookie);
-
-            sessionResult = await authClient.getSession({
-              fetchOptions: {
-                credentials: 'include',
-              }
-            });
-
-            console.log('[AUTH-CALLBACK] Session check result:', sessionResult);
-            console.log('[AUTH-CALLBACK] Session data:', sessionResult.data);
-            console.log('[AUTH-CALLBACK] Session error:', sessionResult.error);
-
-            if (sessionResult.data?.user) {
-              console.log('[AUTH-CALLBACK] ✓ Session established successfully.');
-              console.log('[AUTH-CALLBACK] User:', sessionResult.data.user.email);
-
-              // Refetch session to update AuthProvider state
-              await refetch();
-
-              console.log('[AUTH-CALLBACK] Redirecting to:', redirectTo);
-              history.push(redirectTo);
-              return;
-            } else {
-              console.warn('[AUTH-CALLBACK] No user data in session result');
-            }
-          } catch (checkErr) {
-            console.warn(`[AUTH-CALLBACK] Session check attempt ${attempts + 1} failed:`, checkErr);
-          }
-
-          attempts++;
-          if (attempts < maxAttempts) {
-            await new Promise(resolve => setTimeout(resolve, 800));
-          }
+        if (!token) {
+          console.error('[AUTH-CALLBACK] No one-time token found in URL parameters');
+          setError('Invalid callback: Missing authentication token. Please try logging in again.');
+          return;
         }
 
-        console.error('[AUTH-CALLBACK] Failed to establish session after OAuth callback.');
-        setError('OAuth authentication completed but session was not established. Please try again.');
+        console.log('[AUTH-CALLBACK] One-time token found:', `${token.substring(0, 20)}...`);
+        console.log('[AUTH-CALLBACK] Verifying token with auth service...');
+
+        // Verify the one-time token
+        // This exchanges the token for a verified session
+        const verifyResult = await authClient.oneTimeToken.verify({
+          token,
+        });
+
+        console.log('[AUTH-CALLBACK] Token verification result:', {
+          hasError: !!verifyResult.error,
+          error: verifyResult.error,
+          hasSession: !!verifyResult.data,
+        });
+
+        if (verifyResult.error) {
+          console.error('[AUTH-CALLBACK] Token verification failed:', verifyResult.error);
+          setError(`Token verification failed: ${verifyResult.error}. Please try logging in again.`);
+          return;
+        }
+
+        if (!verifyResult.data?.user) {
+          console.error('[AUTH-CALLBACK] Token verified but no user session found');
+          setError('Token verified but user session could not be established. Please try logging in again.');
+          return;
+        }
+
+        console.log('[AUTH-CALLBACK] ✓ Token verified successfully');
+        console.log('[AUTH-CALLBACK] User authenticated:', verifyResult.data.user.email);
+
+        // Refetch session to update AuthProvider state
+        console.log('[AUTH-CALLBACK] Refreshing session state...');
+        await refetch();
+
+        console.log('[AUTH-CALLBACK] Redirecting to:', redirectTo);
+        history.push(redirectTo);
       } catch (err) {
         console.error('[AUTH-CALLBACK] Error during callback:', err);
         setError(err instanceof Error ? err.message : 'Authentication failed unexpectedly');
