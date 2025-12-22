@@ -12,7 +12,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import Layout from '@theme/Layout';
 import { useHistory, useLocation } from '@docusaurus/router';
-import useDocausaurusContext from '@docusaurus/useDocausaurusContext';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import { createClientForUrl, DEV_AUTH_URL, DEV_API_BASE_URL } from '../lib/auth-client';
 import styles from './auth.module.css';
 
