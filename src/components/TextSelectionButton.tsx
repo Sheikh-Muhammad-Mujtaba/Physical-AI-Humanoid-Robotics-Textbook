@@ -9,8 +9,10 @@ interface TextSelectionButtonProps {
 
 const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
   const { handleSelection, openChat } = useChat();
-  const [buttonPosition, setButtonPosition] = useState<{ x: number; y: number } | null>(null);
-  const [currentSelection, setCurrentSelection] = useState<string | null>(null);
+  const [buttonState, setButtonState] = useState<{ position: { x: number; y: number } | null; text: string | null }>({
+    position: null,
+    text: null,
+  });
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const getSelectionCoords = useCallback(() => {
@@ -60,9 +62,8 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
     const selection = window.getSelection();
     const selectedText = selection?.toString().trim() || '';
 
-    console.log('[TextSelection] mouseUp detected:', {
+    console.log('[TextSelection] Selection detected:', {
       hasSelection: !!selection && selection.rangeCount > 0,
-      isCollapsed: selection?.isCollapsed,
       textLength: selectedText.length,
       text: selectedText.substring(0, 100),
     });
@@ -70,34 +71,54 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
     if (selectedText.length > 0) {
       const coords = getSelectionCoords();
       if (coords) {
-        console.log('[TextSelection] Button will be shown at:', coords);
-        setButtonPosition(coords);
-        setCurrentSelection(selectedText);
+        console.log('[TextSelection] Updating button state with coords:', coords);
+        setButtonState({ position: coords, text: selectedText });
       } else {
-        console.log('[TextSelection] No valid coords returned');
+        console.log('[TextSelection] No valid coords');
+        setButtonState({ position: null, text: null });
       }
     } else {
-      console.log('[TextSelection] No text selected, hiding button');
-      setButtonPosition(null);
-      setCurrentSelection(null);
+      console.log('[TextSelection] No text, hiding button');
+      setButtonState({ position: null, text: null });
     }
   }, [getSelectionCoords]);
 
   const handleClick = useCallback(() => {
-    if (currentSelection) {
+    if (buttonState.text) {
+      console.log('[TextSelection] Button clicked, setting selection context:', buttonState.text);
       // Set the selection in context and open chat
-      handleSelection(currentSelection);
+      handleSelection(buttonState.text);
       openChat();
       // Clear the button
-      setButtonPosition(null);
-      setCurrentSelection(null);
+      setButtonState({ position: null, text: null });
       // Clear browser selection
       window.getSelection()?.removeAllRanges();
     }
-  }, [currentSelection, handleSelection, openChat]);
+  }, [buttonState.text, handleSelection, openChat]);
 
   useEffect(() => {
+    const handleSelectionChange = () => {
+      console.log('[TextSelection] selectionchange event fired');
+      // Use setTimeout to ensure selection is finalized
+      setTimeout(() => {
+        handleMouseUp();
+      }, 50);
+    };
+
+    // Listen to multiple selection events for better coverage
     document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchend', handleMouseUp); // Mobile support
+    document.addEventListener('selectionchange', handleSelectionChange); // Catches programmatic selections
+
+    // Also monitor for selection via keyboard (Shift+Arrow keys)
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if ((e.shiftKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) || e.key === 'Shift') {
+        console.log('[TextSelection] Keyboard selection detected');
+        handleMouseUp();
+      }
+    };
+    document.addEventListener('keyup', handleKeyUp);
+
     let scrollTimeout: NodeJS.Timeout;
     const handleScroll = () => {
         // Debounce scroll handler for performance
@@ -107,14 +128,13 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
             const selection = window.getSelection();
             if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
                 console.log('[TextSelection] Scroll: no selection, hiding button');
-                setButtonPosition(null);
-                setCurrentSelection(null);
-            } else if (buttonPosition && currentSelection) {
+                setButtonState({ position: null, text: null });
+            } else if (buttonState.position && buttonState.text) {
                 // Update button position while keeping selection active during scroll
                 console.log('[TextSelection] Scroll: updating button position');
                 const coords = getSelectionCoords();
                 if (coords) {
-                    setButtonPosition(coords);
+                    setButtonState({ position: coords, text: buttonState.text });
                 }
             }
         }, 50); // Debounce by 50ms
@@ -122,27 +142,39 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
     window.addEventListener('scroll', handleScroll);
     return () => {
       document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchend', handleMouseUp);
+      document.removeEventListener('selectionchange', handleSelectionChange);
+      document.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('scroll', handleScroll);
       clearTimeout(scrollTimeout);
     };
-  }, [handleMouseUp, buttonPosition, currentSelection, getSelectionCoords]);
+  }, [handleMouseUp, buttonState.position, buttonState.text, getSelectionCoords]);
 
-  if (!buttonPosition || !currentSelection) {
+  // Only render if both position and text exist
+  if (!buttonState.position || !buttonState.text) {
     return null;
   }
+
+  console.log('[TextSelection] Rendering button at:', {
+    position: buttonState.position,
+    selection: buttonState.text.substring(0, 50),
+  });
 
   return (
     <button
       ref={buttonRef}
       onClick={handleClick}
-      className="fixed z-[1001] bg-primary text-white dark:text-gray-100 px-3 py-1 rounded-md text-sm shadow-md cursor-pointer hover:bg-opacity-80 transition-colors duration-200"
+      className="fixed z-[9999] bg-primary text-white dark:text-gray-100 px-4 py-2 rounded-lg text-sm font-semibold shadow-xl cursor-pointer hover:bg-opacity-90 hover:shadow-2xl transition-all duration-200 border border-transparent hover:border-white/30"
       style={{
-        left: buttonPosition.x,
-        top: buttonPosition.y,
-        transform: 'translateX(-50%)', // Center horizontally
+        left: `${buttonState.position.x}px`,
+        top: `${buttonState.position.y}px`,
+        transform: 'translateX(-50%)',
+        pointerEvents: 'auto',
+        visibility: 'visible',
       }}
+      title="Click to ask AI about selected text"
     >
-      Ask AI
+      ✨ Ask AI
     </button>
   );
 };

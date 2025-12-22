@@ -70,12 +70,27 @@ const ChatProviderInner: React.FC<ChatProviderProps> = ({ children }) => {
   }, [openChat]);
 
   const sendMessage = useCallback(async (text: string) => {
+    if (!text.trim()) {
+      console.log('[ChatContext] Empty message, skipping');
+      return;
+    }
+
     setIsLoading(true);
 
+    // Capture selectedText before it might be cleared
+    const currentSelectedText = selectedText;
+
     // Create user message - include selection context if present
-    const userMessageContent = selectedText
-      ? `Re: "${selectedText.length > 50 ? selectedText.substring(0, 50) + '...' : selectedText}"\n\n${text}`
+    const userMessageContent = currentSelectedText
+      ? `📌 "${currentSelectedText.length > 80 ? currentSelectedText.substring(0, 80) + '...' : currentSelectedText}"\n\nQ: ${text}`
       : text;
+
+    console.log('[ChatContext] Sending message:', {
+      hasSelection: !!currentSelectedText,
+      selectedTextLength: currentSelectedText?.length,
+      userMessage: userMessageContent.substring(0, 100),
+      text: text,
+    });
 
     const newUserMessage: ChatMessage = {
       content: userMessageContent,
@@ -93,10 +108,10 @@ const ChatProviderInner: React.FC<ChatProviderProps> = ({ children }) => {
 
       console.log("Attempting to fetch chat/ask-selection API with user:", userId);
 
-      if (selectedText && sessionId) {
+      if (currentSelectedText && sessionId) {
         // Use askSelectionWithBackend if text is selected
-        console.log("Fetching /api/ask-selection with selected text and query:", selectedText, text);
-        const response = await askSelectionWithBackend(selectedText, text, sessionId, userId || '');
+        console.log("Fetching /api/ask-selection with selected text and query:", currentSelectedText, text);
+        const response = await askSelectionWithBackend(currentSelectedText, text, sessionId, userId || '');
         botResponseContent = response.answer;
         // Clear selection after sending
         setSelectedText(null);
