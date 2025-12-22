@@ -17,7 +17,7 @@ import { createClientForUrl, DEV_AUTH_URL, DEV_API_BASE_URL } from '../lib/auth-
 import styles from './auth.module.css';
 
 export default function AuthCallbackPage(): React.ReactElement {
-  const { siteConfig } = useDocausaurusContext();
+  const { siteConfig } = useDocusaurusContext();
   const authUrl = (siteConfig.customFields?.betterAuthUrl as string) || DEV_AUTH_URL;
 
   // Get frontend URL (use current origin in browser, fallback to siteConfig.url)
