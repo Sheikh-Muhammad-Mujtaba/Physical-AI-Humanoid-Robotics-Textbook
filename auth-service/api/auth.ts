@@ -177,76 +177,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
 
-    // For successful sign-in (email or OAuth), generate and send JWT token in response header
-    // This allows the frontend to capture the token directly without relying on cookies
-    const isSignInRequest = req.url?.includes('/sign-in/');
-    if (isSignInRequest && response.status === 200) {
-      try {
-        // Try to get session from the response cookies
-        const setCookieHeader = response.headers.get('set-cookie');
-        if (setCookieHeader) {
-          debugLog('ATTEMPTING_JWT_GENERATION', {
-            requestId,
-            message: 'Attempting to generate JWT token after sign-in',
-          });
-
-          // Create a new request with the session cookie to get the JWT token
-          const tokenRequest = new Request(`${protocol}://${host}/api/auth/token`, {
-            method: 'GET',
-            headers: {
-              'cookie': setCookieHeader,
-            },
-          });
-
-          const tokenResponse = await auth.handler(tokenRequest);
-
-          debugLog('JWT_TOKEN_RESPONSE', {
-            requestId,
-            status: tokenResponse.status,
-            statusText: tokenResponse.statusText,
-          });
-
-          if (tokenResponse.status === 200) {
-            const tokenText = await tokenResponse.text();
-            if (tokenText) {
-              try {
-                const tokenData = JSON.parse(tokenText);
-                if (tokenData?.token) {
-                  // Send token in custom header for frontend to capture
-                  res.setHeader('set-auth-token', encodeURIComponent(tokenData.token));
-                  debugLog('JWT_TOKEN_SENT', {
-                    requestId,
-                    message: 'JWT token generated and sent in set-auth-token header',
-                    tokenPreview: tokenData.token.substring(0, 20) + '...',
-                  });
-                }
-              } catch (e) {
-                debugLog('JWT_TOKEN_PARSE_ERROR', {
-                  requestId,
-                  error: String(e),
-                });
-              }
-            }
-          } else {
-            const errorBody = await tokenResponse.text(); // Capture error body
-            const errorHeaders = Object.fromEntries(tokenResponse.headers.entries()); // Capture headers
-            debugLog('JWT_TOKEN_GENERATION_FAILED', {
-              requestId,
-              status: tokenResponse.status,
-              message: 'Token endpoint returned non-200 status',
-              errorBody,
-              errorHeaders,
-            });
-          }
-        }
-      } catch (e) {
-        debugLog('JWT_TOKEN_GENERATION_ERROR', {
-          requestId,
-          error: String(e),
-          message: 'Failed to generate JWT token after sign-in',
-        });
-      }
-    }
+    // NOTE: JWT token generation disabled for session-based authentication
+    // Better Auth automatically sets secure httpOnly session cookies on sign-in (email or OAuth)
+    // Session cookies are the only authentication mechanism used across the application
+    // This is consistent with how email login works and provides better security
+    // Frontend receives these cookies automatically with credentials: 'include' in fetch requests
+    // No need for custom JWT handling or token headers
 
     // Handle redirects (OAuth callbacks return 302)
     if (response.status >= 300 && response.status < 400) {

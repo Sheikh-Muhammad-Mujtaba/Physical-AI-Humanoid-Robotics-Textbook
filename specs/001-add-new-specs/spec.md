@@ -17,6 +17,7 @@ I need to resolve the "module has no exports" build error and ensure Tailwind lo
 * **Requirement**: Create this file to enable Tailwind processing:
   ```javascript
   module.exports = {
+    
     plugins: {
       tailwindcss: {},
       autoprefixer: {},

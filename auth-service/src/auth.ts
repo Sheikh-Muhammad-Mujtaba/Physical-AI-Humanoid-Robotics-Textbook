@@ -170,22 +170,23 @@ export const auth = betterAuth({
   },
   plugins: [
     bearer(),
-    jwt({
-      jwks: {
-        keyPairConfig: {
-          alg: "EdDSA",
-          crv: "Ed25519",
-        },
-      },
-      jwt: {
-        expirationTime: "15m",
-        issuer: process.env.BETTER_AUTH_URL || "http://localhost:3001",
-        // CRITICAL FIX: JWT audience must be the frontend URL (where chatbot validates tokens)
-        // NOT the backend API URL. The chatbot runs on the frontend and expects tokens
-        // issued for the frontend domain, not the backend /api/ endpoint
-        audience: frontendOrigins[0], // Use first frontend origin as primary audience
-      },
-    }),
+    // NOTE: JWT plugin disabled for session-based authentication
+    // The application uses Better Auth's secure session cookies instead of JWTs
+    // Session cookies are automatically managed by Better Auth and sent with credentials: 'include'
+    // This aligns with the email login flow which also uses session-based auth
+    // jwt({
+    //   jwks: {
+    //     keyPairConfig: {
+    //       alg: "EdDSA",
+    //       crv: "Ed25519",
+    //     },
+    //   },
+    //   jwt: {
+    //     expirationTime: "15m",
+    //     issuer: authServiceUrl,
+    //     audience: authServiceUrl,
+    //   },
+    // }),
   ],
 });
 
