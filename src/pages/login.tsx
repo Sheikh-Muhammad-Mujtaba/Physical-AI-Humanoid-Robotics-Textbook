@@ -85,14 +85,17 @@ export default function LoginPage(): React.ReactElement {
       // 3. Redirects to Google/GitHub for user authentication
       // 4. Google/GitHub redirects back to /api/auth/callback/{provider}
       // 5. Backend validates OAuth code and creates session
-      // 6. Backend redirects to /auth-callback page
+      // 6. Backend redirects to /auth-callback page with session cookie
       // 7. Frontend verifies session and redirects to /docs/intro
 
       console.log(`[LOGIN] Starting ${provider} OAuth flow...`);
       console.log(`[LOGIN] Auth service URL: ${authUrl}`);
+      console.log(`[LOGIN] Frontend URL: ${frontendUrl}`);
 
+      // Pass redirect URL to tell backend where to redirect after OAuth callback
       const result = await authClient.signIn.social({
         provider,
+        callbackURL: `${frontendUrl}/auth-callback`,
       });
 
       console.log(`[LOGIN] OAuth response:`, result);

@@ -85,6 +85,9 @@ const backendApiUrl = process.env.API_BASE_URL || "http://localhost:8000";
 // Get auth service URL
 const authServiceUrl = process.env.BETTER_AUTH_URL || "http://localhost:3001";
 
+// Get the primary frontend origin (first in the list)
+const primaryFrontendOrigin = frontendOrigins[0];
+
 // Build list of trusted origins (no hardcoded values)
 const trustedOrigins = [
   ...frontendOrigins,
@@ -95,7 +98,9 @@ const trustedOrigins = [
   self.indexOf(origin) === index
 );
 
+logger.info(`[AUTH] Primary frontend origin: ${primaryFrontendOrigin}`);
 logger.info(`[AUTH] Trusted origins: ${trustedOrigins.join(', ')}`);
+logger.info(`[AUTH] OAuth callback URL will be: ${primaryFrontendOrigin}/auth-callback`);
 
 export const auth = betterAuth({
   database: pool,
@@ -144,7 +149,7 @@ export const auth = betterAuth({
     // Default callback URL for OAuth after successful authentication
     // This is where Better Auth redirects after the OAuth callback is processed
     // The frontend /auth-callback page will handle the redirect and session verification
-    callbackURL: frontendOrigins[0] + "/auth-callback",
+    callbackURL: primaryFrontendOrigin + "/auth-callback",
   },
   rateLimit: {
     enabled: false, // Disable rate limiting to avoid 401 errors during token fetching
