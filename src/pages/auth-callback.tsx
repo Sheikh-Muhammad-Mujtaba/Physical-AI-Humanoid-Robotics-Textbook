@@ -46,8 +46,13 @@ export default function AuthCallbackPage(): React.ReactElement {
 
         while (attempts < maxAttempts) {
           console.log(`[AUTH-CALLBACK] Session check attempt ${attempts + 1}/${maxAttempts}...`);
+          console.log('[AUTH-CALLBACK] Auth URL:', authUrl);
+          console.log('[AUTH-CALLBACK] Frontend URL:', frontendUrl);
 
           try {
+            // Log cookies before requesting session
+            console.log('[AUTH-CALLBACK] Current cookies:', document.cookie);
+
             sessionResult = await authClient.getSession({
               fetchOptions: {
                 credentials: 'include',
@@ -55,6 +60,8 @@ export default function AuthCallbackPage(): React.ReactElement {
             });
 
             console.log('[AUTH-CALLBACK] Session check result:', sessionResult);
+            console.log('[AUTH-CALLBACK] Session data:', sessionResult.data);
+            console.log('[AUTH-CALLBACK] Session error:', sessionResult.error);
 
             if (sessionResult.data?.user) {
               console.log('[AUTH-CALLBACK] ✓ Session established successfully.');
@@ -66,6 +73,8 @@ export default function AuthCallbackPage(): React.ReactElement {
               console.log('[AUTH-CALLBACK] Redirecting to:', redirectTo);
               history.push(redirectTo);
               return;
+            } else {
+              console.warn('[AUTH-CALLBACK] No user data in session result');
             }
           } catch (checkErr) {
             console.warn(`[AUTH-CALLBACK] Session check attempt ${attempts + 1} failed:`, checkErr);
@@ -73,7 +82,7 @@ export default function AuthCallbackPage(): React.ReactElement {
 
           attempts++;
           if (attempts < maxAttempts) {
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 800));
           }
         }
 
