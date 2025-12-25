@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useEffect, useMemo } from "react"
-import { Send, X, Maximize2, MessageCircle, Sparkles } from "lucide-react"
+import { Send, X, Maximize2, MessageCircle, Sparkles, Copy, ThumbsUp, ThumbsDown, RotateCw } from "lucide-react"
 
 interface Message {
   id: string
@@ -162,22 +162,40 @@ export default function ChatBot({ selectedText }: ChatBotProps) {
 
   if (!isOpen) {
     return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-[#1cd98e] via-[#17c97d] to-[#15a860] hover:from-[#2ee89f] hover:via-[#25d98d] hover:to-[#1db870] text-white shadow-xl shadow-[#1cd98e]/60 hover:shadow-2xl hover:shadow-[#1cd98e]/80 flex items-center justify-center transition-all duration-500 hover:scale-125 z-40 group backdrop-blur-sm border border-white/20 animate-pulse-glow"
-        aria-label="Open chat"
-      >
-        <MessageCircle className="w-8 h-8 group-hover:rotate-12 transition-transform duration-300 animate-bounce-subtle" />
-        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#1cd98e] to-transparent opacity-20 group-hover:opacity-40 transition-opacity blur-xl -z-10" />
-      </button>
+      <>
+        <style>{`
+          @keyframes pulse-ring {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.7; }
+          }
+          @keyframes glow-pulse {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(28, 217, 142, 0.8)); }
+            50% { filter: drop-shadow(0 0 20px rgba(28, 217, 142, 1)); }
+          }
+          .animate-pulse-ring { animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+          .animate-glow-pulse { animation: glow-pulse 2s ease-in-out infinite; }
+        `}</style>
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-6 right-6 w-20 h-20 rounded-full bg-gradient-to-br from-[#1cd98e] via-[#17c97d] to-[#0fa860] hover:from-[#2ee89f] hover:via-[#25d98d] hover:to-[#1db870] text-white shadow-2xl shadow-[#1cd98e]/70 hover:shadow-[0_0_40px_rgba(28,217,142,0.8)] flex items-center justify-center transition-all duration-500 hover:scale-110 z-40 group backdrop-blur-md border-2 border-white/30 animate-glow-pulse relative overflow-hidden"
+          aria-label="Open chat"
+        >
+          <div className="absolute inset-0 rounded-full bg-white/10 animate-pulse-ring" />
+          <MessageCircle className="w-10 h-10 group-hover:rotate-12 transition-transform duration-300 relative z-10 animate-bounce-subtle" />
+          <div className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse border border-white/50" />
+        </button>
+      </>
     )
   }
 
   return (
     <div
-      className={`fixed bottom-6 right-6 bg-white/10 backdrop-blur-2xl rounded-3xl shadow-2xl shadow-[#1cd98e]/30 flex flex-col z-40 overflow-hidden transition-all duration-500 border border-white/20 hover:border-white/40 animate-slideIn ${
-        isExpanded ? 'w-[900px] h-[600px]' : 'w-96 h-[500px]'
+      className={`fixed bottom-6 right-6 bg-gradient-to-b from-white/15 via-white/10 to-white/5 backdrop-blur-3xl rounded-3xl shadow-2xl shadow-[#1cd98e]/50 flex flex-col z-40 overflow-hidden transition-all duration-500 border-2 border-gradient-to-r from-white/30 via-white/20 to-white/10 animate-slideIn ${
+        isExpanded ? 'w-[95vw] h-[90vh] max-w-7xl max-h-screen' : 'w-[440px] h-[640px]'
       }`}
+      style={{
+        borderImage: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(28,217,142,0.3) 50%, rgba(255,255,255,0.2) 100%) 1'
+      }}
     >
       {/* Header */}
       <div className="bg-gradient-to-r from-[#1cd98e] via-[#17c97d] to-[#15a860] text-white px-6 py-5 flex items-center justify-between flex-shrink-0 border-b border-white/20 relative overflow-hidden">
@@ -210,20 +228,38 @@ export default function ChatBot({ selectedText }: ChatBotProps) {
       </div>
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-white/50 via-white/30 to-white/50 backdrop-blur-sm">
-        {messages.map((message) => (
+      <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gradient-to-b from-white/40 via-white/20 to-white/30 backdrop-blur-md">
+        {messages.map((message, index) => (
           <div
             key={message.id}
             className={`flex ${message.type === "user" ? "justify-end" : "justify-start"} animate-fadeIn group`}
           >
-            <div
-              className={`max-w-xs px-5 py-3 rounded-2xl text-sm leading-relaxed font-medium transition-all duration-300 backdrop-blur-md border ${
-                message.type === "user"
-                  ? "bg-gradient-to-br from-[#1cd98e] via-[#17c97d] to-[#15a860] text-white rounded-br-none shadow-lg shadow-[#1cd98e]/40 hover:shadow-2xl hover:shadow-[#1cd98e]/60 hover:scale-105 border-white/20 group-hover:border-white/40"
-                  : "bg-white/20 text-gray-900 rounded-bl-none border border-white/30 hover:bg-white/30 hover:shadow-lg hover:shadow-white/20 group-hover:border-white/50 hover:scale-105"
-              }`}
-            >
-              {message.content}
+            <div className="flex flex-col gap-2 w-full max-w-sm">
+              <div
+                className={`px-5 py-4 rounded-2xl text-sm leading-relaxed font-medium transition-all duration-300 backdrop-blur-md border ${
+                  message.type === "user"
+                    ? "bg-gradient-to-br from-[#1cd98e] via-[#17c97d] to-[#15a860] text-white rounded-br-none shadow-lg shadow-[#1cd98e]/40 hover:shadow-2xl hover:shadow-[#1cd98e]/60 hover:scale-[1.02] border-white/20 group-hover:border-white/40 ml-auto"
+                    : "bg-white/25 text-gray-900 rounded-bl-none border border-white/40 hover:bg-white/35 hover:shadow-lg hover:shadow-white/20 group-hover:border-white/60 hover:scale-[1.02]"
+                }`}
+              >
+                {message.content}
+              </div>
+              {message.type === "bot" && index > 0 && (
+                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pl-2">
+                  <button className="p-2 hover:bg-white/20 rounded-lg transition-all hover:shadow-lg text-gray-700 hover:text-[#1cd98e]" title="Copy">
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  <button className="p-2 hover:bg-white/20 rounded-lg transition-all hover:shadow-lg text-gray-700 hover:text-green-600" title="Like">
+                    <ThumbsUp className="w-4 h-4" />
+                  </button>
+                  <button className="p-2 hover:bg-white/20 rounded-lg transition-all hover:shadow-lg text-gray-700 hover:text-red-600" title="Dislike">
+                    <ThumbsDown className="w-4 h-4" />
+                  </button>
+                  <button className="p-2 hover:bg-white/20 rounded-lg transition-all hover:shadow-lg text-gray-700 hover:text-[#1cd98e]" title="Regenerate">
+                    <RotateCw className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -291,29 +327,43 @@ export default function ChatBot({ selectedText }: ChatBotProps) {
       )}
 
       {/* Input Area */}
-      <div className="border-t border-white/20 p-4 bg-white/10 backdrop-blur-md flex-shrink-0">
+      <div className="border-t-2 border-white/30 p-5 bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-lg flex-shrink-0 space-y-3">
         <div className="flex gap-3">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter" && !isLoading) {
-                handleSendMessage(inputValue)
-              }
-            }}
-            placeholder="Ask me anything..."
-            disabled={isLoading}
-            className="flex-1 px-5 py-3 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#1cd98e]/70 focus:border-white/50 transition-all duration-300 disabled:opacity-50 hover:bg-white/30 hover:border-white/40 font-medium shadow-lg shadow-white/10 focus:shadow-xl focus:shadow-[#1cd98e]/30"
-          />
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter" && !isLoading) {
+                  handleSendMessage(inputValue)
+                }
+              }}
+              placeholder="Ask anything about Physical AI..."
+              disabled={isLoading}
+              maxLength={500}
+              className="w-full px-5 py-3.5 rounded-2xl bg-white/30 backdrop-blur-md border-2 border-white/40 text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#1cd98e]/80 focus:border-[#1cd98e]/60 transition-all duration-300 disabled:opacity-50 hover:bg-white/40 hover:border-white/50 font-medium shadow-lg shadow-white/15 focus:shadow-xl focus:shadow-[#1cd98e]/40"
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-600 font-semibold bg-white/20 px-2 py-1 rounded-lg">
+              {inputValue.length}/500
+            </span>
+          </div>
           <button
             onClick={() => handleSendMessage(inputValue)}
             disabled={isLoading || !inputValue.trim()}
-            className="px-5 py-3 bg-gradient-to-r from-[#1cd98e] via-[#17c97d] to-[#15a860] hover:from-[#2ee89f] hover:via-[#25d98d] hover:to-[#1db870] disabled:from-gray-400 disabled:via-gray-400 disabled:to-gray-500 text-white rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center font-bold hover:shadow-xl hover:shadow-[#1cd98e]/50 active:scale-95 border border-white/20 hover:border-white/40 shadow-lg"
+            className="px-6 py-3.5 bg-gradient-to-br from-[#1cd98e] via-[#17c97d] to-[#0fa860] hover:from-[#2ee89f] hover:via-[#25d98d] hover:to-[#1db870] disabled:from-gray-500 disabled:via-gray-500 disabled:to-gray-600 text-white rounded-2xl transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center font-bold hover:shadow-2xl hover:shadow-[#1cd98e]/60 active:scale-95 border-2 border-white/30 hover:border-white/50 shadow-xl disabled:shadow-md hover:scale-105"
             aria-label="Send message"
           >
-            <Send className="w-5 h-5 hover:rotate-12 transition-transform" />
+            <Send className="w-5 h-5 group-hover:rotate-12 transition-transform" />
           </button>
+        </div>
+        <div className="flex items-center justify-between text-xs px-1">
+          <span className="text-gray-600 font-medium">💡 Tip: Ask specific questions for better answers</span>
+          <div className="flex gap-2">
+            <button className="px-2 py-1 rounded-lg hover:bg-white/20 transition-all text-gray-700 hover:text-[#1cd98e] font-medium text-xs">
+              Clear
+            </button>
+          </div>
         </div>
       </div>
 
