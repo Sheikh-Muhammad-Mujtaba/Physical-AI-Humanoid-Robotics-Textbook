@@ -9,9 +9,16 @@ interface TextSelectionButtonProps {
 
 const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
   const { handleSelection, openChat } = useChat();
-  const [buttonState, setButtonState] = useState<{ position: { x: number; y: number } | null; text: string | null }>({
+  const [buttonState, setButtonState] = useState<{
+    position: { x: number; y: number } | null;
+    text: string | null;
+    top: number | null;
+    left: number | null;
+  }>({
     position: null,
     text: null,
+    top: null,
+    left: null,
   });
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -23,49 +30,40 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
 
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
-    const scrollX = window.scrollX || window.pageXOffset;
-    const scrollY = window.scrollY || window.pageYOffset;
 
-    // Position the button above the selected text, centered horizontally
-    let x = rect.left + scrollX + rect.width / 2;
-    let y = rect.top + scrollY - 40; // 40px above selection
-
-    // Ensure button stays within viewport bounds
+    // Use viewport coordinates (relative to current view) instead of page coordinates
+    // This is the proper way to position fixed elements
     const buttonWidth = 100;
     const buttonHeight = 40;
     const padding = 10;
 
-    // Constrain horizontal position
-    x = Math.max(padding + buttonWidth / 2, Math.min(x, window.innerWidth - padding - buttonWidth / 2));
+    // Center horizontally on the selection
+    let left = rect.left + rect.width / 2;
 
-    // Calculate positions for above and below text
-    let positionAbove = rect.top + scrollY - 50; // 50px above selection
-    let positionBelow = rect.bottom + scrollY + 10; // 10px below selection
+    // Constrain horizontal position to viewport
+    left = Math.max(padding + buttonWidth / 2, Math.min(left, window.innerWidth - padding - buttonWidth / 2));
 
-    // Use position above selection, but if it goes off screen, use position below
-    if (positionAbove < padding) {
-      y = positionBelow;
-    } else if (positionAbove + buttonHeight > window.innerHeight + scrollY) {
-      // If both would go off screen, use position below
-      y = positionBelow;
-    } else {
-      y = positionAbove;
+    // Try to position above the selection
+    let top = rect.top - 50; // 50px above
+
+    // If it goes off the top, position below instead
+    if (top < padding) {
+      top = rect.bottom + 10; // 10px below
     }
 
-    // Final safety check - ensure y is not below the bottom of viewport minus padding
-    // This allows button to stay visible even at the very bottom
-    y = Math.max(padding, y);
+    // If it still goes off-screen (very tall selection or at bottom), constrain it
+    if (top + buttonHeight > window.innerHeight) {
+      top = Math.max(padding, window.innerHeight - buttonHeight - padding);
+    }
 
-    console.log('[TextSelection] Button position calculated:', {
-      hasSelection: true,
+    console.log('[TextSelection] Button coords (viewport-relative):', {
       text: selection.toString().substring(0, 50),
-      selectionRect: { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
-      scrollPos: { x: scrollX, y: scrollY },
-      finalPosition: { x, y },
-      viewportSize: { width: window.innerWidth, height: window.innerHeight },
+      rect: { top: rect.top, left: rect.left, bottom: rect.bottom, width: rect.width, height: rect.height },
+      buttonPosition: { left, top },
+      viewportHeight: window.innerHeight,
     });
 
-    return { x, y };
+    return { left, top };
   }, []);
 
   const handleMouseUp = useCallback(() => {
@@ -81,15 +79,20 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
     if (selectedText.length > 0) {
       const coords = getSelectionCoords();
       if (coords) {
-        console.log('[TextSelection] Updating button state with coords:', coords);
-        setButtonState({ position: coords, text: selectedText });
+        console.log('[TextSelection] Showing button at:', coords);
+        setButtonState({
+          position: coords,
+          text: selectedText,
+          left: coords.left,
+          top: coords.top,
+        });
       } else {
         console.log('[TextSelection] No valid coords');
-        setButtonState({ position: null, text: null });
+        setButtonState({ position: null, text: null, left: null, top: null });
       }
     } else {
       console.log('[TextSelection] No text, hiding button');
-      setButtonState({ position: null, text: null });
+      setButtonState({ position: null, text: null, left: null, top: null });
     }
   }, [getSelectionCoords]);
 
@@ -134,17 +137,24 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
         // Debounce scroll handler for performance
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => {
-            // Only clear if there's no active selection
-            const selection = window.getSelection();
-            if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
-                console.log('[TextSelection] Scroll: no selection, hiding button');
-                setButtonState({ position: null, text: null });
-            } else if (buttonState.position && buttonState.text) {
-                // Update button position while keeping selection active during scroll
-                console.log('[TextSelection] Scroll: updating button position');
+            // If button is already visible, update its position while scrolling
+            // Don't clear the button - just update position
+            if (buttonState.left !== null && buttonState.top !== null && buttonState.text) {
+                console.log('[TextSelection] Scroll: updating button position for text:', buttonState.text.substring(0, 30));
                 const coords = getSelectionCoords();
                 if (coords) {
-                    setButtonState({ position: coords, text: buttonState.text });
+                    // Update position to follow the selected text as user scrolls
+                    setButtonState({
+                      position: coords,
+                      text: buttonState.text,
+                      left: coords.left,
+                      top: coords.top,
+                    });
+                } else {
+                    // If coords can't be calculated anymore, it means selection was lost
+                    // Only then clear the button
+                    console.log('[TextSelection] Scroll: selection lost, hiding button');
+                    setButtonState({ position: null, text: null, left: null, top: null });
                 }
             }
         }, 50); // Debounce by 50ms
@@ -161,12 +171,13 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
   }, [handleMouseUp, buttonState.position, buttonState.text, getSelectionCoords]);
 
   // Only render if both position and text exist
-  if (!buttonState.position || !buttonState.text) {
+  if (!buttonState.left || !buttonState.top || !buttonState.text) {
     return null;
   }
 
   console.log('[TextSelection] Rendering button at:', {
-    position: buttonState.position,
+    left: buttonState.left,
+    top: buttonState.top,
     selection: buttonState.text.substring(0, 50),
   });
 
@@ -174,15 +185,17 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
     <button
       ref={buttonRef}
       onClick={handleClick}
-      className="fixed z-[9999] bg-primary text-white dark:text-gray-100 px-4 py-2 rounded-lg text-sm font-semibold shadow-xl cursor-pointer hover:bg-opacity-90 hover:shadow-2xl transition-all duration-200 border border-transparent hover:border-white/30"
+      className="fixed z-[9999] bg-[#1cd98e] dark:bg-[#d8b4fe] text-white dark:text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold shadow-xl cursor-pointer hover:bg-[#15a860] dark:hover:bg-[#a855f7] hover:shadow-2xl transition-all duration-200 border border-transparent hover:border-white/30 dark:hover:border-gray-900/30"
       style={{
-        left: `${buttonState.position.x}px`,
-        top: `${buttonState.position.y}px`,
+        left: `${buttonState.left}px`,
+        top: `${buttonState.top}px`,
         transform: 'translateX(-50%)',
         pointerEvents: 'auto',
         visibility: 'visible',
       }}
       title="Click to ask AI about selected text"
+      aria-label="Ask AI about selected text"
+      data-testid="ask-ai-button"
     >
       ✨ Ask AI
     </button>

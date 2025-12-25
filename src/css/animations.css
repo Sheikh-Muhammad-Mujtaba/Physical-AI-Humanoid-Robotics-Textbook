@@ -1,0 +1,210 @@
+/**
+ * Animation keyframes for Advanced Chatbot UI
+ * Material Design easing and smooth transitions
+ */
+
+/* Fade in animation (opacity only) */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Slide up animation (position + opacity) */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Message enter animation (Material Design inspired) */
+@keyframes messageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading pulse animation */
+@keyframes pulseSubtle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Loading dots animation */
+@keyframes loadingDots {
+  0%,
+  20% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+  80%,
+  100% {
+    opacity: 0.4;
+  }
+}
+
+/* Expand animation for chat window */
+@keyframes expandChat {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Subtle scale on hover (button feedback) */
+@keyframes buttonHoverScale {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.02);
+  }
+}
+
+/* Gradient shift for interactive elements */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Check mark animation for MCQ feedback */
+@keyframes checkMark {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-45deg);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+/* X mark animation for incorrect answer */
+@keyframes xMark {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(45deg);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+/* Base animation utilities */
+.animate-fade-in {
+  animation: fadeIn 300ms ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 300ms ease-out forwards;
+}
+
+.animate-message-enter {
+  animation: messageEnter 300ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-loading-dots {
+  animation: loadingDots 1.4s ease-in-out infinite;
+}
+
+.animate-expand-chat {
+  animation: expandChat 300ms ease-out forwards;
+}
+
+.animate-button-hover {
+  animation: buttonHoverScale 200ms ease-out forwards;
+}
+
+.animate-gradient-shift {
+  animation: gradientShift 3s ease infinite;
+  background-size: 200% 200%;
+}
+
+.animate-check-mark {
+  animation: checkMark 400ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-x-mark {
+  animation: xMark 400ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Reduced motion support - WCAG AA compliance */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Material Design easing functions as variables for reuse */
+:root {
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-entrance: cubic-bezier(0.0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-decelerate: cubic-bezier(0.0, 0, 0.2, 1);
+  --ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --ease-sharp: cubic-bezier(0.4, 0, 0.6, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Transition utilities with Material Design easing */
+.transition-standard {
+  transition: all 300ms var(--ease-standard);
+}
+
+.transition-entrance {
+  transition: all 300ms var(--ease-entrance);
+}
+
+.transition-exit {
+  transition: all 300ms var(--ease-exit);
+}
+
+.transition-smooth {
+  transition: all 200ms var(--ease-standard);
+}

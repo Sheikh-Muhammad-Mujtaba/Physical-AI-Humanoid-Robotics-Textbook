@@ -179,8 +179,24 @@ async def chat(chat_request: ChatRequest, user_id: str = Depends(get_current_use
     db.add(user_message)
     db.commit()
 
+    prompt = f"""You are an expert AI assistant specialized in Physical AI and Humanoid Robotics. Your role is to help students learn and understand concepts from their textbook.
+
+User's question:
+"{chat_request.query}"
+
+Instructions:
+1. Always use the search_tool to find relevant content from the textbook that relates to the user's question.
+2. Use the context retrieved by search_tool as the foundation for your answer.
+3. If the search_tool returns relevant context, prioritize information from the textbook in your response.
+4. If no relevant textbook content is found, you may supplement with your general knowledge about Physical AI and Humanoid Robotics.
+5. Cite or reference the textbook content when applicable to show the source of your information.
+6. Explain concepts clearly and concisely, making them accessible to learners.
+7. If the question relates to specific topics or chapters in the textbook, search for them explicitly.
+
+Be helpful, accurate, and focus on educational value."""
+
     try:
-        result = await Runner.run(agent, chat_request.query)
+        result = await Runner.run(agent, prompt)
         llm_answer = result.final_output
 
         bot_message = ChatHistory(session_id=chat_request.session_id, user_id=user_id, sender="bot", text=llm_answer)
