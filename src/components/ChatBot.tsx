@@ -164,42 +164,44 @@ export default function ChatBot({ selectedText }: ChatBotProps) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-[#1cd98e] to-[#15a860] hover:from-[#19c380] hover:to-[#138f56] text-white shadow-lg shadow-[#1cd98e]/40 hover:shadow-xl hover:shadow-[#1cd98e]/60 flex items-center justify-center transition-all duration-300 hover:scale-110 z-40 group"
+        className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-[#1cd98e] via-[#17c97d] to-[#15a860] hover:from-[#2ee89f] hover:via-[#25d98d] hover:to-[#1db870] text-white shadow-xl shadow-[#1cd98e]/60 hover:shadow-2xl hover:shadow-[#1cd98e]/80 flex items-center justify-center transition-all duration-500 hover:scale-125 z-40 group backdrop-blur-sm border border-white/20 animate-pulse-glow"
         aria-label="Open chat"
       >
-        <MessageCircle className="w-8 h-8 group-hover:rotate-12 transition-transform" />
+        <MessageCircle className="w-8 h-8 group-hover:rotate-12 transition-transform duration-300 animate-bounce-subtle" />
+        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#1cd98e] to-transparent opacity-20 group-hover:opacity-40 transition-opacity blur-xl -z-10" />
       </button>
     )
   }
 
   return (
     <div
-      className={`fixed bottom-6 right-6 bg-white rounded-2xl shadow-2xl shadow-black/20 flex flex-col z-40 overflow-hidden transition-all duration-300 border border-gray-200 ${
+      className={`fixed bottom-6 right-6 bg-white/10 backdrop-blur-2xl rounded-3xl shadow-2xl shadow-[#1cd98e]/30 flex flex-col z-40 overflow-hidden transition-all duration-500 border border-white/20 hover:border-white/40 animate-slideIn ${
         isExpanded ? 'w-[900px] h-[600px]' : 'w-96 h-[500px]'
       }`}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#1cd98e] to-[#15a860] text-white px-6 py-4 flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-            <Sparkles className="w-5 h-5" />
+      <div className="bg-gradient-to-r from-[#1cd98e] via-[#17c97d] to-[#15a860] text-white px-6 py-5 flex items-center justify-between flex-shrink-0 border-b border-white/20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500" />
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 group hover:bg-white/30 transition-all duration-300 shadow-lg shadow-white/20">
+            <Sparkles className="w-5 h-5 group-hover:rotate-180 transition-transform duration-700" />
           </div>
           <div>
-            <h2 className="text-lg font-bold">Physical AI Assistant</h2>
-            <p className="text-xs text-white/70">AI-powered learning companion</p>
+            <h2 className="text-lg font-bold tracking-tight drop-shadow-lg">Physical AI Assistant</h2>
+            <p className="text-xs text-white/80 font-medium">AI-powered learning companion ✨</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 relative z-10">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            className="p-2 hover:bg-white/20 backdrop-blur-sm rounded-lg transition-all duration-300 border border-transparent hover:border-white/30 hover:shadow-lg hover:shadow-white/20"
             aria-label={isExpanded ? "Minimize" : "Expand"}
           >
             <Maximize2 className="w-5 h-5" />
           </button>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            className="p-2 hover:bg-white/20 backdrop-blur-sm rounded-lg transition-all duration-300 border border-transparent hover:border-white/30 hover:shadow-lg hover:shadow-white/20"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
@@ -208,17 +210,17 @@ export default function ChatBot({ selectedText }: ChatBotProps) {
       </div>
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-gray-50 to-white">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-white/50 via-white/30 to-white/50 backdrop-blur-sm">
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex ${message.type === "user" ? "justify-end" : "justify-start"} animate-fadeIn`}
+            className={`flex ${message.type === "user" ? "justify-end" : "justify-start"} animate-fadeIn group`}
           >
             <div
-              className={`max-w-xs px-4 py-3 rounded-lg text-sm leading-relaxed font-medium transition-all ${
+              className={`max-w-xs px-5 py-3 rounded-2xl text-sm leading-relaxed font-medium transition-all duration-300 backdrop-blur-md border ${
                 message.type === "user"
-                  ? "bg-gradient-to-br from-[#1cd98e] to-[#15a860] text-white rounded-br-none shadow-md hover:shadow-lg"
-                  : "bg-gray-100 text-gray-800 rounded-bl-none border border-gray-200 hover:bg-gray-150"
+                  ? "bg-gradient-to-br from-[#1cd98e] via-[#17c97d] to-[#15a860] text-white rounded-br-none shadow-lg shadow-[#1cd98e]/40 hover:shadow-2xl hover:shadow-[#1cd98e]/60 hover:scale-105 border-white/20 group-hover:border-white/40"
+                  : "bg-white/20 text-gray-900 rounded-bl-none border border-white/30 hover:bg-white/30 hover:shadow-lg hover:shadow-white/20 group-hover:border-white/50 hover:scale-105"
               }`}
             >
               {message.content}
@@ -228,15 +230,15 @@ export default function ChatBot({ selectedText }: ChatBotProps) {
 
         {/* Suggested Questions - Show only on initial state */}
         {messages.length === 1 && !isLoading && (
-          <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
-            <p className="text-xs text-gray-500 font-semibold px-2">Quick Questions:</p>
+          <div className="mt-6 pt-6 border-t border-white/30 space-y-3 animate-slideUp">
+            <p className="text-xs text-white/70 font-bold px-2 uppercase tracking-widest">✨ Quick Questions:</p>
             {SUGGESTED_QUESTIONS.map((question, index) => (
               <button
                 key={index}
                 onClick={() => handleSuggestedQuestion(question)}
-                className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-white border border-gray-300 text-gray-700 hover:border-[#1cd98e] hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 transition-all duration-200 group"
+                className="w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white/10 backdrop-blur-md border border-white/30 text-gray-900 hover:bg-gradient-to-r hover:from-[#1cd98e]/20 hover:to-[#15a860]/20 hover:border-[#1cd98e]/60 transition-all duration-300 group hover:shadow-lg hover:shadow-[#1cd98e]/30 hover:scale-105"
               >
-                <span className="group-hover:text-[#1cd98e] transition-colors">+ {question}</span>
+                <span className="group-hover:text-[#1cd98e] transition-colors font-medium">✦ {question}</span>
               </button>
             ))}
           </div>
@@ -244,18 +246,18 @@ export default function ChatBot({ selectedText }: ChatBotProps) {
 
         {/* Loading Indicator */}
         {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-gray-200 px-4 py-3 rounded-lg rounded-bl-none flex gap-2 items-center">
-              <div className="flex gap-1">
+          <div className="flex justify-start animate-fadeIn">
+            <div className="bg-white/20 backdrop-blur-md px-5 py-4 rounded-2xl rounded-bl-none flex gap-3 items-center border border-white/30 shadow-lg shadow-white/10 hover:shadow-xl hover:shadow-white/20 transition-all">
+              <div className="flex gap-1.5">
                 {[0, 1, 2].map((i) => (
                   <div
                     key={i}
-                    className="w-2 h-2 bg-gray-600 rounded-full animate-bounce"
-                    style={{ animationDelay: `${i * 0.1}s` }}
+                    className="w-2.5 h-2.5 bg-gradient-to-b from-[#1cd98e] to-[#15a860] rounded-full animate-bounce shadow-lg shadow-[#1cd98e]/50"
+                    style={{ animationDelay: `${i * 0.15}s` }}
                   />
                 ))}
               </div>
-              <span className="text-xs text-gray-600 ml-1">Thinking...</span>
+              <span className="text-xs font-bold text-gray-900 ml-2 tracking-wide">Thinking<span className="animate-pulse">...</span></span>
             </div>
           </div>
         )}
@@ -263,34 +265,34 @@ export default function ChatBot({ selectedText }: ChatBotProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Selected Text Banner - WhatsApp-style context */}
+      {/* Selected Text Banner - Web3 style context */}
       {capturedText && (
-        <div className="bg-gradient-to-r from-blue-50 to-blue-50/50 border-t-2 border-l-4 border-[#1cd98e] px-4 py-3.5 flex items-start gap-3 shadow-sm">
+        <div className="bg-gradient-to-r from-[#1cd98e]/20 via-[#17c97d]/15 to-[#15a860]/20 backdrop-blur-md border-t-2 border-l-4 border-[#1cd98e] px-5 py-4 flex items-start gap-4 shadow-lg shadow-[#1cd98e]/20 hover:shadow-xl hover:shadow-[#1cd98e]/30 transition-all animate-slideDown">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="inline-flex items-center justify-center w-5 h-5 text-sm">📖</span>
-              <p className="text-xs font-bold text-[#1cd98e] uppercase tracking-wider">Selected from book</p>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="inline-flex items-center justify-center w-6 h-6 text-sm bg-white/20 rounded-lg">📖</span>
+              <p className="text-xs font-bold text-[#1cd98e] uppercase tracking-widest drop-shadow-sm">✦ Selected from book</p>
             </div>
-            <p className="text-sm text-gray-700 italic bg-white/70 p-2 rounded border border-gray-200 line-clamp-2">
+            <p className="text-sm text-gray-900 italic bg-white/40 backdrop-blur-sm p-3 rounded-lg border border-white/50 line-clamp-2 shadow-sm hover:bg-white/50 transition-all font-medium">
               "{capturedText.substring(0, 80)}{capturedText.length > 80 ? '...' : ''}"
             </p>
-            <p className="text-xs text-gray-500 mt-1.5">This context will be included with your message.</p>
+            <p className="text-xs text-gray-700 mt-2 font-medium">⚡ This context will be included with your message.</p>
           </div>
           <button
             onClick={() => setCapturedText("")}
             disabled={isLoading}
-            className="flex-shrink-0 mt-0.5 text-gray-400 hover:text-gray-600 transition-colors"
+            className="flex-shrink-0 mt-1 text-gray-600 hover:text-[#1cd98e] hover:bg-white/20 hover:shadow-lg hover:shadow-[#1cd98e]/30 p-2 rounded-lg transition-all duration-300 border border-transparent hover:border-white/30"
             title="Clear selection"
             aria-label="Clear selection"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
       )}
 
       {/* Input Area */}
-      <div className="border-t border-gray-200 p-4 bg-white flex-shrink-0">
-        <div className="flex gap-2">
+      <div className="border-t border-white/20 p-4 bg-white/10 backdrop-blur-md flex-shrink-0">
+        <div className="flex gap-3">
           <input
             type="text"
             value={inputValue}
@@ -302,15 +304,15 @@ export default function ChatBot({ selectedText }: ChatBotProps) {
             }}
             placeholder="Ask me anything..."
             disabled={isLoading}
-            className="flex-1 px-4 py-2 rounded-xl bg-gray-100 border border-gray-300 text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1cd98e]/50 focus:border-transparent transition-all disabled:opacity-50"
+            className="flex-1 px-5 py-3 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#1cd98e]/70 focus:border-white/50 transition-all duration-300 disabled:opacity-50 hover:bg-white/30 hover:border-white/40 font-medium shadow-lg shadow-white/10 focus:shadow-xl focus:shadow-[#1cd98e]/30"
           />
           <button
             onClick={() => handleSendMessage(inputValue)}
             disabled={isLoading || !inputValue.trim()}
-            className="px-4 py-2 bg-gradient-to-r from-[#1cd98e] to-[#15a860] hover:from-[#19c380] hover:to-[#138f56] disabled:from-gray-300 disabled:to-gray-400 text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center font-bold hover:shadow-lg"
+            className="px-5 py-3 bg-gradient-to-r from-[#1cd98e] via-[#17c97d] to-[#15a860] hover:from-[#2ee89f] hover:via-[#25d98d] hover:to-[#1db870] disabled:from-gray-400 disabled:via-gray-400 disabled:to-gray-500 text-white rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center font-bold hover:shadow-xl hover:shadow-[#1cd98e]/50 active:scale-95 border border-white/20 hover:border-white/40 shadow-lg"
             aria-label="Send message"
           >
-            <Send className="w-5 h-5" />
+            <Send className="w-5 h-5 hover:rotate-12 transition-transform" />
           </button>
         </div>
       </div>
@@ -326,8 +328,69 @@ export default function ChatBot({ selectedText }: ChatBotProps) {
             transform: translateY(0);
           }
         }
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95) translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes pulseGlow {
+          0%, 100% {
+            box-shadow: 0 0 20px rgba(28, 217, 142, 0.6), 0 0 40px rgba(28, 217, 142, 0.3);
+          }
+          50% {
+            box-shadow: 0 0 30px rgba(28, 217, 142, 0.8), 0 0 60px rgba(28, 217, 142, 0.5);
+          }
+        }
+        @keyframes bounceSubtle {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-4px);
+          }
+        }
         .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
+          animation: fadeIn 0.4s ease-out;
+        }
+        .animate-slideIn {
+          animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .animate-slideUp {
+          animation: slideUp 0.5s ease-out;
+        }
+        .animate-slideDown {
+          animation: slideDown 0.4s ease-out;
+        }
+        .animate-pulse-glow {
+          animation: pulseGlow 3s ease-in-out infinite;
+        }
+        .animate-bounce-subtle {
+          animation: bounceSubtle 2s ease-in-out infinite;
         }
         .line-clamp-2 {
           display: -webkit-box;
