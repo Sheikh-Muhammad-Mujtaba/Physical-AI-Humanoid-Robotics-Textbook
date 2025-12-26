@@ -1,6 +1,5 @@
 from typing import List, Optional
-from qdrant_client.http.models import PointStruct
-from config import config, Config
+from config import config
 from models import TextChunk
 import logging
 import os
@@ -8,17 +7,15 @@ import os
 logger = logging.getLogger(__name__)
 
 COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "textbook_chunks")
-# Changed to 768-dimensional model to match Qdrant collection configuration
-# The collection expects 768-dim vectors, not 384-dim from BAAI/bge-base-en
 HUGGINGFACE_EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2"  # 768-dim model
 
 
 async def get_query_embedding(query: str) -> Optional[List[float]]:
     """
-    Generate embedding for a query using Hugging Face's BAAI/bge-base-en model.
+    Generate embedding for a query using Hugging Face's all-mpnet-base-v2 model.
 
     This function uses the Hugging Face Inference API to embed queries without
-    quota limits. The BGE model is optimized for retrieval tasks.
+    quota limits. The model outputs 768-dimensional vectors.
 
     Args:
         query: The text to embed
@@ -35,7 +32,10 @@ async def get_query_embedding(query: str) -> Optional[List[float]]:
             model=HUGGINGFACE_EMBEDDING_MODEL
         )
 
-        # feature_extraction returns a list of floats directly
+        # feature_extraction returns a list of floats directly or numpy array
+        if hasattr(embedding_response, 'tolist'):
+            embedding_response = embedding_response.tolist()
+            
         logger.debug(f"Query embedding generated, dimension: {len(embedding_response)}")
         return embedding_response
 
@@ -46,7 +46,7 @@ async def get_query_embedding(query: str) -> Optional[List[float]]:
 def search_book_content(
     query_embedding: List[float],
     limit: int = 5,
-    score_threshold: Optional[float] = 0.5
+    score_threshold: Optional[float] = 0.0
 ) -> List[TextChunk]:
     """
     Searches the Qdrant database for book content similar to the query embedding.
@@ -58,14 +58,18 @@ def search_book_content(
 
     Returns:
         List of TextChunk objects with relevant content from the textbook
+
+    Example:
+        >>> embedding = await get_query_embedding("Physical AI")
+        >>> chunks = search_book_content(embedding, limit=3)
+        >>> for chunk in chunks:
+        ...     print(chunk.text)
     """
     try:
         qdrant_client = config.get_qdrant_client()
 
         logger.info(f"Searching Qdrant collection '{COLLECTION_NAME}' with limit={limit}")
 
-        # Use query_points() method - compatible with all Qdrant client versions
-        # Returns QueryResponse object with points list
         search_results = qdrant_client.query_points(
             collection_name=COLLECTION_NAME,
             query=query_embedding,
@@ -77,23 +81,25 @@ def search_book_content(
 
         chunks = []
         for i, scored_point in enumerate(search_results.points):
-            # ScoredPoint has: id, score, payload attributes
             score_value = getattr(scored_point, 'score', None)
 
-            chunk = TextChunk(
-                text=scored_point.payload.get('text', ''),
-                source=scored_point.payload.get('source'),
-                page=scored_point.payload.get('page'),
-                score=score_value
-            )
-
-            # Apply score threshold filtering if needed
+            # Apply score threshold filtering
             if score_threshold and score_value is not None and score_value < score_threshold:
                 logger.debug(f"Skipping chunk {i+1}: score {score_value:.3f} below threshold {score_threshold}")
                 continue
 
+            chunk = TextChunk(
+                text=scored_point.payload.get('text', ''),
+                source=scored_point.payload.get('source'),
+                page=scored_point.payload.get('page'), # Might be None
+                score=score_value
+            )
+
             chunks.append(chunk)
             logger.debug(f"Chunk {i+1}: id={scored_point.id}, score={score_value if score_value is not None else 'N/A'}, source={chunk.source}")
+
+        if not chunks:
+            logger.warn("No chunks found matching criteria.")
 
         return chunks
 

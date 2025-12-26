@@ -49,9 +49,9 @@ npm test && npm run lint
 Node.js >=20.0, TypeScript ~5.6.2: Follow standard conventions
 
 ## Recent Changes
+- 001-fix-agent-search: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 - 001-fix-auth-and-l10n: Added Python 3.10+ (Backend), TypeScript 5.x (Frontend) + FastAPI, React, Docusaurus, Tailwind CSS, BetterAuth, Gemini SDK, Qdrant client
 - 001-vercel-deployment: Added Docusaurus (TypeScript), Python 3.10+, TypeScript 5.x + Docusaurus, FastAPI, SQLAlchemy, Qdrant, PyJWT, Next.js (in `auth-service`)
-- 001-betterauth-integration: Added Python 3.11+ (Backend), TypeScript 5.x (Frontend) + FastAPI, uvicorn, pydantic (Backend); React, Docusaurus (Frontend)
 
 
 
