@@ -101,7 +101,7 @@ async def lifespan(app: FastAPI):
     agent = Agent(
         name="PhysicalAIAssistant",
         instructions="You are an AI assistant specialized in Physical AI and Humanoid Robotics. Answer questions based on the context provided by the search_tool. If the tool returns no relevant context, say so and answer based on your general knowledge.",
-        model=OpenAIChatCompletionsModel(model="gemini-2.5-flash", openai_client=chat_client),
+        model=OpenAIChatCompletionsModel(model="gemini-2.5-flash-lite", openai_client=chat_client),
         tools=[search_tool]
     )
 
