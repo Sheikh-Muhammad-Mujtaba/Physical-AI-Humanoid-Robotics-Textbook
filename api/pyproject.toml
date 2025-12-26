@@ -6,7 +6,7 @@ requires-python = ">=3.11"
 dependencies = [
     "fastapi",
     "uvicorn",
-    "qdrant-client",
+    "qdrant-client>=1.7.0",
     "openai",
     "openai-agents",
     "pydantic",
