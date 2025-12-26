@@ -62,32 +62,29 @@ def search_book_content(
 
         logger.info(f"Searching Qdrant collection '{COLLECTION_NAME}' with limit={limit}")
 
-        # Use query_points() method - compatible with REST API
-        # Returns QueryResponse object with points list
-        search_results = qdrant_client.query_points(
+        # Use search() method - simpler API for single vector search
+        # Returns list of ScoredPoint objects
+        search_results = qdrant_client.search(
             collection_name=COLLECTION_NAME,
-            query=query_embedding,
+            query_vector=query_embedding,
             limit=limit,
+            score_threshold=score_threshold if score_threshold else 0.0,
             with_payload=True
         )
 
-        logger.info(f"Found {len(search_results.points)} relevant chunks in Qdrant")
+        logger.info(f"Found {len(search_results)} relevant chunks in Qdrant")
 
         chunks = []
-        for i, scored_point in enumerate(search_results.points):
-            # Check if score meets threshold if provided
-            if score_threshold and hasattr(scored_point, 'score') and scored_point.score < score_threshold:
-                continue
-
+        for i, scored_point in enumerate(search_results):
             # ScoredPoint has: id, score, payload attributes
             chunk = TextChunk(
                 text=scored_point.payload.get('text', ''),
                 source=scored_point.payload.get('source'),
                 page=scored_point.payload.get('page'),
-                score=scored_point.score if hasattr(scored_point, 'score') else None
+                score=scored_point.score
             )
             chunks.append(chunk)
-            logger.debug(f"Chunk {i+1}: id={scored_point.id}, score={getattr(scored_point, 'score', 'N/A')}, source={chunk.source}")
+            logger.debug(f"Chunk {i+1}: id={scored_point.id}, score={scored_point.score:.3f}, source={chunk.source}")
 
         return chunks
 
