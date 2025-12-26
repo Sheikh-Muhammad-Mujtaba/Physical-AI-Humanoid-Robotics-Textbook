@@ -1,6 +1,7 @@
 import os
 import logging
 from qdrant_client import QdrantClient
+from huggingface_hub import InferenceClient
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +13,9 @@ class Config:
     QDRANT_URL: str
     QDRANT_API_KEY: str
     QDRANT_COLLECTION_NAME: str
+    HUGGINGFACE_API_KEY: str
     _qdrant_client: QdrantClient = None
+    _inference_client: InferenceClient = None
 
     def __init__(self):
         self.DATABASE_URL = os.getenv("DATABASE_URL")
@@ -22,6 +25,7 @@ class Config:
         self.QDRANT_URL = os.getenv("QDRANT_URL")
         self.QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
         self.QDRANT_COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "textbook_chunks")
+        self.HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
         self._validate()
 
     def _validate(self):
@@ -38,6 +42,8 @@ class Config:
             errors.append("Missing environment variable: QDRANT_URL")
         if not self.QDRANT_API_KEY:
             errors.append("Missing environment variable: QDRANT_API_KEY")
+        if not self.HUGGINGFACE_API_KEY:
+            errors.append("Missing environment variable: HUGGINGFACE_API_KEY")
 
         if errors:
             for error in errors:
@@ -59,5 +65,16 @@ class Config:
                 logger.error(f"Failed to initialize Qdrant client: {str(e)}")
                 raise
         return self._qdrant_client
+
+    def get_inference_client(self) -> InferenceClient:
+        """Get or create Hugging Face Inference client (singleton pattern)."""
+        if self._inference_client is None:
+            try:
+                self._inference_client = InferenceClient(api_key=self.HUGGINGFACE_API_KEY)
+                logger.info("Successfully initialized Hugging Face Inference client")
+            except Exception as e:
+                logger.error(f"Failed to initialize Hugging Face Inference client: {str(e)}")
+                raise
+        return self._inference_client
 
 config = Config()

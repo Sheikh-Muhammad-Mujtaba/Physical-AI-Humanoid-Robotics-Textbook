@@ -8,6 +8,38 @@ import os
 logger = logging.getLogger(__name__)
 
 COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "textbook_chunks")
+HUGGINGFACE_EMBEDDING_MODEL = "BAAI/bge-base-en"  # State-of-the-art retrieval-optimized model
+
+
+async def get_query_embedding(query: str) -> Optional[List[float]]:
+    """
+    Generate embedding for a query using Hugging Face's BAAI/bge-base-en model.
+
+    This function uses the Hugging Face Inference API to embed queries without
+    quota limits. The BGE model is optimized for retrieval tasks.
+
+    Args:
+        query: The text to embed
+
+    Returns:
+        List of floats representing the embedding, or None if embedding fails
+    """
+    try:
+        logger.debug(f"Embedding query using {HUGGINGFACE_EMBEDDING_MODEL}: '{query[:100]}'")
+        inference_client = config.get_inference_client()
+
+        embedding_response = inference_client.feature_extraction(
+            text=query,
+            model=HUGGINGFACE_EMBEDDING_MODEL
+        )
+
+        # feature_extraction returns a list of floats directly
+        logger.debug(f"Query embedding generated, dimension: {len(embedding_response)}")
+        return embedding_response
+
+    except Exception as e:
+        logger.error(f"Error embedding query with Hugging Face: {str(e)}", exc_info=True)
+        return None
 
 def search_book_content(
     query_embedding: List[float],

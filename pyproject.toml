@@ -13,6 +13,7 @@ dependencies = [
     "python-dotenv",
     "sqlalchemy",
     "psycopg2-binary",
+    "huggingface-hub",
 ]
 
 [build-system]

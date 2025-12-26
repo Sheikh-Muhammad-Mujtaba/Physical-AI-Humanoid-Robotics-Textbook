@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'util
 
 from config import Config
 from models import ChatRequest, ChatResponse, AskSelectionRequest, HistoryMessage, FeedbackRequest
-from tools import search_book_content, format_context
+from tools import search_book_content, format_context, get_query_embedding
 from database import create_tables, get_db
 from sql_models import ChatHistory, Feedback
 from auth import get_current_user_from_session  # Use session-based auth instead of JWT
@@ -38,7 +38,8 @@ async def search_tool(query: str) -> str:
     Searches the textbook vector database for relevant content using semantic search.
 
     This tool is automatically called by the agent when answering questions.
-    It embeds the query and searches Qdrant for the most relevant textbook chunks.
+    It embeds the query using Hugging Face's BAAI/bge-base-en model and searches
+    Qdrant for the most relevant textbook chunks.
 
     Args:
         query: The user's question or search query
@@ -49,21 +50,14 @@ async def search_tool(query: str) -> str:
     import logging
     logger = logging.getLogger(__name__)
 
-    try:
-        logger.info(f"search_tool called with query: {query[:100]}...")
+    logger.info(f"search_tool called with query: {query[:100]}...")
 
-        # Step 1: Embed the user's query using Google Gemini embedding model
-        logger.debug(f"Embedding query: '{query}'")
-        query_embedding_response = await embedding_client.embeddings.create(
-            model="models/embedding-001",
-            input=[query]
-        )
-        query_embedding = query_embedding_response.data[0].embedding
-        logger.debug(f"Query embedding generated, dimension: {len(query_embedding)}")
+    # Step 1: Embed the user's query using Hugging Face's BGE model (free, no quota limits)
+    query_embedding = await get_query_embedding(query)
 
-    except Exception as e:
-        logger.error(f"Error embedding query: {str(e)}", exc_info=True)
-        return "I'm sorry, I couldn't process your request to understand the query. This is a technical issue with query processing."
+    if query_embedding is None:
+        logger.warning(f"Failed to embed query, proceeding without vector search")
+        return "I'm currently unable to retrieve specific context from the textbook due to an embedding service issue, but I can still try to answer your question based on general knowledge about Physical AI and Humanoid Robotics."
 
     # Step 2: Search Qdrant vector database for relevant chunks
     context_chunks = []
