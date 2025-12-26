@@ -62,7 +62,8 @@ def search_book_content(
 
         logger.info(f"Searching Qdrant collection '{COLLECTION_NAME}' with limit={limit}")
 
-        search_result = qdrant_client.search(
+        # Use search_points() which is the correct method in qdrant_client
+        search_result = qdrant_client.search_points(
             collection_name=COLLECTION_NAME,
             query_vector=query_embedding,
             limit=limit,
@@ -70,18 +71,18 @@ def search_book_content(
             with_payload=True
         )
 
-        logger.info(f"Found {len(search_result)} relevant chunks in Qdrant")
+        logger.info(f"Found {len(search_result.points)} relevant chunks in Qdrant")
 
         chunks = []
-        for i, hit in enumerate(search_result):
+        for i, point in enumerate(search_result.points):
             chunk = TextChunk(
-                text=hit.payload.get('text', ''),
-                source=hit.payload.get('source'),
-                page=hit.payload.get('page'),
-                score=hit.score  # Include similarity score
+                text=point.payload.get('text', ''),
+                source=point.payload.get('source'),
+                page=point.payload.get('page'),
+                score=point.score  # Include similarity score
             )
             chunks.append(chunk)
-            logger.debug(f"Chunk {i+1}: score={hit.score:.3f}, source={chunk.source}")
+            logger.debug(f"Chunk {i+1}: score={point.score:.3f}, source={chunk.source}")
 
         return chunks
 
