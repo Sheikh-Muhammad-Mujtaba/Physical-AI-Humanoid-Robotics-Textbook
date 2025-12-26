@@ -8,7 +8,9 @@ import os
 logger = logging.getLogger(__name__)
 
 COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "textbook_chunks")
-HUGGINGFACE_EMBEDDING_MODEL = "BAAI/bge-base-en"  # State-of-the-art retrieval-optimized model
+# Changed to 768-dimensional model to match Qdrant collection configuration
+# The collection expects 768-dim vectors, not 384-dim from BAAI/bge-base-en
+HUGGINGFACE_EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2"  # 768-dim model
 
 
 async def get_query_embedding(query: str) -> Optional[List[float]]:
@@ -62,44 +64,14 @@ def search_book_content(
 
         logger.info(f"Searching Qdrant collection '{COLLECTION_NAME}' with limit={limit}")
 
-        # Use query_points() with named vector support
-        # The 'using' parameter specifies which named vector to search
-        # Try the most common named vector names first
-        search_results = None
-        vector_names_to_try = ["text", "embedding", "vector", None]  # None means default vector
-
-        for vector_name in vector_names_to_try:
-            try:
-                if vector_name:
-                    logger.debug(f"Attempting search with named vector: {vector_name}")
-                    search_results = qdrant_client.query_points(
-                        collection_name=COLLECTION_NAME,
-                        query=query_embedding,
-                        limit=limit,
-                        using=vector_name,
-                        with_payload=True
-                    )
-                else:
-                    logger.debug("Attempting search with default vector")
-                    search_results = qdrant_client.query_points(
-                        collection_name=COLLECTION_NAME,
-                        query=query_embedding,
-                        limit=limit,
-                        with_payload=True
-                    )
-
-                logger.info(f"Successfully searched using vector: {vector_name or 'default'}")
-                break
-            except Exception as vector_error:
-                logger.debug(f"Failed with vector name '{vector_name}': {str(vector_error)}")
-                if vector_name == vector_names_to_try[-2]:  # Last non-None attempt
-                    # If all named vectors failed, try without specifying
-                    continue
-                continue
-
-        if search_results is None:
-            logger.error(f"Could not search collection with any vector configuration")
-            return []
+        # Use query_points() method - compatible with all Qdrant client versions
+        # Returns QueryResponse object with points list
+        search_results = qdrant_client.query_points(
+            collection_name=COLLECTION_NAME,
+            query=query_embedding,
+            limit=limit,
+            with_payload=True
+        )
 
         logger.info(f"Found {len(search_results.points)} relevant chunks in Qdrant")
 
