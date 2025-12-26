@@ -31,25 +31,68 @@ chat_client = AsyncOpenAI(api_key=config.GEMINI_API_KEY, base_url="https://gener
 embedding_client = AsyncOpenAI(api_key=config.GEMINI_API_KEY, base_url="https://generativelanguage.googleapis.com/v1beta/")
 
 
-# Define the search tool
+# Define the search tool - this is called by the agent to retrieve knowledge from Qdrant
 @function_tool
 async def search_tool(query: str) -> str:
-    """Searches the textbook for relevant content."""
-    try:
-        query_embedding_response = await embedding_client.embeddings.create(model="models/embedding-001", input=[query])
-        query_embedding = query_embedding_response.data[0].embedding
-    except Exception as e:
-        print(f"Error embedding query: {e}")
-        return "I'm sorry, I couldn't process your request to understand the query."
+    """
+    Searches the textbook vector database for relevant content using semantic search.
 
+    This tool is automatically called by the agent when answering questions.
+    It embeds the query and searches Qdrant for the most relevant textbook chunks.
+
+    Args:
+        query: The user's question or search query
+
+    Returns:
+        Formatted context from the textbook, or a message if no relevant content is found
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    try:
+        logger.info(f"search_tool called with query: {query[:100]}...")
+
+        # Step 1: Embed the user's query using Google Gemini embedding model
+        logger.debug(f"Embedding query: '{query}'")
+        query_embedding_response = await embedding_client.embeddings.create(
+            model="models/embedding-001",
+            input=[query]
+        )
+        query_embedding = query_embedding_response.data[0].embedding
+        logger.debug(f"Query embedding generated, dimension: {len(query_embedding)}")
+
+    except Exception as e:
+        logger.error(f"Error embedding query: {str(e)}", exc_info=True)
+        return "I'm sorry, I couldn't process your request to understand the query. This is a technical issue with query processing."
+
+    # Step 2: Search Qdrant vector database for relevant chunks
     context_chunks = []
     try:
-        context_chunks = search_book_content(query_embedding)
-    except Exception as e:
-        print(f"Warning: Qdrant search failed: {e}. Proceeding with generic LLM response.")
-        return "I'm currently unable to retrieve specific context from the textbook, but I can still try to answer generally."
+        logger.info("Searching Qdrant vector database for relevant textbook chunks...")
+        context_chunks = search_book_content(
+            query_embedding=query_embedding,
+            limit=5,  # Get top 5 most relevant chunks
+            score_threshold=0.5  # Only include chunks with >50% relevance
+        )
+        logger.info(f"Found {len(context_chunks)} relevant chunks in Qdrant")
 
-    return format_context(context_chunks)
+        if not context_chunks:
+            logger.warning(f"No relevant chunks found for query: {query}")
+            return "I couldn't find directly relevant content in the textbook for this question, but I can try to answer based on general knowledge about Physical AI and Humanoid Robotics."
+
+    except Exception as e:
+        logger.error(f"Error searching Qdrant: {str(e)}", exc_info=True)
+        return "I'm currently unable to retrieve specific context from the textbook due to a database issue, but I can still try to answer your question generally."
+
+    # Step 3: Format the chunks for the LLM
+    try:
+        formatted_context = format_context(context_chunks, include_scores=False)
+        logger.debug(f"Context formatted, length: {len(formatted_context)} chars, chunks: {len(context_chunks)}")
+        return formatted_context
+
+    except Exception as e:
+        logger.error(f"Error formatting context: {str(e)}", exc_info=True)
+        return "I found some relevant content but had trouble processing it. Let me answer based on what I know about Physical AI and Humanoid Robotics."
 
 # Global agent variable
 agent: Agent = None
@@ -253,3 +296,42 @@ Be concise but thorough. Focus on helping the student truly understand the selec
     except Exception as e:
         print(f"Error during agent run: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while processing your request.")
+
+
+# Debug endpoint to check Qdrant collection status
+@app.get("/api/debug/qdrant-status", response_model=dict)
+async def qdrant_status():
+    """Check the status of the Qdrant vector database and collection."""
+    try:
+        from tools import get_collection_info
+        collection_info = get_collection_info()
+        return {
+            "status": "connected",
+            "collection": collection_info
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+
+
+# Debug endpoint to test search tool
+@app.post("/api/debug/test-search", response_model=dict)
+async def test_search(request: dict):
+    """Test the search tool with a sample query."""
+    if not request.get("query"):
+        raise HTTPException(status_code=400, detail="Missing 'query' field")
+
+    try:
+        result = await search_tool(request["query"])
+        return {
+            "status": "success",
+            "query": request["query"],
+            "result": result[:500]  # Return first 500 chars to limit response size
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
