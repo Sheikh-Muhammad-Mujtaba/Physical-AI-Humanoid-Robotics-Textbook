@@ -1,63 +1,142 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useChat } from '../contexts/ChatContext';
+import { Copy, ThumbsUp, ThumbsDown, RotateCw } from 'lucide-react';
 
 const ChatbotWidget: React.FC = () => {
   const { isOpen, openChat, closeChat, messages, selectedText, sendMessage, isLoading, handleSelection } = useChat();
   const [inputMessage, setInputMessage] = useState('');
+  const [charCount, setCharCount] = useState(0);
+  const [hoveredMessageIndex, setHoveredMessageIndex] = useState<number | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Detect dark mode
+  useEffect(() => {
+    const darkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    setIsDarkMode(darkMode);
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'data-theme') {
+          const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+          setIsDarkMode(isDark);
+        }
+      });
+    });
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
-  // Handle sending message with selection context
+  // Handle sending message
   const handleSendMessage = () => {
     if (inputMessage.trim()) {
       sendMessage(inputMessage);
       setInputMessage('');
+      setCharCount(0);
     }
   };
 
-  // Clear selection tag
+  // Handle input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.slice(0, 500);
+    setInputMessage(value);
+    setCharCount(value.length);
+  };
+
+  // Copy message
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  // Clear selection
   const clearSelection = () => {
     handleSelection(null);
   };
 
-  // Truncate text for display
+  // Truncate text
   const truncateText = (text: string, maxLength: number = 100) => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
   };
 
   return (
-    <div className="fixed bottom-5 right-5 z-[1000]">
+    <div className="fixed bottom-4 right-4 z-[1000]">
+      {/* Ask AI Button */}
       {!isOpen ? (
         <button
           onClick={openChat}
-          className="w-16 h-16 rounded-full bg-primary text-white border-none text-2xl cursor-pointer flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+          className={`relative w-14 h-14 rounded-full text-white border-2 cursor-pointer flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-transform duration-200 ${
+            isDarkMode
+              ? 'bg-gradient-to-br from-purple-500 to-purple-700 border-purple-400'
+              : 'bg-gradient-to-br from-[#ff0000] to-[#cc0000] border-red-500'
+          }`}
+          title="Ask AI"
         >
-          💬
+          <span className="text-2xl">💬</span>
+          <div
+            className={`absolute -top-2 -right-2 w-5 h-5 rounded-full border-2 border-white shadow-lg animate-pulse ${
+              isDarkMode ? 'bg-purple-400' : 'bg-red-700'
+            }`}
+          ></div>
         </button>
       ) : (
-        <div className="w-96 h-[550px] bg-white text-gray-900 dark:bg-zinc-900 dark:text-gray-100 rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700">
+        /* Chat Window - Mobile Responsive */
+        <div
+          className={`fixed inset-4 bottom-auto sm:fixed sm:bottom-20 sm:right-4 sm:w-96 sm:inset-auto rounded-lg sm:rounded-2xl flex flex-col overflow-hidden border shadow-2xl transition-all duration-300 ${
+            isDarkMode
+              ? 'bg-gray-950 border-purple-900 text-white'
+              : 'bg-white border-gray-300 text-gray-900'
+          }`}
+          style={{
+            height: 'calc(100vh - 8rem)',
+            maxHeight: '80vh',
+            minHeight: 'calc(100vh - 240px)',
+          }}
+        >
           {/* Header */}
-          <div className="bg-primary text-white p-3 flex justify-between items-center">
-            <span className="font-semibold">AI Tutor</span>
+          <div
+            className={`flex items-center justify-between px-4 py-3 border-b flex-shrink-0 ${
+              isDarkMode
+                ? 'bg-purple-900/40 border-purple-800'
+                : 'bg-gradient-to-r from-red-50 to-red-100 border-red-200'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-2 h-2 rounded-full animate-pulse ${
+                  isDarkMode ? 'bg-purple-400' : 'bg-red-600'
+                }`}
+              ></div>
+              <span className="font-bold text-base">AI Tutor</span>
+            </div>
             <button
               onClick={closeChat}
-              className="bg-transparent border-none text-white text-xl cursor-pointer hover:opacity-80"
+              className={`w-7 h-7 flex items-center justify-center rounded border text-base font-bold transition-all duration-200 ${
+                isDarkMode
+                  ? 'hover:bg-purple-800 border-purple-700 text-purple-300'
+                  : 'hover:bg-red-100 border-red-300 text-red-600'
+              }`}
+              title="Close"
             >
-              &times;
+              ✕
             </button>
           </div>
 
-          {/* Messages Area */}
-          <div className="flex-grow p-3 overflow-y-auto">
+          {/* Messages Container */}
+          <div
+            className={`flex-1 overflow-y-auto px-3 py-4 space-y-3 ${
+              isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'
+            }`}
+          >
             {messages.length === 0 && !selectedText ? (
-              <div className="h-full flex items-center justify-center">
-                <p className="text-center text-gray-500 dark:text-gray-400">
-                  Select text from the book or ask a question to get started!
+              <div className="h-full flex flex-col items-center justify-center gap-3">
+                <div className="text-5xl">✨</div>
+                <p className={`text-center text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Ask a question!
                 </p>
               </div>
             ) : (
@@ -65,27 +144,87 @@ const ChatbotWidget: React.FC = () => {
                 {messages.map((msg, index) => (
                   <div
                     key={index}
-                    className={`mb-3 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}
+                    className={`flex gap-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                    onMouseEnter={() => msg.sender === 'assistant' && setHoveredMessageIndex(index)}
+                    onMouseLeave={() => setHoveredMessageIndex(null)}
                   >
                     <div
-                      className={`inline-block rounded-lg px-3 py-2 max-w-[85%] ${
+                      className={`max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
                         msg.sender === 'user'
-                          ? 'bg-primary text-white'
-                          : 'bg-gray-100 dark:bg-gray-700'
+                          ? isDarkMode
+                            ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white'
+                            : 'bg-gradient-to-br from-red-500 to-red-600 text-white'
+                          : isDarkMode
+                          ? 'bg-gray-800 border border-gray-700 text-gray-100'
+                          : 'bg-gray-200 border border-gray-300 text-gray-900'
                       }`}
                     >
-                      <p className="whitespace-pre-wrap break-words text-sm">{msg.content}</p>
+                      <p className="break-words">{msg.content}</p>
+                      {msg.sender === 'assistant' && hoveredMessageIndex === index && (
+                        <div className="flex gap-1 mt-2 pt-2 border-t border-current border-opacity-20">
+                          <button
+                            onClick={() => copyToClipboard(msg.content)}
+                            className={`p-1 rounded transition-colors ${
+                              isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-300'
+                            }`}
+                            title="Copy"
+                          >
+                            <Copy size={14} />
+                          </button>
+                          <button
+                            className={`p-1 rounded transition-colors ${
+                              isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-300'
+                            }`}
+                            title="Like"
+                          >
+                            <ThumbsUp size={14} />
+                          </button>
+                          <button
+                            className={`p-1 rounded transition-colors ${
+                              isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-300'
+                            }`}
+                            title="Dislike"
+                          >
+                            <ThumbsDown size={14} />
+                          </button>
+                          <button
+                            className={`p-1 rounded transition-colors ${
+                              isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-300'
+                            }`}
+                            title="Regenerate"
+                          >
+                            <RotateCw size={14} />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
                 {isLoading && (
-                  <div className="mb-3 text-left">
-                    <div className="inline-block rounded-lg px-3 py-2 bg-gray-100 dark:bg-gray-700">
-                      <div className="flex items-center gap-1">
-                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-                      </div>
+                  <div className="flex gap-2">
+                    <div
+                      className={`inline-flex gap-1.5 px-3 py-2 rounded-lg ${
+                        isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-gray-200 border border-gray-300'
+                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full animate-bounce ${
+                          isDarkMode ? 'bg-purple-400' : 'bg-red-500'
+                        }`}
+                        style={{ animationDelay: '0ms' }}
+                      ></span>
+                      <span
+                        className={`w-2 h-2 rounded-full animate-bounce ${
+                          isDarkMode ? 'bg-purple-300' : 'bg-red-400'
+                        }`}
+                        style={{ animationDelay: '150ms' }}
+                      ></span>
+                      <span
+                        className={`w-2 h-2 rounded-full animate-bounce ${
+                          isDarkMode ? 'bg-purple-200' : 'bg-red-300'
+                        }`}
+                        style={{ animationDelay: '300ms' }}
+                      ></span>
                     </div>
                   </div>
                 )}
@@ -94,50 +233,60 @@ const ChatbotWidget: React.FC = () => {
             )}
           </div>
 
-          {/* Input Area */}
-          <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-            {/* WhatsApp-style Selection Banner - Non-editable Context */}
+          {/* Input Section */}
+          <div
+            className={`flex-shrink-0 border-t p-3 ${
+              isDarkMode
+                ? 'bg-gray-900 border-purple-800/50'
+                : 'bg-gray-50 border-red-200'
+            }`}
+          >
+            {/* Selection Banner */}
             {selectedText && (
-              <div className="mb-3 p-2.5 bg-gradient-to-r from-blue-50 to-blue-50/50 dark:from-blue-900/40 dark:to-blue-900/20 rounded-lg border-l-4 border-primary shadow-sm transition-all duration-200">
-                <div className="flex justify-between items-start gap-2">
+              <div
+                className={`mb-2 p-2 rounded border text-xs ${
+                  isDarkMode
+                    ? 'bg-purple-900/40 border-purple-800'
+                    : 'bg-red-50 border-red-200'
+                }`}
+              >
+                <div className="flex justify-between items-start gap-1">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 mb-1.5">
-                      <svg className="w-3.5 h-3.5 text-primary dark:text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M4 4a2 2 0 012-2h6a2 2 0 012 2v2h2a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h2V4z" />
-                      </svg>
-                      <span className="text-xs font-semibold text-primary dark:text-blue-400 truncate">
-                        📖 Selected from book
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-300 italic line-clamp-2 bg-white/50 dark:bg-gray-800/50 p-1.5 rounded border border-gray-200/50 dark:border-gray-700/50">
-                      "{truncateText(selectedText, 120)}"
+                    <p className={`font-semibold mb-1 ${isDarkMode ? 'text-purple-300' : 'text-red-600'}`}>
+                      📖 Selected
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      This context will be included with your message.
+                    <p className={`italic ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      "{truncateText(selectedText, 60)}"
                     </p>
                   </div>
                   <button
                     onClick={clearSelection}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 flex-shrink-0 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 p-1 rounded transition-colors"
-                    title="Clear selection"
-                    aria-label="Clear selection"
+                    className={`flex-shrink-0 font-bold ${isDarkMode ? 'text-purple-300' : 'text-red-600'}`}
+                    title="Clear"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    ×
                   </button>
                 </div>
               </div>
             )}
 
             {/* Input Field */}
-            <div className="flex items-center gap-2">
+            <div
+              className={`flex gap-1.5 border rounded px-2 py-1.5 items-center focus-within:ring-2 transition-all ${
+                isDarkMode
+                  ? 'bg-gray-800 border-purple-700 focus-within:border-purple-600 focus-within:ring-purple-600/50'
+                  : 'bg-white border-red-300 focus-within:border-red-500 focus-within:ring-red-500/30'
+              }`}
+            >
               <input
                 type="text"
-                placeholder={selectedText ? "Ask about the selection..." : "Type a message..."}
-                className="flex-grow p-2 border border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                placeholder="Ask..."
+                className={`flex-1 bg-transparent text-sm focus:outline-none ${
+                  isDarkMode ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-600'
+                }`}
                 value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
+                onChange={handleInputChange}
+                maxLength={500}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -149,12 +298,34 @@ const ChatbotWidget: React.FC = () => {
               <button
                 onClick={handleSendMessage}
                 disabled={isLoading || !inputMessage.trim()}
-                className="bg-primary text-white p-2 rounded-lg hover:bg-opacity-80 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                className={`p-1 rounded text-white transition-all flex-shrink-0 ${
+                  isDarkMode
+                    ? 'bg-gradient-to-r from-purple-600 to-purple-800 hover:shadow-md'
+                    : 'bg-gradient-to-r from-red-500 to-red-600 hover:shadow-md'
+                } disabled:opacity-50`}
+                title="Send"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
               </button>
+            </div>
+
+            {/* Counter */}
+            <div className="flex justify-end mt-1 text-xs">
+              <span
+                className={
+                  charCount > 450
+                    ? isDarkMode
+                      ? 'text-red-400'
+                      : 'text-red-600'
+                    : isDarkMode
+                    ? 'text-purple-400'
+                    : 'text-red-500'
+                }
+              >
+                {charCount}/500
+              </span>
             </div>
           </div>
         </div>
