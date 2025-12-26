@@ -185,7 +185,7 @@ const TextSelectionButton: React.FC<TextSelectionButtonProps> = () => {
     <button
       ref={buttonRef}
       onClick={handleClick}
-      className="fixed z-[9999] bg-[#1cd98e] dark:bg-[#d8b4fe] text-white dark:text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold shadow-xl cursor-pointer hover:bg-[#15a860] dark:hover:bg-[#a855f7] hover:shadow-2xl transition-all duration-200 border border-transparent hover:border-white/30 dark:hover:border-gray-900/30"
+      className="fixed z-[9999] bg-[#ff0000] dark:bg-[#d8b4fe] text-white dark:text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold shadow-xl cursor-pointer hover:bg-[#15a860] dark:hover:bg-[#a855f7] hover:shadow-2xl transition-all duration-200 border border-transparent hover:border-white/30 dark:hover:border-gray-900/30"
       style={{
         left: `${buttonState.left}px`,
         top: `${buttonState.top}px`,
