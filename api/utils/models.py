@@ -35,3 +35,4 @@ class TextChunk(BaseModel):
     text: str
     source: Optional[str] = None
     page: Optional[int] = None
+    score: Optional[float] = None
